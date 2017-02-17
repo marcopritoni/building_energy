@@ -1,0 +1,61 @@
+body{ 
+  padding: 20px;
+  background-position: center;
+  background-image: url(http://wallpapercave.com/wp/F0uViyV.png)
+}
+
+/*Evaluate Button*/
+a {
+	-webkit-transition: all 200ms cubic-bezier(0.390, 0.500, 0.150, 1.360);
+	-moz-transition: all 200ms cubic-bezier(0.390, 0.500, 0.150, 1.360);
+	-ms-transition: all 200ms cubic-bezier(0.390, 0.500, 0.150, 1.360);
+	-o-transition: all 200ms cubic-bezier(0.390, 0.500, 0.150, 1.360);
+	transition: all 200ms cubic-bezier(0.390, 0.500, 0.150, 1.360);
+	display: block;
+	margin: 20px auto;
+	max-width: 180px;
+	text-decoration: none;
+  text-align: center;
+	border-radius: 4px;
+	padding: 20px 30px;
+}
+
+a.button {
+	color: rgba(30, 22, 54, 0.6);
+	box-shadow: rgba(81, 124, 3, 0.4) 0 0px 0px 5px inset;
+}
+
+a.button:hover {
+	color: rgba(255, 255, 255, 0.85);
+	box-shadow: rgba(81, 124, 3, 0.7) 0 0px 0px 40px inset;
+}/*Evaluate Button - end*/
+
+
+/*building/fuel/model dropdown menu*/
+.wrapper{width:250px;/*margin:10px auto;*/}
+
+.sbx{
+  border: 1px solid #d3d9d7;
+  border-radius: 5px;
+  margin:0;
+  width:100%;
+ font-family:arial;
+background: #eee url("http://blog.idevelopweb.site/wp-content/uploads/2016/05/nw_selarw.png") no-repeat scroll 97.5% center; 
+}
+
+.cus_selt{padding:10px;display:block;}
+
+.styled {
+float:left;
+height: 56px;
+margin: -58px 0 0;
+opacity: 0;
+width: 100%;
+filter: alpha(opacity=0);
+}
+/*model dropdown menu - end*/
+
+/* output part == highchart  */
+.output{
+  margin-top:500px;
+}
