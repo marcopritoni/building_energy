@@ -233,7 +233,7 @@ class data_preprocessor(object):
 
         return data
 
-    def feature_extraction(self,data)
+    def feature_extraction(self,data):
         data["YEAR"]=data.index.year
         data["MONTH"]=data.index.month
         data["TOD"]=data.index.hour

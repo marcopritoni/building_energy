@@ -37,82 +37,6 @@ class DataGatherer(object):
         # from .csv
         return load_data(filename)
 
-
-class PreProcessor(object):
-
-    def add_variables(self, data):  # feature extraction function
-        # select columns needed
-        # , u'steam.gallons']
-        colmn = [u'chw.bph', u'elec.bph', u'steam.bph', u'oat']
-        data = data.loc[:, colmn]
-        # rename columns
-        data.columns = ['chw', 'elec', 'steam', 'oat']  # , "condensate"]
-        # add time-dependent variables
-        data["YEAR"] = data.index.year
-        data["MONTH"] = data.index.month
-        data["TOD"] = data.index.hour
-        data["DOW"] = data.index.weekday
-        data["WEEK"] = data.index.week
-        data["DOY"] = data.index.dayofyear
-
-        # force numeric type for all variables
-        for col in data.columns:
-            data[col] = pd.to_numeric(data[col], errors='coerce')
-
-        # add heating and cooling degree hours
-        hdh_point = 65
-        cdh_point = 65
-        data['hdh'] = data['oat']
-        data.loc[data.loc[:, 'hdh'] > hdh_point, 'hdh'] = 0
-        data.loc[data.loc[:, 'hdh'] <= hdh_point, 'hdh'] = hdh_point - \
-            data.loc[data.loc[:, 'hdh'] <= hdh_point, 'hdh']
-        data.loc[:, 'cdh'] = data['oat']
-        data.loc[data.loc[:, 'cdh'] < cdh_point, 'cdh'] = 0
-        data.loc[data.loc[:, 'cdh'] >= cdh_point, 'cdh'] = data.loc[
-            data.loc[:, 'cdh'] >= cdh_point, 'cdh'] - cdh_point
-        return data
-
-    def clean_data(self, data):
-        # remove outliers: force values withinn band:  < mean + 5sd ro remove
-        # outliers
-        n = 4
-        cond_chw_min = 0
-        cond_chw_max = data.chw.mean() + (data.chw.std() * n)
-        cond_elec_min = 0
-        cond_elec_max = data.elec.mean() + (data.elec.std() * n)
-        cond_steam_min = 0
-        cond_steam_max = data.steam.mean() + (data.steam.std() * n)
-        cond_oat_min = data.oat.mean() - (data.oat.std() * n)
-        cond_oat_max = data.oat.mean() + (data.oat.std() * n)
-    # fill missing variables or cut outliers with mean data
-        data.loc[((data.chw) < cond_chw_min) | ((data.chw) > cond_chw_max), "chw"] = data.loc[:, 'chw'].mean()
-        data.loc[((data.elec) < cond_elec_min) | ((data.elec) >
-                                                  cond_elec_max), "elec"] = data.loc[:, 'elec'].mean()
-        data.loc[((data.steam) < cond_steam_min) | ((data.steam) >
-                                                    cond_steam_max), "steam"] = data.loc[:, 'steam'].mean()
-        data.loc[((data.oat) < cond_oat_min) | (
-            (data.oat) > cond_oat_max)] = data.oat.mean()
-        data = data.dropna()
-
-        data = special_case(data)
-        return data
-
-    # bad practice do not do that
-    def special_case(self, data):
-        for i in range(3):
-            col = "elec"
-            data.loc[data[col] == data[col].max(), col] = data.loc[
-                :, col].mean()
-            col = "chw"
-            data.loc[data[col] == data[col].max(), col] = data.loc[
-                :, col].mean()
-        return data
-
-    def remove_negative(self, dataNoBound):
-        dataNoBound[dataNoBound < 0] = 0
-        return dataNoBound
-
-
 class ModelSelector(object):
 
     def train_model(self, model_data, tar, var, algorithm, mod_type, train_start, train_end, val_start, val_end):
@@ -208,10 +132,13 @@ class ModelSelector(object):
         scores = {}
 
         n = compare.count()[1]
-        R2 = r2_score(compare["target_actual"], compare["target_predicted"])  # this can be negative
-        RMSE = (mean_squared_error(compare["target_actual"], compare["target_predicted"]) * n / (n - p))**(0.5)
+        R2 = r2_score(compare["target_actual"], compare[
+                      "target_predicted"])  # this can be negative
+        RMSE = (mean_squared_error(compare["target_actual"], compare[
+                "target_predicted"]) * n / (n - p))**(0.5)
         CV_RMSE = RMSE * 100 / compare["target_actual"].mean()
-        NMBE = compare["target_actual"].sub(compare["target_predicted"]).sum() / (compare["target_predicted"].mean()) / (n - p) * 100
+        NMBE = compare["target_actual"].sub(compare["target_predicted"]).sum(
+        ) / (compare["target_predicted"].mean()) / (n - p) * 100
         scores["Adj_R2"] = 1 - (1 - R2) * (n - 1) / (n - p - 1)
         scores["RMSE"] = RMSE
         scores["CV_RMSE"] = CV_RMSE
@@ -356,13 +283,15 @@ class Plotter(object):
     def plot_PrePostSav_byMo(self, data, tar):
         last_mo = data[data["PrePost"] == 1].index.max().month
         temp = data.groupby(["MONTH", "YEAR"])[tar].mean().unstack()
-        (temp[(temp.index <= last_mo)].diff(axis=1) * (-1)).plot(figsize=(15, 5), kind="bar", title=tar)
+        (temp[(temp.index <= last_mo)].diff(axis=1) * (-1)
+         ).plot(figsize=(15, 5), kind="bar", title=tar)
         plt.show()
 
     def plot_ModPostSav_byMo(self, compare_sav, tar):
         cols = ["target_predicted", "target_actual"]
         compare_sav = compare_sav.ix[:, cols]
-        (compare_sav.groupby(compare_sav.index.month).mean().diff(axis=1) * (-1)).plot(figsize=(15, 5), kind="bar", title=tar)
+        (compare_sav.groupby(compare_sav.index.month).mean().diff(
+            axis=1) * (-1)).plot(figsize=(15, 5), kind="bar", title=tar)
         plt.show()
 
     def plot_daily_profile(self, compare_data):

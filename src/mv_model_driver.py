@@ -13,7 +13,7 @@ style.use('ggplot')
 
 #  new modules - marco.pritoni@gmail.com
 from PIPy_Datalink import *
-from Data_Preprocessor import *
+from data_preprocessor import *
 
 from sklearn import svm, cross_validation, linear_model, preprocessing, ensemble
 from sklearn.metrics import r2_score
@@ -28,50 +28,42 @@ from sklearn.metrics import mean_squared_error
 # 6 predict
 # 7 compare
 
+
 def main():
     downloader = pipy_datalink()
-    data_processor =  data_preprocessor(
-                        temp,
-                        
-                        runInterpolate=False,
-                        
-                        runRemoveNA=False,
-                       
-                        runRemoveOutliers=True,
-                       
-                        runRemoveOutOfBound=False,
-                       
-                        runResample=False,
-                       
-                        runExtendIndex=False,
-                       
-                        time_res="h",
-                       
-                        sd_val=3,
-                       
-                        low_bound=0,
-                       
-                        high_bound=9998,
-                       
-                        freq="h"                    
-                        
-                        )
+    raw_data = downloader.get_stream_by_point(
+        ['Ghausi_Electricity_Demand_kBtu', 'OAT'], _start="2014", _end="t")
+
+    data_processor = Data_Preprocessor(raw_data)
+    
     # 1-3
     timeSlicer = (slice("2014-01", "2014-12"))
     data_name = 'Ghausi_Electricity_Demand_kBtu'
-    data_preprocessor.data_cleaned.loc[timeSlicer, data_name]
-    
+    cleaned_data = data_processor.data_cleaned
+    var = []
+    train_data = cleaned_data.loc[timeSlicer, var]
+    train_target = cleaned_data.loc[timeSlicer, data_name]
+
+    print("Middle")
+    print(train_target)
     # 4
-    model = linear_model.LinearRegression()
-    model_coeff.mod.fit()
-    
+    clf = linear_model.LinearRegression()
+    model = clf.fit(train_data[:-1], train_target[:-1])
+    """
     # 5
+    #model.score(data_train,target_train)
     
     # 6
-    model_coeff.predict()
+    predictions = model.predict(cleaned_data)
     
     # 7
+    compare = pd.DataFrame(predictions)
+    #compare.columns = ["target_actual"]
+    #compare["target_predicted"] = predictions   
+
+    score = model.score(cleaned_data, predictions)
+    print(score)"""
 
 
-if __name == "__main__":
+if __name__ == "__main__":
     main()
