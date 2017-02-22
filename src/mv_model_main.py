@@ -1,7 +1,7 @@
 import datetime
 import json
 import matplotlib
-import MV_Script-Marco-V3
+import mv_script_marco
 import numpy as np
 import os
 import pandas as pd
@@ -40,12 +40,12 @@ def main():
     raw_data = downloader.get_stream_by_point(
         ['Ghausi_Electricity_Demand_kBtu', 'OAT'], _start="2014", _end="t")
 
-    data_preprocessor = Data_Preprocessor(raw_data)
+    data_preprocessor = DataPreprocessor(raw_data)
     
     # 1-3
     timeSlicer = (slice("2014-01", "2014-12"))
     data_name = 'Ghausi_Electricity_Demand_kBtu'
-    cleaned_data = data_preprocessor.data_cleaned
+    cleaned_data = data_preprocessor.cleaned_data
     
     data = cleaned_data
     

@@ -20,12 +20,12 @@ from datetime import timedelta
 from sklearn import svm, cross_validation, linear_model, preprocessing, ensemble
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
-import seaborn as sns
+#import seaborn as sns
 from matplotlib.pyplot import cm
 from pandas.tseries.offsets import MonthEnd
 from scipy import stats
 
-get_ipython().magic(u'matplotlib inline')
+#get_ipython().magic(u'matplotlib inline')
 style.use('ggplot')
 
 
@@ -611,7 +611,7 @@ if __name__ == "__main__":
     print saving_cost.sum()[2:].sum()
     print saving_perc.sum()[2:].sum()
 
-
+"""
 # In[ ]:
 
 saving_cost
@@ -784,5 +784,5 @@ data_clean.loc[:, ["steam", "oat"]].groupby(pd.TimeGrouper(freq='M')).mean(
 data_clean.loc[:, ["steam", "oat"]].to_csv(
     "data/clean/Ghausi_M&V_Data_steam_clean.csv")
 
-
+"""
 # In[ ]:
