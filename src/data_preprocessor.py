@@ -13,10 +13,9 @@ TODO:
 version 0.1
 '''
 
+import numpy as np
 import pandas as pd
 from scipy import stats
-import numpy as np
-
 
 class DataPreprocessor(object):
     """Preprocessor class for data cleaning and manipulation
@@ -95,7 +94,8 @@ class DataPreprocessor(object):
 
             except:
                 print "_removeNA failed"
-
+                
+        
         if self.outliers_removed:
             # sd_val=3
             try:
@@ -104,7 +104,7 @@ class DataPreprocessor(object):
 
             except:
                 print "_removeOutliers failed"
-
+        
         if self.bounds_enforced:
             # low_bound=0
             # high_bound=9998
@@ -114,16 +114,17 @@ class DataPreprocessor(object):
 
             except:
                 print "_removeOutOfBound failed"
-
+        
         if self.resampling:
             # freq="d"
             try:
                 data = self.resample_data(data, self.freq)
+                data = self.remove_na(data)
                 print "_resampleData worked"
 
             except:
                 print "_resampleData failed"
-
+        
         if self.run_extend_index:
             try:
                 print "testing"

@@ -1,58 +1,78 @@
+# Standard library imports
 import datetime
 import json
-import matplotlib
-import mv_script_marco
-import numpy as np
 import os
-import pandas as pd
-import requests as req
 import sys
 
+# Third-party library imports
+import matplotlib
+import numpy as np
+import pandas as pd
+import requests as req
+
 from matplotlib import style
-#%matplotlib inline
-style.use('ggplot')
-
-
-#  new modules - marco.pritoni@gmail.com
-from PIPy_Datalink import *
-from data_preprocessor import *
-
 from sklearn import svm, cross_validation, linear_model, preprocessing, ensemble
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 
-# Steps
-# 1 filter data periods
-# 2 separate datasets
-# 3 separate output and input
-# 4 train a model
-# 5 get scores for the model = validation
-# 6 predict
-# 7 compare
+#%matplotlib inline
+style.use('ggplot')
+
+# Local imports
+#  new modules - marco.pritoni@gmail.com
+from data_preprocessor import *
+from mv_script_marco import *
+from PIPy_Datalink import *
 
 
 def main():
     """
     TODO: Documentation of this function
+    building
+    fuel type
+    baseline1 start end
+    baseline2 start end
+    evaluation period start end
+    extrapolate
+    model type
     """
-    
+    # Steps
+    # 1 filter data periods
+    # 2 separate datasets
+    # 3 separate output and input
+    # 4 train a model
+    # 5 get scores for the model = validation
+    # 6 predict
+    # 7 compare
+
+    data_name = 'Ghausi_Electricity_Demand_kBtu'
+    energy_type = "OAT"
     downloader = pipy_datalink()
     raw_data = downloader.get_stream_by_point(
-        ['Ghausi_Electricity_Demand_kBtu', 'OAT'], _start="2014", _end="t")
+        [data_name, 'OAT'], _start="2014", _end="t")
 
     data_preprocessor = DataPreprocessor(raw_data)
     
     # 1-3
-    timeSlicer = (slice("2014-01", "2014-12"))
-    data_name = 'Ghausi_Electricity_Demand_kBtu'
     cleaned_data = data_preprocessor.cleaned_data
     
-    data = cleaned_data
+    time_slice = (slice("2014-01", "2014-12"))
+    training_data = np.array([cleaned_data.loc[time_slice, data_name]])
+    target_values = np.array([cleaned_data.loc[time_slice, energy_type]])
+
+    print training_data
+    print target_values
+    
+    clf = linear_model.LinearRegression()
+    model_coeff = clf.fit(training_data, target_values)
+
+    sys.exit()
+    #data = data_preprocessor.feature_extraction(cleaned_data)
     
     #TODO: Use command line arguments and talk with Raymund about this (sys.argv[...])
     #TODO: Refactor code
     #TODO: use DataFrame.to_json() at http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_json.html
-    
+    """   
     # TASKS
     explor = False  # plots exploratory graphs
     search = True  # iterates to get best model
@@ -110,6 +130,7 @@ def main():
         print "Target Var is        %s" % (tar)
         print "Training time range:   %s - %s" % (train_start, train_end)
         print "Validation time range: %s - %s" % (val_start, val_end)
+        print data
 
         # TRAIN MODEL
         ret_obj = train_model(data, tar, var, algorithm,
@@ -162,7 +183,7 @@ def main():
         # UNCERTAINTY
         # uncert_tot.update(calc_uncert)
         print calc_uncert(compare_train, compare_sav, 95, score_tot, tar, absol=True)
-
+"""
 
 if __name__ == "__main__":
     main()
