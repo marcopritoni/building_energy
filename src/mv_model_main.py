@@ -47,24 +47,39 @@ def main():
 
     data_name = 'Ghausi_Electricity_Demand_kBtu'
     energy_type = "OAT"
+    _start = "2014"
+    _end = "t"
+    slice_start = '2014-01'
+    slice_end = '2014-12'
+    compare = {}
+    
     downloader = pipy_datalink()
     raw_data = downloader.get_stream_by_point(
-        [data_name, 'OAT'], _start="2014", _end="t")
+        [data_name, energy_type], _start, _end)
 
     data_preprocessor = DataPreprocessor(raw_data)
     
     # 1-3
     cleaned_data = data_preprocessor.cleaned_data
     
-    time_slice = (slice("2014-01", "2014-12"))
+    time_slice = (slice(slice_start, slice_end))
     training_data = np.array([cleaned_data.loc[time_slice, data_name]])
     target_values = np.array([cleaned_data.loc[time_slice, energy_type]])
 
     print training_data
     print target_values
     
+    #4
     clf = linear_model.LinearRegression()
     model_coeff = clf.fit(training_data, target_values)
+    
+    #5
+    compare = pd.DataFrame(target_values)
+    compare.columns = ["target_actual"]
+    #compare["target_predicted"] = clf.predict(training_data)
+    scores = calc_scores(compare, 0.5)
+    print val
+    
 
     sys.exit()
     #data = data_preprocessor.feature_extraction(cleaned_data)
