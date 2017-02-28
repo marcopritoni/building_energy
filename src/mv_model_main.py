@@ -35,51 +35,70 @@ def main():
     evaluation period start end
     extrapolate
     model type
+    
+    Later worry about caching to speed up
     """
-    # Steps
-    # 1 filter data periods
-    # 2 separate datasets
-    # 3 separate output and input
-    # 4 train a model
-    # 5 get scores for the model = validation
-    # 6 predict
-    # 7 compare
 
     data_name = 'Ghausi_Electricity_Demand_kBtu'
     energy_type = "OAT"
     _start = "2014"
     _end = "t"
-    slice_start = '2014-01'
-    slice_end = '2014-12'
-    compare = {}
-    
+    base_start = '2014-01'
+    base_end = '2014-12'
+    eval_start = '2015-01'
+    eval_end = '2015-02'
+    predict_start = '2020-01'
+    predict_end = '2020-04'
+        
     downloader = pipy_datalink()
     raw_data = downloader.get_stream_by_point(
         [data_name, energy_type], _start, _end)
 
     data_preprocessor = DataPreprocessor(raw_data)
     
-    # 1-3
+    # 1 filter data periods
+    # 2 separate datasets
+    # 3 separate output and input
     cleaned_data = data_preprocessor.cleaned_data
     
-    time_slice = (slice(slice_start, slice_end))
-    training_data = np.array([cleaned_data.loc[time_slice, data_name]])
-    target_values = np.array([cleaned_data.loc[time_slice, energy_type]])
-
+    base_slice = (slice(base_start, base_end))
+    training_data = np.array([cleaned_data.loc[base_slice, data_name]])
+    training_data = np.transpose(training_data)
+    target_values = np.array([cleaned_data.loc[base_slice, energy_type]])
+    target_values = np.transpose(target_values)
+    
     print training_data
     print target_values
     
-    #4
+    # 4 train a model
     clf = linear_model.LinearRegression()
-    model_coeff = clf.fit(training_data, target_values)
-    
-    #5
-    compare = pd.DataFrame(target_values)
-    compare.columns = ["target_actual"]
-    #compare["target_predicted"] = clf.predict(training_data)
-    scores = calc_scores(compare, 0.5)
-    print val
-    
+    clf.fit(training_data, target_values)
+    base_prediction = clf.predict(training_data)
+    r2 = r2_score(target_values, base_prediction)
+    print base_prediction
+    print r2
+
+    # 5 get scores for the model = validation
+    eval_slice = (slice(eval_start, eval_end))
+    eval_training_data = np.array([cleaned_data.loc[eval_slice, data_name]])
+    eval_training_data = np.transpose(eval_training_data)
+    eval_target = np.array([cleaned_data.loc[eval_slice, energy_type]])
+    eval_target = np.transpose(eval_target)
+    eval_predict = clf.predict(eval_training_data)
+    r2 = r2_score(eval_target, eval_predict)
+    print eval_predict
+    print r2
+    """
+    # 6 predict
+    predict_slice = (slice(predict_start, predict_end))
+    predict_training_data = np.array([cleaned_data.loc[predict_slice, data_name]])
+    predict_training_data = np.transpose(predict_training_data)
+    predict_target = np.array([cleaned_data.loc[predict_slice, energy_type]])
+    predict_target = np.transpose(predict_target)
+    extrapolated_data = clf.predict(predict_training_data)
+    print extrapolated_data
+    """
+    # 7 compare    
 
     sys.exit()
     #data = data_preprocessor.feature_extraction(cleaned_data)
