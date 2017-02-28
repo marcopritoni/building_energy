@@ -39,6 +39,20 @@ def main():
     Later worry about caching to speed up
     """
 
+    """
+    Gets user input from command line and sets to the variables that will be used to retrieve and process data
+    data_name = raw_input("Enter building name: ")
+    energy_type = raw_input("Enter energy type: ")
+    start = raw_input("Enter start date: ")
+    end = raw_input("Enter end date: ")
+    base_start = raw_input("Enter baseline start date: ")
+    base_end = raw_input("Enter baseline end date: ")
+    eval_start = raw_input("Enter validation start date: ")
+    eval_end = raw_input("Enter validation end date: ")
+    predict_start = raw_input("Enter prediction start date: ")
+    predict_end = raw_input("Enter prediction end date: ")
+    """
+
     data_name = 'Ghausi_Electricity_Demand_kBtu'
     energy_type = "OAT"
     _start = "2014"
