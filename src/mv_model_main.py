@@ -1,14 +1,24 @@
 # Standard library imports
 import datetime
 import json
+import logging.config
 import os
 import sys
+import time
+
+# Start logging temporarily with file object
+sys.stderr = open('../logs/error.log', 'w')
+info_log = open('../logs/info.log', 'w')
+info_log.close()
+date_format = time.strftime("%m/%d/%Y %H:%M:%S %p ")
+sys.stderr.write(date_format + " - root - [ERROR] - " + os.linesep)
 
 # Third-party library imports
 import matplotlib
 import numpy as np
 import pandas as pd
 import requests as req
+import yaml
 
 from matplotlib import style
 from sklearn import svm, cross_validation, linear_model, preprocessing, ensemble
@@ -24,20 +34,10 @@ from data_preprocessor import *
 from mv_script_marco import *
 from PIPy_Datalink import *
 
-
 def main():
-    """
-    TODO: Documentation of this function
-    building
-    fuel type
-    baseline1 start end
-    baseline2 start end
-    evaluation period start end
-    extrapolate
-    model type
+    #TODO: Documentation of this function
     
-    Later worry about caching to speed up
-    """
+    #TODO: Caching to speed up
 
     """
     Gets user input from command line and sets to the variables that will be used to retrieve and process data
@@ -52,7 +52,8 @@ def main():
     predict_start = raw_input("Enter prediction start date: ")
     predict_end = raw_input("Enter prediction end date: ")
     """
-
+    start_logger()
+    
     data_name = 'Ghausi_Electricity_Demand_kBtu'
     energy_type = "OAT"
     _start = "2014"
@@ -63,7 +64,7 @@ def main():
     eval_end = '2015-02'
     predict_start = '2020-01'
     predict_end = '2020-04'
-        
+    
     downloader = pipy_datalink()
     raw_data = downloader.get_stream_by_point(
         [data_name, energy_type], _start, _end)
@@ -231,7 +232,33 @@ def main():
         # UNCERTAINTY
         # uncert_tot.update(calc_uncert)
         print calc_uncert(compare_train, compare_sav, 95, score_tot, tar, absol=True)
-"""
+"""    
+class Logger(logging.Logger):
+    """Custom logger to wrap around file streams"""
+    
+    def __init__(self, name = __name__):
+        self.logger = logging.getLogger(name)
+        
+    def write(self, message):
+        self.logger.error(message)
+        
+        
+def start_logger():   
+    default_path='logging.yaml'
+    default_level=logging.INFO
+    env_key='LOG_CFG'
+    path = default_path
+    value = os.getenv(env_key, None)
+    if value:
+        path = value
+    if os.path.exists(path):
+        with open(path, 'rt') as f:
+            config = yaml.safe_load(f.read())
+            logging.config.dictConfig(config)
+    else:
+        logging.basicConfig(level=default_level)
+    
+    sys.stderr = Logger()
 
 if __name__ == "__main__":
     main()

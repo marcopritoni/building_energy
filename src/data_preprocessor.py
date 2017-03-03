@@ -13,6 +13,8 @@ TODO:
 version 0.1
 '''
 
+import logging
+
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -36,7 +38,7 @@ class DataPreprocessor(object):
         self.freq = "h"
         self.raw_data = df
         self.cleaned_data = self.clean_data(df)
-
+         
     def interpolate_data(self, data, time_res):
         data = data.groupby(pd.TimeGrouper(time_res)).mean()
         # may want to look into resample() or interpolate() method
@@ -75,55 +77,56 @@ class DataPreprocessor(object):
         # this allows to use DataSet methods such as data.interpolate()
 
         # data=self
-        print "debugging"
-
+        logger = logging.getLogger(__name__)
+        logger.info("Starting data cleaning")
+        
         # apply these methods with this sequence
         if self.interpolating:
             # time_res="h"
             try:
                 data = self.interpolate_data(data, self.time_res)
-                print "_interpolate worked"
+                logger.info("Interpolated data")
 
             except:
-                print "_interpolate failed"
+                logger.error("Failed to interpolate data")
 
         if self.na_removed:
             try:
                 data = self.remove_na(data)
-                print "_removeNA worked"
+                logger.info("Removed NA data")
 
             except:
-                print "_removeNA failed"
+                logger.error("Failed to remove NA data")
                 
         
         if self.outliers_removed:
             # sd_val=3
             try:
                 data = self.remove_outliers(data, self.sd_val)
-                print "_removeOutliers worked"
+                logger.info("Removed outlier from data")
 
             except:
-                print "_removeOutliers failed"
+                logger.error("Failed to remove outlier from data")
         
         if self.bounds_enforced:
             # low_bound=0
             # high_bound=9998
             try:
                 data = self.remove_out_of_bound(data, self.low_bound, self.high_bound)
-                print "_removeOutOfBound worked"
+                logger.info("Removed out of bounds data")
 
             except:
-                print "_removeOutOfBound failed"
+                logger.error("Failed to remove out of bounds data")
         
         if self.resampling:
             # freq="d"
             try:
                 data = self.resample_data(data, self.freq)
                 data = self.remove_na(data)
-                print "_resampleData worked"
+                logger.info("Re-sampled data")
 
             except:
-                print "_resampleData failed"
+                logger.error("Failed to re-sample data")
         
         if self.run_extend_index:
             try:
