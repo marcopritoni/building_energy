@@ -53,6 +53,7 @@ def main():
     predict_end = raw_input("Enter prediction end date: ")
     """
     start_logger()
+    np.set_printoptions(threshold=np.nan)
     
     data_name = 'Ghausi_Electricity_Demand_kBtu'
     energy_type = "OAT"
@@ -103,6 +104,7 @@ def main():
     r2 = r2_score(eval_target, eval_predict)
     print eval_predict
     print r2
+    
     """
     # 6 predict
     predict_slice = (slice(predict_start, predict_end))
