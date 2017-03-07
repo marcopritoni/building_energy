@@ -1,5 +1,4 @@
 # Standard library imports
-import datetime
 import json
 import logging.config
 import os
@@ -14,29 +13,22 @@ date_format = time.strftime("%m/%d/%Y %H:%M:%S %p ")
 sys.stderr.write(date_format + " - root - [ERROR] - " + os.linesep)
 
 # Third-party library imports
-import matplotlib
 import numpy as np
 import pandas as pd
-import requests as req
 import yaml
 
-from matplotlib import style
 from sklearn import svm, cross_validation, linear_model, preprocessing, ensemble
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 
-#%matplotlib inline
-style.use('ggplot')
-
 # Local imports
 #  new modules - marco.pritoni@gmail.com
-from data_preprocessor import *
-from mv_script_marco import *
-from PIPy_Datalink import *
+from data_preprocessor import DataPreprocessor
+#from mv_script_marco import *
+from PIPy_Datalink import pipy_datalink
 
 def main():
     #TODO: Documentation of this function
-    
     #TODO: Caching to speed up
 
     """
@@ -52,7 +44,25 @@ def main():
     predict_start = raw_input("Enter prediction start date: ")
     predict_end = raw_input("Enter prediction end date: ")
     """
+    
+    """
+    building_name = sys.argv[1]
+    energy_type = sys.argv[2]
+    start = sys.argv[3]
+    end = sys.argv[4]
+    base_start = sys.argv[5]
+    base_end = sys.argv[6]
+    eval_start = sys.argv[7]
+    eval_end = sys.argv[8]
+    predict_start = sys.argv[9]
+    predict_end = sys.argv[10]
+    
+    data_name = ''.join(building_name, energy_type, "Demand_kBtu", sep='_')
+    """
+    
     start_logger()
+    
+    # Do not truncate numpy arrays when printing
     np.set_printoptions(threshold=np.nan)
     
     data_name = 'Ghausi_Electricity_Demand_kBtu'
@@ -65,6 +75,7 @@ def main():
     eval_end = '2015-02'
     predict_start = '2020-01'
     predict_end = '2020-04'
+    model_type = 0;
     
     downloader = pipy_datalink()
     raw_data = downloader.get_stream_by_point(
@@ -116,8 +127,6 @@ def main():
     print extrapolated_data
     """
     # 7 compare    
-
-    sys.exit()
     #data = data_preprocessor.feature_extraction(cleaned_data)
     
     #TODO: Use command line arguments and talk with Raymund about this (sys.argv[...])
@@ -261,6 +270,9 @@ def start_logger():
         logging.basicConfig(level=default_level)
     
     sys.stderr = Logger()
+
+def to_json(array):
+    return json.dumps(array.tolist())
 
 if __name__ == "__main__":
     main()
