@@ -52,37 +52,41 @@ def main():
     # Do not truncate numpy arrays when printing
     np.set_printoptions(threshold=np.nan)
     
-    data_name = 'Ghausi_Electricity_Demand_kBtu'
+    data_name = 'Ghausi_ChilledWater_Demand_kBtu'
     energy_type = 'OAT'
     _start = '2014'
     _end = 't'
     base_start = '2014-01'
     base_end = '2014-12'
     eval_start = '2015-01'
-    eval_end = '2015-02'
-    predict_start = '2020-01'
-    predict_end = '2020-04'
+    eval_end = '2015-12'
+    predict_start = '2016-01'
+    predict_end = '2016-12'
     model_type = 0
     
+    base_slice = (slice(base_start, base_end))
+    eval_slice = (slice(eval_start, eval_end))
+    predict_slice = (slice(predict_start, predict_end))
+    
     downloader = pipy_datalink()
-    raw_data = downloader.get_stream_by_point(
+    data_raw = downloader.get_stream_by_point(
         [data_name, energy_type], _start, _end)
 
-    data_preprocessor = DataPreprocessor(raw_data)
-    
+    preprocessor = DataPreprocessor(data_raw)
+    preprocessor.clean_data()
+    preprocessor.add_degree_days(preprocessor.data_cleaned)
+    preprocessor.add_time_features(preprocessor.data_preprocessed)
+    preprocessor.create_dummies(preprocessor.data_preprocessed, var_to_expand=['TOD','DOW','MONTH'])
+    data = preprocessor.data_preprocessed
+    '''
     # 1 filter data periods
-    # 2 separate datasets
+    # 2 separate data-sets
     # 3 separate output and input
-    cleaned_data = data_preprocessor.cleaned_data
     
-    base_slice = (slice(base_start, base_end))
-    training_data = np.array([cleaned_data.loc[base_slice, data_name]])
+    training_data = np.array([data.loc[base_slice, data_name]])
     training_data = np.transpose(training_data)
-    target_values = np.array([cleaned_data.loc[base_slice, energy_type]])
+    target_values = np.array([data.loc[base_slice, energy_type]])
     target_values = np.transpose(target_values)
-    
-    print training_data
-    print target_values
     
     # 4 train a model
     clf = linear_model.LinearRegression()
@@ -93,28 +97,51 @@ def main():
     print r2
 
     # 5 get scores for the model = validation
-    eval_slice = (slice(eval_start, eval_end))
-    eval_training_data = np.array([cleaned_data.loc[eval_slice, data_name]])
+    
+    eval_training_data = np.array([data.loc[eval_slice, data_name]])
     eval_training_data = np.transpose(eval_training_data)
-    eval_target = np.array([cleaned_data.loc[eval_slice, energy_type]])
+    eval_target = np.array([data.loc[eval_slice, energy_type]])
     eval_target = np.transpose(eval_target)
     eval_predict = clf.predict(eval_training_data)
     r2 = r2_score(eval_target, eval_predict)
     print eval_predict
     print r2
+    '''
     
+    #Model variables
+    out = ["Ghausi_ChilledWater_Demand_kBtu"]
+    inp = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
+           u'TOD_3', u'TOD_4', u'TOD_5', u'TOD_6', u'TOD_7', u'TOD_8', u'TOD_9',
+           u'TOD_10', u'TOD_11', u'TOD_12', u'TOD_13', u'TOD_14', u'TOD_15',
+           u'TOD_16', u'TOD_17', u'TOD_18', u'TOD_19', u'TOD_20', u'TOD_21',
+           u'TOD_22', u'TOD_23', u'DOW_0', u'DOW_1', u'DOW_2', u'DOW_3', u'DOW_4',
+           u'DOW_5', u'DOW_6', u'MONTH_1', u'MONTH_2', u'MONTH_3', u'MONTH_4',
+           u'MONTH_5', u'MONTH_6', u'MONTH_7', u'MONTH_8', u'MONTH_9', u'MONTH_10',
+           u'MONTH_11', u'MONTH_12']
+    
+    clf = linear_model.LinearRegression()
+    data_set = DataSet(data, base_slice, eval_slice, predict_slice, out, inp)
+    model = clf.fit(data_set.bs2_in, data_set.bs2_out)
+    score = model.score(data_set.bs2_in.values, data_set.bs2_out.values)
+    model.predict(data_set.bs2_in.values)
+    
+    output = data_set.bs2_out
+    output["prediction"] = model.predict(data_set.bs2_in.values)
+    
+    print output.to_json()
+    print(score)
     '''
     # 6 predict
-    predict_slice = (slice(predict_start, predict_end))
-    predict_training_data = np.array([cleaned_data.loc[predict_slice, data_name]])
+    
+    predict_training_data = np.array([data_cleaned.loc[predict_slice, data_name]])
     predict_training_data = np.transpose(predict_training_data)
-    predict_target = np.array([cleaned_data.loc[predict_slice, energy_type]])
+    predict_target = np.array([data_cleaned.loc[predict_slice, energy_type]])
     predict_target = np.transpose(predict_target)
     extrapolated_data = clf.predict(predict_training_data)
     print extrapolated_data
     '''
     # 7 compare    
-    #data = data_preprocessor.feature_extraction(cleaned_data)
+    #data = data_preprocessor.feature_extraction(data_cleaned)
     
     #TODO: Use command line arguments and talk with Raymund about this (sys.argv[...])
     #TODO: Refactor code
@@ -162,11 +189,81 @@ def start_logger():
     sys.stderr.close()
     sys.stderr = StreamWriter()
 
+'''Data'''
+class DataSet(object):
+    '''
+    Inspired by Paul Raftery Class:
+    fist prototype
+    
+    the dataset_type field is to help standardize notation of different datasets:
+           'A':'measured pre-retrofit data',
+           'B':'pre-retrofit prediction with pre-retrofit model',
+           'C':'pre-retrofit prediction with post-retrofit model',
+           'D':'measured post-retrofit data',
+           'E':'post-retrofit prediction with pre-retrofit model',
+           'F':'post-retrofit prediction with pos-tretrofit model',
+           'G':'TMY prediction with pre-retrofit model',
+           'H':'TMY prediction with post-retrofit model'
+    typical comparisons used by mave:
+        Pre-retrofit model performance = A vs B
+        Single model M&V = D vs E
+        Post retrofit model performance  = D vs F
+        Dual model M&V, normalized to tmy data = G vs H
+    '''
+    
+    def __init__(self, data, 
+                 tPeriod1=(slice(None)),
+                 tPeriod2=(slice(None)),
+                 tPeriod3=(slice(None)),
+                 out=[''],
+                 inp=['']
+                ):
+        
+        # the attributes dynamically calcylated using indices and column names
+        # first draft duplicates datasets
+        #self.baseline1_par={'inpt':{'slicer':(slice(None)), 'col':['']},'outpt':{'slicer':(slice(None)), 'col':['']}}
+        #self.baseline1_par={'inpt': {'col': ['OAT'], 'slicer':(slice(None))}, 'outpt': {'col': ['Ghausi_Electricity_Demand_kBtu'], 'slicer':(slice(None))}}
+        
+        self.fulldata=data
+        try:
+            self.bs1_in=data.loc[tPeriod1,inp]
+        except:
+            pass
+        
+        try:
+            self.bs1_out=data.loc[tPeriod1,out]
+        except:
+            pass                   
+                           
+        try:
+            self.bs2_in=data.loc[tPeriod2,inp]
+        except:
+            pass                   
+        
+        try:
+            self.bs2_out=data.loc[tPeriod2,out]
+        except:
+            pass                   
+        
+        try:
+            self.eval_in=data.loc[tPeriod3,inp]
+        except:
+            pass                   
 
-def to_json(array):
-    return json.dumps(array.tolist())
+        try:
+            self.eval_out=data.loc[tPeriod3,out]
+        except:
+            pass                   
+       
 
-
+    def set_dataset(self, baseline_type, date_slicer, inpt, outpt):
+        # need to develop a method to update stuff
+        return
+        
+    def get_dataset(self, baseline_type, date_slicer, inpt_outpt):
+        #ret=self.self.fulldata.loc[]
+        
+        return
 
 if __name__ == '__main__':
     try:

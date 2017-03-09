@@ -18,6 +18,7 @@ TODO:
 
 '''
 
+import logging
 import pandas as pd
 import os
 import requests as req
@@ -96,11 +97,11 @@ class pipy_datalink(object):
             point_name, include_WebID=True)
 
         if len(pointList) > 1:
-            print "warining: the query returned more than one WebID n=%d, \
-            only the first one is used\n returning only first" % len(pointList)
+            logging.warning('Query returned more than one WebID n=%d, \
+            only the first one is used\n returning only first' % len(pointList))
         Web_ID_ = PointDic[pointList[0]]
 
-        print Web_ID_
+        logging.info(Web_ID_)
         return Web_ID_
 
     def get_stream_by_point(self,
@@ -147,7 +148,7 @@ class pipy_datalink(object):
 
             for point_name in point_names:
 
-                print point_name
+                logging.info(point_name)
                 Web_ID = self.get_webID_by_point(point_name, dataserver,)
                 stream = self.get_stream(
                     Web_ID, _start, _end, _calculation, _interval, _sumType, _label=point_name)
@@ -202,7 +203,7 @@ class pipy_datalink(object):
             Web_ID, _start, _end, _calculation, _interval, _sumType, _label)
 
         # prints for testing: <Response [200]> means it works
-        print response
+        logging.debug(response)
 
         # parse the response
         if _calculation == (("interpolated") or ("recorded")):
@@ -227,7 +228,7 @@ class pipy_datalink(object):
 
         # constructs the first part of the http call
         Web_ID_string = self.root + "streams/" + Web_ID + "/" + _calculation
-        print Web_ID_string
+        logging.info(Web_ID_string)
 
         # constructs the parameters for requests REST api call
         if _sumType:
@@ -358,7 +359,7 @@ class pipy_datalink(object):
         # If the requests fails
         else:
             # print to screen error
-            print "I can't find the stream with this WebID"
+            logging.error("I can't find the stream with this WebID")
 
             # returns empty Dataframe
             return pd.DataFrame()
@@ -422,7 +423,7 @@ class pipy_datalink(object):
 
         else:
             # print error to screen
-            print "I can't find the stream with this WebID"
+            logging.error("I can't find the stream with this WebID")
         return pd.DataFrame()
 
     def _parse_end(self, response, Web_ID, _label):
@@ -461,6 +462,6 @@ class pipy_datalink(object):
 
         else:
             # print to screen error
-            print "I can't find the stream with this WebID"
+            logging.error("Cannot find stream with this WebID")
 
         return js['Value']
