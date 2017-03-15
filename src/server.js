@@ -6,11 +6,11 @@ var url = require("url");
 var PythonShell = require('python-shell');
 var options = {
   mode: 'text',
-  pythonPath: 'C:/Users/zeusa/Anaconda2/python',
-  pythonOptions: ['-u','-W ignore'] 
+  pythonPath: 'D:/anaconda/python',
+  pythonOptions: ['-u','-W ignore']
 };
 var app = express();
-app.use(express.static('web interface demo v1'));
+app.use(express.static('../web interface demo v1'));
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + "/../" + "web interface demo v1/index.html");
