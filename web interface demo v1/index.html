@@ -11,11 +11,11 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min.js"></script>
-  
-  
+
+
       <link rel="stylesheet" href="css/style.css">
 
-  
+
 </head>
 
 <body>
@@ -136,14 +136,21 @@
 
 
 <!-- evaluate button  -->
-<a href="#" class="button">EVALUATE</a>
+<a href="#" class="button" id="evaluate">EVALUATE</a>
 
 <!-- output part == highchart  -->
 <div class="output">
   <h1>Output Charts and Stats here</h1>
+  <h2>Please wait...(it takes about 20s)</h2>
 </div>
-  
+
     <script src="js/index.js"></script>
+    <script src="js/evaluate.js"></script>
+    <script src="http://code.highcharts.com/stock/highstock.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+<h1>High Stock</h1>
+<div class="highstock">
+</div>
 
 </body>
 </html>
