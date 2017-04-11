@@ -33,37 +33,43 @@ from PIPy_Datalink import pipy_datalink
 def main():
     #TODO: Documentation of this function
     #TODO: Caching to speed up
-    
-    '''
-    building_name = sys.argv[1]
-    energy_type = sys.argv[2]
-    start = sys.argv[3]
-    end = sys.argv[4]
-    base_start = sys.argv[5]
-    base_end = sys.argv[6]
-    eval_start = sys.argv[7]
-    eval_end = sys.argv[8]
-    predict_start = sys.argv[9]
-    predict_end = sys.argv[10]
-    
-    data_name = ''.join(building_name, energy_type, 'Demand_kBtu', sep='_')
-    '''
-    
+
     start_logger()
     
     # Do not truncate numpy arrays when printing
     np.set_printoptions(threshold=np.nan)
-    
-    data_name = 'Ghausi_ChilledWater_Demand_kBtu'
-    energy_type = 'OAT'
-    _start = '2014'
-    _end = 't'
+        
+    # Test example
+    building_name = 'Ghausi'
+    energy_type = 'ChilledWater'
     base_start = '2014-01'
     base_end = '2014-12'
     eval_start = '2015-01'
     eval_end = '2015-12'
     predict_start = '2016-01'
     predict_end = '2016-12'
+           
+    # Check if command-line arguments are correctly set
+    if(len(sys.argv) == 11):
+        building_name = sys.argv[1]
+        energy_type = sys.argv[2]
+        base_start = sys.argv[3]
+        base_end = sys.argv[4]
+        base_start2 = sys.argv[5]
+        base_end2 = sys.argv[6]
+        eval_start = sys.argv[7]
+        eval_end = sys.argv[8]
+        predict_start = sys.argv[9]
+        predict_end = sys.argv[10]
+    
+    else:
+        logging.error("Incorrect number of command-line arguments!")
+
+    data_name = '_'.join([building_name, energy_type, 'Demand_kBtu'])
+    
+    # Time period to request data from PI system
+    start = '2014'
+    end = 't'
     model_type = 0
     
     base_slice = (slice(base_start, base_end))
@@ -71,8 +77,7 @@ def main():
     predict_slice = (slice(predict_start, predict_end))
     
     downloader = pipy_datalink()
-    data_raw = downloader.get_stream_by_point(
-        [data_name, energy_type], _start, _end)
+    data_raw = downloader.get_stream_by_point([data_name, 'OAT'], start, end)
 
     preprocessor = DataPreprocessor(data_raw)
     preprocessor.clean_data()
@@ -111,7 +116,7 @@ def main():
     '''
     
     #Model variables
-    out = ["Ghausi_ChilledWater_Demand_kBtu"]
+    out = [data_name]
     inp = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
            u'TOD_3', u'TOD_4', u'TOD_5', u'TOD_6', u'TOD_7', u'TOD_8', u'TOD_9',
            u'TOD_10', u'TOD_11', u'TOD_12', u'TOD_13', u'TOD_14', u'TOD_15',
@@ -282,7 +287,7 @@ class Plotter(object):
 
     # data manipulation methods
     
-    def unstack_():
+    def unstack_(self):
         return
     
     def add_timeColumn(self,data, timecol):
@@ -404,8 +409,8 @@ class Plotter(object):
 
         # 4. plot per2
 
-        WE_data.plot(figsize=(18,5), kind="scatter", x=var_in2,y=var_out2,
-                                     label='WeekEnd', color='g', ax=ax).set_title(var_out+" Week Days");
+        #WE_data.plot(figsize=(18,5), kind="scatter", x=var_in2,y=var_out2,
+        #                             label='WeekEnd', color='g', ax=ax).set_title(var_out+" Week Days");
             
  
         return

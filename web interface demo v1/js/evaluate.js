@@ -59,17 +59,17 @@ var main = function() {
           gridLineWidth: 1
         },
         title : {
-          text : 'Ghausi_ChilledWater_Demand_kBtu'
+          text : data[0][0]
         },
 
         series : [{
-          name : 'Ghausi_ChilledWater_Demand_kBtu',//data[0][0]
+          name : data[0][0],
           data : realdata,
           tooltip: {
             valueDecimals: 2
           }
         }, {
-          name : 'predition',//data[1][0]
+          name : 'prediction',//data[1][0]
           data : preditiondata,
           tooltip: {
             valueDecimals: 2

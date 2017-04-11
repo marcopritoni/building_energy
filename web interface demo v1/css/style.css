@@ -59,4 +59,6 @@ filter: alpha(opacity=0);
 /* output part == highchart  */
 .output{
   margin-top:200px;
+  margin-bottom:200px;
 }
+
