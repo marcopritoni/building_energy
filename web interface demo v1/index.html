@@ -24,15 +24,15 @@
   <label for="sbx">Select Building</label>
   <div class="sbx">
      <span class="cus_selt" id="sel_txt1">Select a Building*</span>
-    <select id="sel_val1" class="styled">
-        <option>Select a Building*</option>
-        <option>option1</option>
-        <option>option2</option>
-        <option>option3</option>
-        <option>option4</option>
-        <option>option5</option>
-        <option>option6</option>
-        <option>option7</option>
+    <select id="sel_val1" class="styled" required>
+        <option selected value="">Select a Building*</option>
+        <option>Ghausi</option>
+        <option>Bainer</option>
+        <option>Meyer</option>
+        <option>Briggs</option>
+        <option>EPS</option>
+        <option>Physics</option>
+        <option>Hutchison</option>
       </select>
    </div>
  </div>
@@ -43,15 +43,12 @@
   <label for="sbx">Select Fuel Type</label>
   <div class="sbx">
      <span class="cus_selt" id="sel_txt2">Select a Type of Fuel*</span>
-    <select id="sel_val2" class="styled">
-        <option>Select a Type of Fuel*</option>
-        <option>option1</option>
-        <option>option2</option>
-        <option>option3</option>
-        <option>option4</option>
-        <option>option5</option>
-        <option>option6</option>
-        <option>option7</option>
+    <select id="sel_val2" class="styled" required>
+        <option value="" selected>Select a Type of Fuel*</option>
+        <option value="ChilledWater">Chilled Water</option>
+        <option value="Electricity">Electricity</option>
+        <option value="NaturalGas">Natural Gas</option>
+        <option value="Steam">Steam</option>
       </select>
    </div>
  </div>
@@ -121,7 +118,7 @@
   <label for="sbx">Select Model Type</label>
   <div class="sbx">
      <span class="cus_selt" id="sel_txt3">Select a Model*</span>
-    <select id="sel_val3" class="styled">
+    <select id="sel_val3" class="styled" disabled="true">
         <option>Select a Model*</option>
         <option>option1</option>
         <option>option2</option>
