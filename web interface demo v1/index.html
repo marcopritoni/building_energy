@@ -86,7 +86,7 @@
 <br /><br /><br />
 
 <!-- evaluation period  -->
-<label for="">Evaluation Period (Default=Same as Baseline1 Period)</label>
+<label for="">Evaluation Period</label>
 <form id="form3" name="form3" class="form-inline">
     <div class="form-group">
         <label for="startDate3">Start Date</label>
@@ -99,7 +99,7 @@
 <br /><br /><br />
 
 <!-- optional  -->
-<label for="">Extrapolated Performance Period (Stitched TMY3 or Weather Available Data)</label>
+<label for="">Extrapolated Performance Period</label>
 <form id="form4" name="form4" class="form-inline">
     <div class="form-group">
         <label for="startDate4">Start Date</label>
@@ -117,16 +117,9 @@
 <div class="wrapper">
   <label for="sbx">Select Model Type</label>
   <div class="sbx">
-     <span class="cus_selt" id="sel_txt3">Select a Model*</span>
+     <span class="cus_selt" id="sel_txt3">Linear Regression</span>
     <select id="sel_val3" class="styled" disabled="true">
-        <option>Select a Model*</option>
-        <option>option1</option>
-        <option>option2</option>
-        <option>option3</option>
-        <option>option4</option>
-        <option>option5</option>
-        <option>option6</option>
-        <option>option7</option>
+        <option selected>Linear Regression</option>
       </select>
    </div>
  </div>
@@ -137,17 +130,15 @@
 
 <!-- output part == highchart  -->
 <div class="output">
-  <h1>Output Charts and Stats here</h1>
-  <h2>Please wait...(it takes about 20s)</h2>
+  <div class="highstock"></div>
 </div>
 
     <script src="js/index.js"></script>
     <script src="js/evaluate.js"></script>
     <script src="http://code.highcharts.com/stock/highstock.js"></script>
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
-<h1>High Stock</h1>
-<div class="highstock">
-</div>
+
+
 
 </body>
 </html>
