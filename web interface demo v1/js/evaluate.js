@@ -22,7 +22,7 @@ var main = function() {
 	parameters['predictstart'] = (predictdate.slice(0,2).join('-'));
 	predictdate2 = $('#endDate4').val().split('/');
 	parameters['predictend'] = (predictdate2.slice(0,2).join('-'));
-	parameters['modeltype'] = '0';
+
   (function(){
   	
     $.getJSON("/python.json", parameters, function (response) {
