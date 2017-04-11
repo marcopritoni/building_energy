@@ -14,12 +14,17 @@ var main = function() {
 	parameters['base2start'] = (baseline2date.slice(0,2).join('-'));
 	baseline2date2 = $('#endDate2').val().split('/');
 	parameters['base2end'] = (baseline2date2.slice(0,2).join('-'));
-	baseline3date = $('#startDate3').val().split('/');
-	parameters['evalstart'] = (baseline3date.slice(0,2).join('-'));
-	baseline3date2 = $('#endDate3').val().split('/');
-	parameters['evalend'] = (baseline3date2.slice(0,2).join('-'));
+	evaldate = $('#startDate3').val().split('/');
+	parameters['evalstart'] = (evaldate.slice(0,2).join('-'));
+	evaldate2 = $('#endDate3').val().split('/');
+	parameters['evalend'] = (evaldate2.slice(0,2).join('-'));
+	predictdate = $('#startDate4').val().split('/');
+	parameters['predictstart'] = (predictdate.slice(0,2).join('-'));
+	predictdate2 = $('#endDate4').val().split('/');
+	parameters['predictend'] = (predictdate2.slice(0,2).join('-'));
+	parameters['modeltype'] = '0';
   (function(){
-
+  	
     $.getJSON("/python.json", parameters, function (response) {
 			console.log(response);
 			var data = [];

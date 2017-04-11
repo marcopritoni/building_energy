@@ -161,12 +161,12 @@ $(function () {
 $(function () {
     var sd = new Date(), ed = new Date();
   
-    /*$('#startDate4').datetimepicker({ 
+    $('#startDate4').datetimepicker({ 
       pickTime: false, 
       format: "YYYY/MM/DD", 
       defaultDate: sd, 
       maxDate: ed 
-    });*/
+    });
   
     $('#endDate4').datetimepicker({ 
       pickTime: false, 
