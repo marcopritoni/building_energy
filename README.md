@@ -6,6 +6,8 @@ Links:
 
 [To-Do List](https://docs.google.com/document/d/1h2y7RrZevOHxx7QUWn26go2ICIpi0FqJx89yN8ibmu0/edit)
 
+[User Guide](https://docs.google.com/a/ucdavis.edu/document/d/1v8DetE_kWH1meEMuyJGWW_88s6TjK9tt1pT0Fw__7vg/edit?usp=sharing)
+
 Requirements Document TBD
 
 Presentation Slides TBD
