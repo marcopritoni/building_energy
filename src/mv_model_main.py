@@ -73,19 +73,26 @@ def main():
     end = 't'
     model_type = 0
     
-    base_slice = (slice(base_start, base_end))
-    eval_slice = (slice(eval_start, eval_end))
-    predict_slice = (slice(predict_start, predict_end))
+    model = Model(data_name, base_start, base_end, eval_start, eval_end, 
+                  predict_start, predict_end, start, end)
     
-    downloader = pipy_datalink()
-    data_raw = downloader.get_stream_by_point([data_name, 'OAT'], start, end)
-
-    preprocessor = DataPreprocessor(data_raw)
-    preprocessor.clean_data()
-    preprocessor.add_degree_days(preprocessor.data_cleaned)
-    preprocessor.add_time_features(preprocessor.data_preprocessed)
-    preprocessor.create_dummies(preprocessor.data_preprocessed, var_to_expand=['TOD','DOW','MONTH'])
-    data = preprocessor.data_preprocessed
+    model.train_model()
+    model.predict_model()
+    model.output()
+    
+#     base_slice = (slice(base_start, base_end))
+#     eval_slice = (slice(eval_start, eval_end))
+#     predict_slice = (slice(predict_start, predict_end))
+#     
+#     downloader = pipy_datalink()
+#     data_raw = downloader.get_stream_by_point([data_name, 'OAT'], start, end)
+# 
+#     preprocessor = DataPreprocessor(data_raw)
+#     preprocessor.clean_data()
+#     preprocessor.add_degree_days(preprocessor.data_cleaned)
+#     preprocessor.add_time_features(preprocessor.data_preprocessed)
+#     preprocessor.create_dummies(preprocessor.data_preprocessed, var_to_expand=['TOD','DOW','MONTH'])
+#     data = preprocessor.data_preprocessed
     '''
     # 1 filter data periods
     # 2 separate data-sets
@@ -117,27 +124,27 @@ def main():
     '''
     
     #Model variables
-    out = [data_name]
-    inp = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
-           u'TOD_3', u'TOD_4', u'TOD_5', u'TOD_6', u'TOD_7', u'TOD_8', u'TOD_9',
-           u'TOD_10', u'TOD_11', u'TOD_12', u'TOD_13', u'TOD_14', u'TOD_15',
-           u'TOD_16', u'TOD_17', u'TOD_18', u'TOD_19', u'TOD_20', u'TOD_21',
-           u'TOD_22', u'TOD_23', u'DOW_0', u'DOW_1', u'DOW_2', u'DOW_3', u'DOW_4',
-           u'DOW_5', u'DOW_6', u'MONTH_1', u'MONTH_2', u'MONTH_3', u'MONTH_4',
-           u'MONTH_5', u'MONTH_6', u'MONTH_7', u'MONTH_8', u'MONTH_9', u'MONTH_10',
-           u'MONTH_11', u'MONTH_12']
-    
-    clf = linear_model.LinearRegression()
-    data_set = DataSet(data, base_slice, eval_slice, predict_slice, out, inp)
-    model = clf.fit(data_set.bs2_in, data_set.bs2_out)
-    score = model.score(data_set.bs2_in.values, data_set.bs2_out.values)
-    model.predict(data_set.bs2_in.values)
-    
-    output = data_set.bs2_out
-    output["prediction"] = model.predict(data_set.bs2_in.values)
-    
-    print output.to_json()
-    print(score)
+#     out = [data_name]
+#     inp = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
+#            u'TOD_3', u'TOD_4', u'TOD_5', u'TOD_6', u'TOD_7', u'TOD_8', u'TOD_9',
+#            u'TOD_10', u'TOD_11', u'TOD_12', u'TOD_13', u'TOD_14', u'TOD_15',
+#            u'TOD_16', u'TOD_17', u'TOD_18', u'TOD_19', u'TOD_20', u'TOD_21',
+#            u'TOD_22', u'TOD_23', u'DOW_0', u'DOW_1', u'DOW_2', u'DOW_3', u'DOW_4',
+#            u'DOW_5', u'DOW_6', u'MONTH_1', u'MONTH_2', u'MONTH_3', u'MONTH_4',
+#            u'MONTH_5', u'MONTH_6', u'MONTH_7', u'MONTH_8', u'MONTH_9', u'MONTH_10',
+#            u'MONTH_11', u'MONTH_12']
+#     
+#     clf = linear_model.LinearRegression()
+#     data_set = DataSet(data, base_slice, eval_slice, predict_slice, out, inp)
+#     model = clf.fit(data_set.bs2_in, data_set.bs2_out)
+#     score = model.score(data_set.bs2_in.values, data_set.bs2_out.values)
+#     model.predict(data_set.bs2_in.values)
+#     
+#     output = data_set.bs2_out
+#     output["prediction"] = model.predict(data_set.bs2_in.values)
+#     
+#     print output.to_json()
+#     print(score)
     '''
     # 6 predict
     
@@ -158,12 +165,12 @@ def main():
     #Savings
     P1 = Plotter()
     #PrePostSav
-    pps = P1.plot_PrePostSav_byMo(data_set.fulldata, data_name)
-    print pps.to_json()
+    #pps = P1.plot_PrePostSav_byMo(data_set.fulldata, data_name)
+    #print pps.to_json()
     
     #ModPostSav
-    mps = P1.plot_ModPostSav_byMo(data_set.fulldata, data_name)
-    print mps.to_json()
+    #mps = P1.plot_ModPostSav_byMo(data_set.fulldata, data_name)
+    #print mps.to_json()
     
 '''Logging code'''
 class StreamWriter():
@@ -476,7 +483,64 @@ class Plotter(object):
     
     
     # plotting methods: 5- Heat Mapsd
+    
+class Model(object):
+    self.data
+    self.data_set 
+    self.output
+    self.score
+    
+    def __init__(self, data_name, base_s, base_e, eval_s, eval_e, predict_s, predict_e, s, e):
+        out = [data_name]
+        inp = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
+           u'TOD_3', u'TOD_4', u'TOD_5', u'TOD_6', u'TOD_7', u'TOD_8', u'TOD_9',
+           u'TOD_10', u'TOD_11', u'TOD_12', u'TOD_13', u'TOD_14', u'TOD_15',
+           u'TOD_16', u'TOD_17', u'TOD_18', u'TOD_19', u'TOD_20', u'TOD_21',
+           u'TOD_22', u'TOD_23', u'DOW_0', u'DOW_1', u'DOW_2', u'DOW_3', u'DOW_4',
+           u'DOW_5', u'DOW_6', u'MONTH_1', u'MONTH_2', u'MONTH_3', u'MONTH_4',
+           u'MONTH_5', u'MONTH_6', u'MONTH_7', u'MONTH_8', u'MONTH_9', u'MONTH_10',
+           u'MONTH_11', u'MONTH_12']
+        base_start = base_s
+        base_end = base_e
+        eval_start = eval_s
+        eval_end = eval_s
+        predict_start = predict_s
+        predict_end = predict_e
+        start = s
+        end = e
+        
+    def process_data(self):
+        base_slice = (slice(base_start, base_end))
+        eval_slice = (slice(eval_start, eval_end))
+        predict_slice = (slice(predict_start, predict_end))
+        
+        downloader = pipy_datalink()
+        data_raw = downloader.get_stream_by_point([data_name, 'OAT'], start, end)
+    
+        preprocessor = DataPreprocessor(data_raw)
+        preprocessor.clean_data()
+        preprocessor.add_degree_days(preprocessor.data_cleaned)
+        preprocessor.add_time_features(preprocessor.data_preprocessed)
+        preprocessor.create_dummies(preprocessor.data_preprocessed, var_to_expand=['TOD','DOW','MONTH'])
+        data = preprocessor.data_preprocessed
+    
+    def train_model(self):
+        process_data()
+        
+        clf = linear_model.LinearRegression()
+        data_set = DataSet(data, base_slice, eval_slice, predict_slice, out, inp)
+        model = clf.fit(data_set.bs2_in, data_set.bs2_out)
+        score = model.score(data_set.bs2_in.values, data_set.bs2_out.values)
+        model.predict(data_set.bs2_in.values)
 
+    def predict_model(self):
+        output = data_set.bs2_out
+        output["prediction"] = model.predict(data_set.bs2_in.values)
+    
+    def output(self):
+        print output.to_json()
+        print(score)
+    
 if __name__ == '__main__':
     try:
         main()
