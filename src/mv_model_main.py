@@ -31,7 +31,7 @@ from data_preprocessor import DataPreprocessor
 from PIPy_Datalink import pipy_datalink
 
 def main():
-    #TODO: Documentation of this function
+    #TODO: Documentation
     #TODO: Caching to speed up
 
     start_logger()
@@ -43,13 +43,14 @@ def main():
     building_name = 'Ghausi'
     energy_type = 'ChilledWater'
     base_start = '2014-01'
-    base_end = '2014-12'
+    base_end = '2014-12'    
     eval_start = '2015-01'
     eval_end = '2015-12'
     predict_start = '2016-01'
     predict_end = '2016-12'
+    model_type = 0
            
-    # Check if command-line arguments are correctly set
+    # Check if number of command-line arguments is correctly set
     if(len(sys.argv) == 11):
         building_name = sys.argv[1]
         energy_type = sys.argv[2]
@@ -61,38 +62,35 @@ def main():
         eval_end = sys.argv[8]
         predict_start = sys.argv[9]
         predict_end = sys.argv[10]
+        model_type = 0
     
     else:
         logging.error("Incorrect number of command-line arguments!")
-
-    data_name = '_'.join([building_name, energy_type, 'Demand_kBtu'])
-    print data_name 
     
     # Time period to request data from PI system
     start = '2014'
     end = 't'
-    model_type = 0
     
-    model = Model(data_name, base_start, base_end, eval_start, eval_end, 
-                  predict_start, predict_end, start, end)
+    data_name = '_'.join([building_name, energy_type, 'Demand_kBtu'])
+    base_slice = (slice(base_start, base_end))
+    eval_slice = (slice(eval_start, eval_end))
+    predict_slice = (slice(predict_start, predict_end))
     
-    model.train_model()
-    model.predict_model()
+    downloader = pipy_datalink()
+    data_raw = downloader.get_stream_by_point([data_name, 'OAT'], start, end)
+
+    preprocessor = DataPreprocessor(data_raw)
+    preprocessor.clean_data()
+    preprocessor.add_degree_days(preprocessor.data_cleaned)
+    preprocessor.add_time_features(preprocessor.data_preprocessed)
+    preprocessor.create_dummies(preprocessor.data_preprocessed, var_to_expand=['TOD','DOW','MONTH'])
+    data = preprocessor.data_preprocessed
+    
+    model = Model(data_name, base_slice, eval_slice, predict_slice, start, end)
+    
+    model.train()
+    model.predict()
     model.output()
-    
-#     base_slice = (slice(base_start, base_end))
-#     eval_slice = (slice(eval_start, eval_end))
-#     predict_slice = (slice(predict_start, predict_end))
-#     
-#     downloader = pipy_datalink()
-#     data_raw = downloader.get_stream_by_point([data_name, 'OAT'], start, end)
-# 
-#     preprocessor = DataPreprocessor(data_raw)
-#     preprocessor.clean_data()
-#     preprocessor.add_degree_days(preprocessor.data_cleaned)
-#     preprocessor.add_time_features(preprocessor.data_preprocessed)
-#     preprocessor.create_dummies(preprocessor.data_preprocessed, var_to_expand=['TOD','DOW','MONTH'])
-#     data = preprocessor.data_preprocessed
     '''
     # 1 filter data periods
     # 2 separate data-sets
@@ -157,10 +155,6 @@ def main():
     '''
     # 7 compare    
     #data = data_preprocessor.feature_extraction(data_cleaned)
-    
-    #TODO: Use command line arguments and talk with Raymund about this (sys.argv[...])
-    #TODO: Refactor code
-    #TODO: use DataFrame.to_json() at http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_json.html
     
     #Savings
     P1 = Plotter()
@@ -484,15 +478,10 @@ class Plotter(object):
     
     # plotting methods: 5- Heat Mapsd
     
-class Model(object):
-    self.data
-    self.data_set 
-    self.output
-    self.score
-    
-    def __init__(self, data_name, base_s, base_e, eval_s, eval_e, predict_s, predict_e, s, e):
-        out = [data_name]
-        inp = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
+class Model(object):    
+    def __init__(self, data_name, base_slice, eval_slice, predict_slice, s, e):
+        self.output = [data_name]
+        self.input = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
            u'TOD_3', u'TOD_4', u'TOD_5', u'TOD_6', u'TOD_7', u'TOD_8', u'TOD_9',
            u'TOD_10', u'TOD_11', u'TOD_12', u'TOD_13', u'TOD_14', u'TOD_15',
            u'TOD_16', u'TOD_17', u'TOD_18', u'TOD_19', u'TOD_20', u'TOD_21',
@@ -500,42 +489,22 @@ class Model(object):
            u'DOW_5', u'DOW_6', u'MONTH_1', u'MONTH_2', u'MONTH_3', u'MONTH_4',
            u'MONTH_5', u'MONTH_6', u'MONTH_7', u'MONTH_8', u'MONTH_9', u'MONTH_10',
            u'MONTH_11', u'MONTH_12']
-        base_start = base_s
-        base_end = base_e
-        eval_start = eval_s
-        eval_end = eval_s
-        predict_start = predict_s
-        predict_end = predict_e
-        start = s
-        end = e
         
-    def process_data(self):
-        base_slice = (slice(base_start, base_end))
-        eval_slice = (slice(eval_start, eval_end))
-        predict_slice = (slice(predict_start, predict_end))
-        
-        downloader = pipy_datalink()
-        data_raw = downloader.get_stream_by_point([data_name, 'OAT'], start, end)
+        self.clf = linear_model.LinearRegression()
+        self.base_slice = base_slice
+        self.eval_slice = eval_slice
+        self.predict_slice = predict_slice
+        self.start = s
+        self.end = e
     
-        preprocessor = DataPreprocessor(data_raw)
-        preprocessor.clean_data()
-        preprocessor.add_degree_days(preprocessor.data_cleaned)
-        preprocessor.add_time_features(preprocessor.data_preprocessed)
-        preprocessor.create_dummies(preprocessor.data_preprocessed, var_to_expand=['TOD','DOW','MONTH'])
-        data = preprocessor.data_preprocessed
-    
-    def train_model(self):
-        process_data()
-        
-        clf = linear_model.LinearRegression()
+    def train(self):        
         data_set = DataSet(data, base_slice, eval_slice, predict_slice, out, inp)
-        model = clf.fit(data_set.bs2_in, data_set.bs2_out)
-        score = model.score(data_set.bs2_in.values, data_set.bs2_out.values)
-        model.predict(data_set.bs2_in.values)
+        self.clf.fit(data_set.bs2_in, data_set.bs2_out)
+        score = self.clf.score(data_set.bs2_in.values, data_set.bs2_out.values)
 
-    def predict_model(self):
+    def predict(self):
         output = data_set.bs2_out
-        output["prediction"] = model.predict(data_set.bs2_in.values)
+        output["prediction"] = self.clf.predict(data_set.bs2_in.values)
     
     def output(self):
         print output.to_json()
