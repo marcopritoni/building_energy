@@ -100,14 +100,12 @@ def main():
     data_set = DataSet(data, base_slice, base_slice, eval_slice, output_vars, input_vars)
     model = Model(model_type)
     model.train(data_set)
-    
-    print(data_set.bs1_out.to_json())
-    print(data_set.eval_out.to_json())
-        
+    model.output()
     #model.predict(data_set.eval_in.values)
     
     #model.output()
     '''
+    # Old Simple Model
     # 1 filter data periods
     # 2 separate data-sets
     # 3 separate output and input
@@ -171,18 +169,6 @@ def main():
     extrapolated_data = clf.predict(predict_training_data)
     print extrapolated_data
     '''
-    # 7 compare    
-    #data = data_preprocessor.feature_extraction(data_cleaned)
-    
-    #Savings
-    P1 = Plotter()
-    #PrePostSav
-    #pps = P1.plot_PrePostSav_byMo(data_set.fulldata, data_name)
-    #print pps.to_json()
-    
-    #ModPostSav
-    #mps = P1.plot_ModPostSav_byMo(data_set.fulldata, data_name)
-    #print mps.to_json()
     
 '''Logging code'''
 class StreamWriter():
@@ -301,218 +287,51 @@ class DataSet(object):
         #ret=self.self.fulldata.loc[]
         
         return
-
-class Plotter(object):
-
-
-    # data manipulation methods
-    
-    def unstack_(self):
-        return
-    
-    def add_timeColumn(self,data, timecol):
-        
-        # need to be more flexible, this is a placeholder
-        if isinstance(timecol, list):
-            for elem in timecol:
-                
-                if elem=="TOD":
-                    
-                
-                    data[elem]=data.index.hour
-                
-                elif elem=="YR-MO":
-                    
-                    year=pd.Series(data.index.year, index=data.index)
-                    month=pd.Series(data.index.month,index=data.index).map("{:02}".format)
-                    data.loc[:,elem]=(year.astype(str) +"-" + (month.astype(str)))
-        
-        return data
-
-    def filterWeekDay(self,data):
-        return data[(data.index.weekday <5)]
-        # data.index.weekday == 0 is Monday 
-        # data.index.weekday == 6 is Sunday 
-    
-    def filterWeekEnd(self,data):
-        return data[((data.index.weekday > 4)&(data.index.weekday <=6))]
-        # data.index.weekday == 0 is Monday 
-        # data.index.weekday == 6 is Sunday 
-    
-    # plotting methods: 1- LineCharts
-    
-    def plot_energy_profile_byMo (self,
-                                  data,
-                                  start_, 
-                                  end_, 
-                                  var):
-        # daily energy profile by Month (each line is an avergage month)
-        # 1. select rows (time interval) and columns (variable)
-        tSlicer=(slice(start_,end_))
-        data=pd.DataFrame(data.loc[tSlicer,var])
-        
-        # 2. add time columns
-        data=self.add_timeColumn(data, ["TOD","YR-MO"])
-        
-        # 3. reshape unstacking
-        data_unstacked=data.groupby(["TOD","YR-MO"]).mean().unstack()
-        
-        # 4. format plot
-        n=len(data_unstacked.columns)
-        #color=cm.rainbow(np.linspace(0,1,n))
-        
-        # 5. plot
-        data_unstacked.plot(figsize=(15,5),label=var, title=var,ylim=[0,data_unstacked.max().max()*1.1])
-        
-        return
-        
-        
-    # plotting methods: 2- ScatterPlots
-              
-    def plot_scatter_WD_WE (self,
-                    data, 
-                    start_, 
-                    end_, 
-                    var_out,
-                    var_in):
-        
-        # 1. select rows (time interval) and columns (variable)
-        tSlicer=(slice(start_,end_))
-        data=pd.DataFrame(data.loc[tSlicer,[var_in,var_out]])
-
-        # 2. setup plots
-        fig, ax = plt.subplots()
-
-        # 3. select/plot WD
-
-        WD_data=self.filterWeekDay(data)
-        WD_data.loc[tSlicer, :].plot(figsize=(18,5), kind="scatter", x=var_in,y=var_out,
-                                     label='WeekDay', color='r', ax=ax).set_title(var_out+" Week Days");
-
-        # 4. select/plot WE
-
-        WE_data=self.filterWeekEnd(data)
-        WE_data.loc[tSlicer, :].plot(figsize=(18,5), kind="scatter", x=var_in,y=var_out,
-                                     label='WeekEnd', color='g', ax=ax).set_title(var_out+" Week Days");
-            
-        return
-
-
-    
-### need to rewrite after this
-
-    def plot_scatter_Per1vsPer2 (self,
-                      data_per1,
-                      data_per2,
-                      var_out,
-                      var_in,
-                      var_out2=None,
-                      var_in2=None      
-                                ):
-        
-#        if var_in2:
-        var_in2=var_in
-
-#        if var_out2:
-        var_out2=var_out
-        
-        # this method assumes the datasets are already separated and sliced in time
-        # it also assumes the two in/out variables have the same name
-
-        # 2. setup plots
-        fig, ax = plt.subplots()
-
-        # 3. plot per1
-
-        data_per1.plot(figsize=(18,5), kind="scatter", x=var_in,y=var_out,
-                                     label='Period 1', color='r', ax=ax).set_title(var_out+" Period 1");
-
-        # 4. plot per2
-
-        #WE_data.plot(figsize=(18,5), kind="scatter", x=var_in2,y=var_out2,
-        #                             label='WeekEnd', color='g', ax=ax).set_title(var_out+" Week Days");
-            
- 
-        return
-
-    def plot_compare (self,
-                      compare_data,
-                      plot_start,
-                      plot_end,
-                      tar):
-        compare = compare_data.loc[plot_start:plot_end,:]#.plot(figsize=(15,5),title=tar)#.set_title("month = %d" %month)
-        
-        return compare 
-        #plt.show() 
-
-    def plot_PrePost_byMo (self,
-                           data, 
-                           tar):
-        last_mo=data[data["PrePost"]==1].index.max().month
-        temp=data.groupby(["MONTH","YEAR"])[tar].mean().unstack()
-        temp[(temp.index<=last_mo)].plot(figsize=(15,5), kind="bar",title=tar)
-        plt.show()
-
-    def plot_ModPost_byMo (self,
-                           compare_sav, 
-                           tar):
-        cols=["target_predicted", "target_actual"]
-        compare_sav = compare_sav.ix[:, cols]
-        compare_sav.groupby(compare_sav.index.month).mean().plot(figsize=(15,5), kind="bar",title=tar)
-        plt.show()
-
-    def plot_PrePostSav_byMo(self,
-                             data, 
-                             tar):
-        '''
-            No PrePost field retrieved from data; gives an error
-            hardcoding to 1 for now
-        '''
-        last_mo=1#data[data["PrePost"]==1].index.max().month
-        temp=data.groupby(["MONTH","YEAR"])[tar].mean().unstack()
-        prepostsav = (temp[(temp.index<=last_mo)].diff(axis=1)*(-1))#.plot(figsize=(15,5), kind="bar",title=tar)
-        
-        return prepostsav
-        #plt.show()
-
-    def plot_ModPostSav_byMo(self,
-                             compare_sav, 
-                             tar):
-        cols=["target_predicted", "target_actual"]
-        compare_sav = compare_sav.ix[:, cols]
-        modpostsav = (compare_sav.groupby(compare_sav.index.month).mean().diff(axis=1)*(-1))#.plot(figsize=(15,5), kind="bar",title=tar)
-        
-        return modpostsav
-        #plt.show() 
-        
-        
-    # plotting methods: 3- BarCharts
-    
-    
-    
-    # plotting methods: 4- BoxPlot
-
-    
-    
-    # plotting methods: 5- Heat Mapsd
     
 class Model(object):    
-    def __init__(self, model_type):
+    def __init__(self, model_type, data_set=None):
         self.clf = linear_model.LinearRegression()
+        self.data_set = data_set
     
     def train(self, data_set):
+        self.data_set = data_set
         self.clf.fit(data_set.bs1_in, data_set.bs1_out)
-        data_set.bs1_out["prediction"] = self.clf.predict(data_set.bs1_in.values);
-        data_set.eval_out["prediction"] = self.clf.predict(data_set.eval_in.values);
-        print self.clf.score(data_set.bs1_in.values, data_set.bs1_out.values);
+        data_set.bs1_out['Model'] = self.clf.predict(data_set.bs1_in.values)
+        data_set.eval_out['Model'] = self.clf.predict(data_set.eval_in.values)
+        out_var = self.data_set.eval_out.columns[0]
+        #data_set.eval_out['Savings'] = data_set.eval_out['Model'].sub(data_set.eval_out[out_var])
         
     def predict(self, data):
         return self.clf.predict(data)
     
-    #def output(self):
-    #    print output.to_json()
-    #    print(score)
+    # compare is a two column dataframe with one column with output variable and one with the model prediction
+    # p is the number of variables in the model (eg. count the columns in the dataframe with input variables)
+    @staticmethod
+    def calc_scores(compare, p, out_var):
+        scores={}
+        
+        n=compare.count()[1]
+        R2=r2_score(compare[out_var], compare[["Model"]]) # this can be negative
+        RMSE=((mean_squared_error(compare[out_var], compare[["Model"]]))*n/(n-p))**(0.5)
+        CV_RMSE=RMSE*100/compare[out_var].mean()
+        NMBE =(compare.diff(axis=1)[["Model"]]).sum()/(compare[["Model"]].mean())/(n-p)*100
+        scores["Adj_R2"]= 1-(1-R2)*(n-1)/(n-p-1)
+        scores["RMSE"]=RMSE
+        scores["CV_RMSE"]=CV_RMSE
+        scores["NMBE"]=NMBE
+        return scores
     
+    def output(self):
+        num_inputs = len(self.data_set.bs1_in.columns)
+        out_var = self.data_set.bs1_out.columns[0]
+        print(self.data_set.bs1_out.to_json())
+        print(self.data_set.eval_out.to_json())
+        
+        # TODO: Figure out how to serialize dict with numpy types
+        # Likely fix: change data structure or serialize manually
+        #print(json.dumps(self.calc_scores(self.data_set.bs1_out, num_inputs, out_var).tolist()))
+        
+        #print()
 if __name__ == '__main__':
     try:
         main()
