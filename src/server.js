@@ -6,7 +6,7 @@ var url = require("url");
 var PythonShell = require('python-shell');
 var options = {
   mode: 'text',
-  pythonPath: 'D:/anaconda/python',//change pythonPath to your pc's python path
+  pythonPath: 'C:/Users/zeusa/Anaconda2/python',//change pythonPath to your pc's python path
   pythonOptions: ['-u','-W ignore']
 };
 var app = express();
@@ -26,6 +26,6 @@ app.get('/python.json', function(req, res){
   });
 });
 
-app.listen(8080);
+app.listen(8000);
 
-console.log('Server running at http://127.0.0.1:8080');
+console.log('Server running at http://127.0.0.1:8000');

@@ -13,18 +13,21 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min.js"></script>
 
 
-      <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 
 
 </head>
 
 <body>
+<div class="container">
+<div class="row">
+<div id="options_menu" class="center-block">
   <!-- building dropdown menu  -->
-<div class="wrapper">
-  <label for="sbx">Select Building</label>
-  <div class="sbx">
-     <span class="cus_selt" id="sel_txt1">Select a Building*</span>
-    <select id="sel_val1" class="styled" required>
+  <div class="wrapper">
+    <label for="sbx">Select Building</label>
+    <div class="sbx">
+      <span class="cus_selt" id="sel_txt1">Select a Building*</span>
+      <select id="sel_val1" class="styled" required>
         <option selected value="">Select a Building*</option>
         <option>Ghausi</option>
         <option>Bainer</option>
@@ -34,95 +37,91 @@
         <option>Physics</option>
         <option>Hutchison</option>
       </select>
-   </div>
- </div>
-<br /><br /><br />
+    </div>
+  </div>
 
-<!-- fuel dropdown menu  -->
-<div class="wrapper">
-  <label for="sbx">Select Fuel Type</label>
-  <div class="sbx">
-     <span class="cus_selt" id="sel_txt2">Select a Type of Fuel*</span>
-    <select id="sel_val2" class="styled" required>
+  <!-- fuel dropdown menu  -->
+  <div class="wrapper">
+    <label for="sbx">Select Fuel Type</label>
+    <div class="sbx">
+      <span class="cus_selt" id="sel_txt2">Select a Type of Fuel*</span>
+      <select id="sel_val2" class="styled" required>
         <option value="" selected>Select a Type of Fuel*</option>
         <option value="ChilledWater">Chilled Water</option>
         <option value="Electricity">Electricity</option>
         <option value="NaturalGas">Natural Gas</option>
         <option value="Steam">Steam</option>
       </select>
-   </div>
- </div>
-<br /><br /><br />
+    </div>
+  </div>
 
-
-
-
-
-
-<!-- baseline1 period -->
-<label for="">Select Baseline1</label>
-<form id="form" name="form" class="form-inline">
-    <div class="form-group">
+  <!-- baseline1 period -->
+  <div class="wrapper">
+    <label for="">Select Baseline1</label>
+    <form id="form" name="form" class="form-inline">
+      <div class="form-group">
         <label for="startDate">Start Date</label>
-        <input id="startDate" name="startDate" type="text" class="form-control" />
-        &nbsp;
+        <input id="startDate" name="startDate" type="date" class="form-control" value="2014-01-01"/>
         <label for="endDate">End Date</label>
-        <input id="endDate" name="endDate" type="text" class="form-control" />
-    </div>
-</form>
-<br /><br /><br />
+        <input id="endDate" name="endDate" type="date" class="form-control" value="2014-06-01"/>
+      </div>
+    </form>
+  </div>
 
-<!-- baseline2 period -->
-<label for="">Select Baseline2</label>
-<form id="form2" name="form2" class="form-inline">
-    <div class="form-group">
+  <!-- baseline2 period -->
+  <div class="wrapper">
+    <label for="">Select Baseline2</label>
+    <form id="form2" name="form2" class="form-inline">
+      <div class="form-group">
         <label for="startDate2">Start Date</label>
-        <input id="startDate2" name="startDate2" type="text" class="form-control" />
-        &nbsp;
+        <input id="startDate2" name="startDate2" type="date" class="form-control" value="2014-07-01"/>
         <label for="endDate2">End Date</label>
-        <input id="endDate2" name="endDate2" type="text" class="form-control" />
-    </div>
-</form>
-<br /><br /><br />
+        <input id="endDate2" name="endDate2" type="date" class="form-control" value="2014-12-01"/>
+      </div>
+    </form>
+  </div>
 
-<!-- evaluation period  -->
-<label for="">Evaluation Period</label>
-<form id="form3" name="form3" class="form-inline">
-    <div class="form-group">
+  <!-- evaluation period  -->
+  <div class="wrapper">
+    <label for="">Evaluation Period</label>
+    <form id="form3" name="form3" class="form-inline">
+      <div class="form-group">
         <label for="startDate3">Start Date</label>
-        <input id="startDate3" name="startDate3" type="text" class="form-control" />
-        &nbsp;
+        <input id="startDate3" name="startDate3" type="date" class="form-control" value="2015-01-01"/>
         <label for="endDate3">End Date</label>
-        <input id="endDate3" name="endDate3" type="text" class="form-control" />
-    </div>
-</form>
-<br /><br /><br />
+        <input id="endDate3" name="endDate3" type="date" class="form-control" value="2015-12-01"/>
+      </div>
+    </form>
+  </div>
 
-<!-- optional  -->
-<label for="">Extrapolated Performance Period</label>
-<form id="form4" name="form4" class="form-inline">
-    <div class="form-group">
+  <!-- optional  -->
+  <div class="wrapper">
+    <label for="">Extrapolated Performance Period</label>
+    <form id="form4" name="form4" class="form-inline">
+      <div class="form-group">
         <label for="startDate4">Start Date</label>
-        <input id="startDate4" name="startDate4" type="text" class="form-control" />
-        &nbsp;
+        <input id="startDate4" name="startDate4" type="date" class="form-control" value="2016-01-01"/>
         <label for="endDate4">End Date</label>
-        <input id="endDate4" name="endDate4" type="text" class="form-control" />
-    </div>
-</form>
-<br /><br /><br />
+        <input id="endDate4" name="endDate4" type="date" class="form-control" value="2016-12-01"/>
+      </div>
+    </form>
+  </div>
 
 
-
-<!-- model dropdown menu  -->
-<div class="wrapper">
-  <label for="sbx">Select Model Type</label>
-  <div class="sbx">
-     <span class="cus_selt" id="sel_txt3">Linear Regression</span>
-    <select id="sel_val3" class="styled" disabled="true">
+  <!-- model dropdown menu  -->
+  <div class="wrapper">
+    <label for="sbx">Select Model Type</label>
+    <div class="sbx">
+      <span class="cus_selt" id="sel_txt3">Linear Regression</span>
+      <select id="sel_val3" class="styled" disabled="true">
         <option selected>Linear Regression</option>
       </select>
+     </div>
    </div>
- </div>
+
+</div>
+</div>
+</div>
 
 
 <!-- evaluate button  -->
@@ -133,10 +132,10 @@
   <div class="highstock"></div>
 </div>
 
-    <script src="js/index.js"></script>
-    <script src="js/evaluate.js"></script>
-    <script src="http://code.highcharts.com/stock/highstock.js"></script>
-    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+<script src="js/index.js"></script>
+<script src="js/evaluate.js"></script>
+<script src="http://code.highcharts.com/stock/highstock.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
 
 
 
