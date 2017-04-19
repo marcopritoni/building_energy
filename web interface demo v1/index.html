@@ -2,10 +2,11 @@
 <html >
 <head>
   <meta charset="UTF-8">
-  <title>Building Energy Performance Report Web Interface</title>
+  <title>Building Energy Performance Report|UC Davis CEED</title>
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/css/bootstrap-datetimepicker.min.css">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/css/bootstrapValidator.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
     <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.min.js"></script>
@@ -19,50 +20,65 @@
 </head>
 
 <body>
+<!-- header  -->
+<div class="header">
+  <h1 class="header_logo">Building Energy Performance Report | UC Davis CEED</h1>
+</div>
+
+<div class="input-container">
+
+
   <!-- building dropdown menu  -->
 <div class="wrapper">
   <label for="sbx">Select Building</label>
   <div class="sbx">
      <span class="cus_selt" id="sel_txt1">Select a Building*</span>
-    <select id="sel_val1" class="styled">
-        <option>Select a Building*</option>
-        <option>option1</option>
-        <option>option2</option>
-        <option>option3</option>
-        <option>option4</option>
-        <option>option5</option>
-        <option>option6</option>
-        <option>option7</option>
+    <select id="sel_val1" class="styled" required>
+        <option selected value="">Select a Building*</option>
+        <option>Ghausi</option>
+        <option>Bainer</option>
+        <option>Meyer</option>
+        <option>Briggs</option>
+        <option>EPS</option>
+        <option>Physics</option>
+        <option>Hutchison</option>
       </select>
    </div>
  </div>
-<br /><br /><br />
+
 
 <!-- fuel dropdown menu  -->
 <div class="wrapper">
   <label for="sbx">Select Fuel Type</label>
   <div class="sbx">
      <span class="cus_selt" id="sel_txt2">Select a Type of Fuel*</span>
-    <select id="sel_val2" class="styled">
-        <option>Select a Type of Fuel*</option>
-        <option>option1</option>
-        <option>option2</option>
-        <option>option3</option>
-        <option>option4</option>
-        <option>option5</option>
-        <option>option6</option>
-        <option>option7</option>
+    <select id="sel_val2" class="styled" required>
+        <option value="" selected>Select a Type of Fuel*</option>
+        <option value="ChilledWater">Chilled Water</option>
+        <option value="Electricity">Electricity</option>
+        <option value="NaturalGas">Natural Gas</option>
+        <option value="Steam">Steam</option>
       </select>
    </div>
  </div>
-<br /><br /><br />
 
+<!-- model dropdown menu  -->
+<div class="wrapper">
+  <label for="sbx">Select Model Type</label>
+  <div class="sbx">
+     <span class="cus_selt" id="sel_txt3">Linear Regression</span>
+    <select id="sel_val3" class="styled" disabled="true">
+        <option selected>Linear Regression</option>
+      </select>
+   </div>
+ </div>
 
 
 
 
 
 <!-- baseline1 period -->
+<div class="input-period">
 <label for="">Select Baseline1</label>
 <form id="form" name="form" class="form-inline">
     <div class="form-group">
@@ -73,9 +89,10 @@
         <input id="endDate" name="endDate" type="text" class="form-control" />
     </div>
 </form>
-<br /><br /><br />
+</div>
 
 <!-- baseline2 period -->
+<div class="input-period">
 <label for="">Select Baseline2</label>
 <form id="form2" name="form2" class="form-inline">
     <div class="form-group">
@@ -86,10 +103,11 @@
         <input id="endDate2" name="endDate2" type="text" class="form-control" />
     </div>
 </form>
-<br /><br /><br />
+</div>
 
 <!-- evaluation period  -->
-<label for="">Evaluation Period (Default=Same as Baseline1 Period)</label>
+<div class="input-period">
+<label for="">Evaluation Period</label>
 <form id="form3" name="form3" class="form-inline">
     <div class="form-group">
         <label for="startDate3">Start Date</label>
@@ -99,58 +117,39 @@
         <input id="endDate3" name="endDate3" type="text" class="form-control" />
     </div>
 </form>
-<br /><br /><br />
+</div>
 
 <!-- optional  -->
-<label for="">Extrapolated Performance Period (Stitched TMY3 or Weather Available Data)</label>
+<div class="input-period">
+<label for="">Extrapolated Performance Period</label>
 <form id="form4" name="form4" class="form-inline">
     <div class="form-group">
-        <!--<label for="startDate4">Start Date</label>
+        <label for="startDate4">Start Date</label>
         <input id="startDate4" name="startDate4" type="text" class="form-control" />
-        &nbsp;-->
-        <label for="endDate4">Till Date</label>
+        &nbsp;
+        <label for="endDate4">End Date</label>
         <input id="endDate4" name="endDate4" type="text" class="form-control" />
     </div>
 </form>
-<br /><br /><br />
+</div>
 
 
-
-<!-- model dropdown menu  -->
-<div class="wrapper">
-  <label for="sbx">Select Model Type</label>
-  <div class="sbx">
-     <span class="cus_selt" id="sel_txt3">Select a Model*</span>
-    <select id="sel_val3" class="styled">
-        <option>Select a Model*</option>
-        <option>option1</option>
-        <option>option2</option>
-        <option>option3</option>
-        <option>option4</option>
-        <option>option5</option>
-        <option>option6</option>
-        <option>option7</option>
-      </select>
-   </div>
- </div>
-
+</div>
 
 <!-- evaluate button  -->
 <a href="#" class="button" id="evaluate">EVALUATE</a>
 
 <!-- output part == highchart  -->
 <div class="output">
-  <h1>Output Charts and Stats here</h1>
-  <h2>Please wait...(it takes about 20s)</h2>
+  <div class="highstock"></div>
 </div>
 
     <script src="js/index.js"></script>
     <script src="js/evaluate.js"></script>
     <script src="http://code.highcharts.com/stock/highstock.js"></script>
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
-<h1>High Stock</h1>
-<div class="highstock">
-</div>
+
+
 
 </body>
 </html>
