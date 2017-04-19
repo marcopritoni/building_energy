@@ -67,9 +67,6 @@ def main():
     
     else:
         logging.error("Incorrect number of command-line arguments!")
-
-    data_name = '_'.join([building_name, energy_type, 'Demand_kBtu'])
-    print data_name 
     
     # Time period to request data from PI system
     start = '2014'
