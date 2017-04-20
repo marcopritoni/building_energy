@@ -29,7 +29,7 @@ body{
 }
 
 /*input-container*/
-.input-container{
+#input-container{
   display: block;
   margin: auto;
   max-width: 60%;
@@ -47,6 +47,7 @@ body{
   display: block;
   margin-top: 20px;
   margin: auto;
+  width: 100%;
 }
 
 /*Evaluate Button*/
@@ -110,3 +111,6 @@ filter: alpha(opacity=0);
   margin-bottom:200px;
 }
 
+.form-group {
+  width: 100%;
+}
