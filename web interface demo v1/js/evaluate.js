@@ -51,7 +51,7 @@ var main = function() {
 				}
 			}
 			console.log(preditiondata);
-      $('.highstock').highcharts('StockChart', {
+      $('#highstock').highcharts('StockChart', {
         rangeSelector : {
           selected : 1
         },
@@ -59,23 +59,82 @@ var main = function() {
           gridLineWidth: 1
         },
         title : {
-          text : data[0][0]
+          text : "Model Against Baseline 1"
         },
-
+        legend : {
+        	enabled: true
+        },
         series : [{
           name : data[0][0],
           data : realdata,
           tooltip: {
             valueDecimals: 2
-          }
+          },
+          color : "green"
         }, {
-          name : 'prediction',//data[1][0]
+          name : data[1][0],
           data : preditiondata,
           tooltip: {
             valueDecimals: 2
-          }
+          },
+          color: "red"
         }]
       });
+
+      var data2 = [];
+      var ghausi2 = JSON.parse(response[1]);
+			for (var key in ghausi2) {
+				if (ghausi2.hasOwnProperty(key)) {
+					data2.push([key, ghausi2[key]]);
+				}
+			}
+			console.log(data2[0][1]);
+			var realdata = [];
+			var real = data2[0][1];
+			for (var key in real) {
+				if (real.hasOwnProperty(key)) {
+					realdata.push([parseInt(key), real[key]]);
+				}
+			}
+			console.log(realdata);
+			var preditiondata = [];
+			var predition = data2[1][1];
+			for (var key in predition) {
+				if (predition.hasOwnProperty(key)) {
+					preditiondata.push([parseInt(key), predition[key]]);
+				}
+			}
+
+      $('#highstock2').highcharts('StockChart', {
+        rangeSelector : {
+          selected : 1
+        },
+        xAxis: {
+          gridLineWidth: 1
+        },
+        title : {
+          text : "Model Against Evaluation Period"
+        },
+        legend : {
+        	enabled : true
+        },
+        series : [{
+          name : data2[0][0],
+          data : realdata,
+          tooltip: {
+            valueDecimals: 2
+          },
+          color : "green"
+        }, {
+          name : data[1][0],
+          data : preditiondata,
+          tooltip: {
+            valueDecimals: 2
+          },
+          color : "red"
+        }]
+      });
+
     });
   })();
 };

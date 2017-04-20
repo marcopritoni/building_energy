@@ -72,7 +72,10 @@ input.form-control {
 /* output part == highchart  */
 .output{
   margin-top:50px;
+  width:80%;
+  margin-left:10%;
 }
 
-#options_menu {
+.chart {
+  margin-bottom: 50px;
 }
