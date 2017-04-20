@@ -2,18 +2,30 @@
 //data formating not working yet
 
 var main = function() {
-	$.getJSON("/python.json", function(response){
 
-		$("body").append("<h1>Python says :</h1>");
-		response.forEach(function(print){
-			$("body").append("<p>"+print+"</p>");
-		})
-	});
-
-
+	parameters = {};
+	parameters['building'] = ($('#sel_val1').val());
+	parameters['energy'] = ($('#sel_val2').val());
+	baseline1date = $('#startDate').val().split('/');
+	parameters['base1start'] = (baseline1date.slice(0,2).join('-'));
+	baseline1date2 = $('#endDate').val().split('/');
+	parameters['base1end'] = (baseline1date2.slice(0,2).join('-'));
+	baseline2date = $('#startDate2').val().split('/');
+	parameters['base2start'] = (baseline2date.slice(0,2).join('-'));
+	baseline2date2 = $('#endDate2').val().split('/');
+	parameters['base2end'] = (baseline2date2.slice(0,2).join('-'));
+	evaldate = $('#startDate3').val().split('/');
+	parameters['evalstart'] = (evaldate.slice(0,2).join('-'));
+	evaldate2 = $('#endDate3').val().split('/');
+	parameters['evalend'] = (evaldate2.slice(0,2).join('-'));
+	predictdate = $('#startDate4').val().split('/');
+	parameters['predictstart'] = (predictdate.slice(0,2).join('-'));
+	predictdate2 = $('#endDate4').val().split('/');
+	parameters['predictend'] = (predictdate2.slice(0,2).join('-'));
 
   (function(){
-    $.getJSON("/python.json",  function (response) {
+  	
+    $.getJSON("/python.json", parameters, function (response) {
 			console.log(response);
 			var data = [];
 			var ghausi = JSON.parse(response[0]);
@@ -39,7 +51,7 @@ var main = function() {
 				}
 			}
 			console.log(preditiondata);
-      $('.highstock').highcharts('StockChart', {
+      $('#highstock').highcharts('StockChart', {
         rangeSelector : {
           selected : 1
         },
@@ -47,23 +59,82 @@ var main = function() {
           gridLineWidth: 1
         },
         title : {
-          text : 'Ghausi_ChilledWater_Demand_kBtu'
+          text : "Model Against Baseline 1"
         },
-
+        legend : {
+        	enabled: true
+        },
         series : [{
-          name : 'Ghausi_ChilledWater_Demand_kBtu',//data[0][0]
+          name : data[0][0],
           data : realdata,
           tooltip: {
             valueDecimals: 2
-          }
+          },
+          color : "green"
         }, {
-          name : 'predition',//data[1][0]
+          name : data[1][0],
           data : preditiondata,
           tooltip: {
             valueDecimals: 2
-          }
+          },
+          color: "red"
         }]
       });
+
+      var data2 = [];
+      var ghausi2 = JSON.parse(response[1]);
+			for (var key in ghausi2) {
+				if (ghausi2.hasOwnProperty(key)) {
+					data2.push([key, ghausi2[key]]);
+				}
+			}
+			console.log(data2[0][1]);
+			var realdata = [];
+			var real = data2[0][1];
+			for (var key in real) {
+				if (real.hasOwnProperty(key)) {
+					realdata.push([parseInt(key), real[key]]);
+				}
+			}
+			console.log(realdata);
+			var preditiondata = [];
+			var predition = data2[1][1];
+			for (var key in predition) {
+				if (predition.hasOwnProperty(key)) {
+					preditiondata.push([parseInt(key), predition[key]]);
+				}
+			}
+
+      $('#highstock2').highcharts('StockChart', {
+        rangeSelector : {
+          selected : 1
+        },
+        xAxis: {
+          gridLineWidth: 1
+        },
+        title : {
+          text : "Model Against Evaluation Period"
+        },
+        legend : {
+        	enabled : true
+        },
+        series : [{
+          name : data2[0][0],
+          data : realdata,
+          tooltip: {
+            valueDecimals: 2
+          },
+          color : "green"
+        }, {
+          name : data[1][0],
+          data : preditiondata,
+          tooltip: {
+            valueDecimals: 2
+          },
+          color : "red"
+        }]
+      });
+
     });
   })();
 };

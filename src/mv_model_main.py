@@ -31,48 +31,54 @@ from data_preprocessor import DataPreprocessor
 from PIPy_Datalink import pipy_datalink
 
 def main():
-    #TODO: Documentation of this function
+    #TODO: Documentation
     #TODO: Caching to speed up
-    
-    '''
-    building_name = sys.argv[1]
-    energy_type = sys.argv[2]
-    start = sys.argv[3]
-    end = sys.argv[4]
-    base_start = sys.argv[5]
-    base_end = sys.argv[6]
-    eval_start = sys.argv[7]
-    eval_end = sys.argv[8]
-    predict_start = sys.argv[9]
-    predict_end = sys.argv[10]
-    
-    data_name = ''.join(building_name, energy_type, 'Demand_kBtu', sep='_')
-    '''
-    
+
     start_logger()
     
     # Do not truncate numpy arrays when printing
     np.set_printoptions(threshold=np.nan)
-    
-    data_name = 'Ghausi_ChilledWater_Demand_kBtu'
-    energy_type = 'OAT'
-    _start = '2014'
-    _end = 't'
+        
+    # Test example
+    building_name = 'Ghausi'
+    energy_type = 'ChilledWater'
+    model_type = 'LinearRegression'
     base_start = '2014-01'
-    base_end = '2014-12'
+    base_end = '2014-12'    
     eval_start = '2015-01'
     eval_end = '2015-12'
     predict_start = '2016-01'
     predict_end = '2016-12'
-    model_type = 0
     
+           
+    # Check if number of command-line arguments is correctly set
+    if len(sys.argv) == 11:
+        building_name = sys.argv[1]
+        energy_type = sys.argv[2]
+        model_type = 0
+        base_start = sys.argv[3]
+        base_end = sys.argv[4]
+        base_start2 = sys.argv[5]
+        base_end2 = sys.argv[6]
+        eval_start = sys.argv[7]
+        eval_end = sys.argv[8]
+        predict_start = sys.argv[9]
+        predict_end = sys.argv[10]
+    
+    else:
+        logging.error("Incorrect number of command-line arguments!")
+    
+    # Time period to request data from PI system
+    start = '2014'
+    end = 't'
+    
+    data_name = '_'.join([building_name, energy_type, 'Demand_kBtu'])
     base_slice = (slice(base_start, base_end))
     eval_slice = (slice(eval_start, eval_end))
     predict_slice = (slice(predict_start, predict_end))
     
     downloader = pipy_datalink()
-    data_raw = downloader.get_stream_by_point(
-        [data_name, energy_type], _start, _end)
+    data_raw = downloader.get_stream_by_point([data_name, 'OAT'], start, end)
 
     preprocessor = DataPreprocessor(data_raw)
     preprocessor.clean_data()
@@ -80,7 +86,26 @@ def main():
     preprocessor.add_time_features(preprocessor.data_preprocessed)
     preprocessor.create_dummies(preprocessor.data_preprocessed, var_to_expand=['TOD','DOW','MONTH'])
     data = preprocessor.data_preprocessed
+    
+    output_vars = [data_name]
+    input_vars = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
+       u'TOD_3', u'TOD_4', u'TOD_5', u'TOD_6', u'TOD_7', u'TOD_8', u'TOD_9',
+       u'TOD_10', u'TOD_11', u'TOD_12', u'TOD_13', u'TOD_14', u'TOD_15',
+       u'TOD_16', u'TOD_17', u'TOD_18', u'TOD_19', u'TOD_20', u'TOD_21',
+       u'TOD_22', u'TOD_23', u'DOW_0', u'DOW_1', u'DOW_2', u'DOW_3', u'DOW_4',
+       u'DOW_5', u'DOW_6', u'MONTH_1', u'MONTH_2', u'MONTH_3', u'MONTH_4',
+       u'MONTH_5', u'MONTH_6', u'MONTH_7', u'MONTH_8', u'MONTH_9', u'MONTH_10',
+       u'MONTH_11', u'MONTH_12']
+    
+    data_set = DataSet(data, base_slice, base_slice, eval_slice, output_vars, input_vars)
+    model = Model(model_type)
+    model.train(data_set)
+    model.output()
+    #model.predict(data_set.eval_in.values)
+    
+    #model.output()
     '''
+    # Old Simple Model
     # 1 filter data periods
     # 2 separate data-sets
     # 3 separate output and input
@@ -111,7 +136,8 @@ def main():
     '''
     
     #Model variables
-    out = ["Ghausi_ChilledWater_Demand_kBtu"]
+    '''
+    out = [data_name]
     inp = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
            u'TOD_3', u'TOD_4', u'TOD_5', u'TOD_6', u'TOD_7', u'TOD_8', u'TOD_9',
            u'TOD_10', u'TOD_11', u'TOD_12', u'TOD_13', u'TOD_14', u'TOD_15',
@@ -120,18 +146,19 @@ def main():
            u'DOW_5', u'DOW_6', u'MONTH_1', u'MONTH_2', u'MONTH_3', u'MONTH_4',
            u'MONTH_5', u'MONTH_6', u'MONTH_7', u'MONTH_8', u'MONTH_9', u'MONTH_10',
            u'MONTH_11', u'MONTH_12']
-    
+     
     clf = linear_model.LinearRegression()
     data_set = DataSet(data, base_slice, eval_slice, predict_slice, out, inp)
-    model = clf.fit(data_set.bs2_in, data_set.bs2_out)
-    score = model.score(data_set.bs2_in.values, data_set.bs2_out.values)
-    model.predict(data_set.bs2_in.values)
+    model = clf.fit(data_set.bs1_in, data_set.bs1_out)
+    score = model.score(data_set.eval_in.values, data_set.eval_out.values)
     
     output = data_set.bs2_out
     output["prediction"] = model.predict(data_set.bs2_in.values)
-    
+     
     print output.to_json()
     print(score)
+    '''
+    
     '''
     # 6 predict
     
@@ -142,22 +169,6 @@ def main():
     extrapolated_data = clf.predict(predict_training_data)
     print extrapolated_data
     '''
-    # 7 compare    
-    #data = data_preprocessor.feature_extraction(data_cleaned)
-    
-    #TODO: Use command line arguments and talk with Raymund about this (sys.argv[...])
-    #TODO: Refactor code
-    #TODO: use DataFrame.to_json() at http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_json.html
-    
-    #Savings
-    P1 = Plotter()
-    #PrePostSav
-    pps = P1.plot_PrePostSav_byMo(data_set.fulldata, data_name)
-    print pps.to_json()
-    
-    #ModPostSav
-    mps = P1.plot_ModPostSav_byMo(data_set.fulldata, data_name)
-    print mps.to_json()
     
 '''Logging code'''
 class StreamWriter():
@@ -231,7 +242,7 @@ class DataSet(object):
                  inp=['']
                 ):
         
-        # the attributes dynamically calcylated using indices and column names
+        # the attributes dynamically calculated using indices and column names
         # first draft duplicates datasets
         #self.baseline1_par={'inpt':{'slicer':(slice(None)), 'col':['']},'outpt':{'slicer':(slice(None)), 'col':['']}}
         #self.baseline1_par={'inpt': {'col': ['OAT'], 'slicer':(slice(None))}, 'outpt': {'col': ['Ghausi_Electricity_Demand_kBtu'], 'slicer':(slice(None))}}
@@ -276,201 +287,51 @@ class DataSet(object):
         #ret=self.self.fulldata.loc[]
         
         return
-
-class Plotter(object):
-
-
-    # data manipulation methods
     
-    def unstack_():
-        return
+class Model(object):    
+    def __init__(self, model_type, data_set=None):
+        self.clf = linear_model.LinearRegression()
+        self.data_set = data_set
     
-    def add_timeColumn(self,data, timecol):
+    def train(self, data_set):
+        self.data_set = data_set
+        self.clf.fit(data_set.bs1_in, data_set.bs1_out)
+        data_set.bs1_out['Model'] = self.clf.predict(data_set.bs1_in.values)
+        data_set.eval_out['Model'] = self.clf.predict(data_set.eval_in.values)
+        out_var = self.data_set.eval_out.columns[0]
+        #data_set.eval_out['Savings'] = data_set.eval_out['Model'].sub(data_set.eval_out[out_var])
         
-        # need to be more flexible, this is a placeholder
-        if isinstance(timecol, list):
-            for elem in timecol:
-                
-                if elem=="TOD":
-                    
-                
-                    data[elem]=data.index.hour
-                
-                elif elem=="YR-MO":
-                    
-                    year=pd.Series(data.index.year, index=data.index)
-                    month=pd.Series(data.index.month,index=data.index).map("{:02}".format)
-                    data.loc[:,elem]=(year.astype(str) +"-" + (month.astype(str)))
-        
-        return data
-
-    def filterWeekDay(self,data):
-        return data[(data.index.weekday <5)]
-        # data.index.weekday == 0 is Monday 
-        # data.index.weekday == 6 is Sunday 
+    def predict(self, data):
+        return self.clf.predict(data)
     
-    def filterWeekEnd(self,data):
-        return data[((data.index.weekday > 4)&(data.index.weekday <=6))]
-        # data.index.weekday == 0 is Monday 
-        # data.index.weekday == 6 is Sunday 
+    # compare is a two column dataframe with one column with output variable and one with the model prediction
+    # p is the number of variables in the model (eg. count the columns in the dataframe with input variables)
+    @staticmethod
+    def calc_scores(compare, p, out_var):
+        scores={}
+        
+        n=compare.count()[1]
+        R2=r2_score(compare[out_var], compare[["Model"]]) # this can be negative
+        RMSE=((mean_squared_error(compare[out_var], compare[["Model"]]))*n/(n-p))**(0.5)
+        CV_RMSE=RMSE*100/compare[out_var].mean()
+        NMBE =(compare.diff(axis=1)[["Model"]]).sum()/(compare[["Model"]].mean())/(n-p)*100
+        scores["Adj_R2"]= 1-(1-R2)*(n-1)/(n-p-1)
+        scores["RMSE"]=RMSE
+        scores["CV_RMSE"]=CV_RMSE
+        scores["NMBE"]=NMBE
+        return scores
     
-    # plotting methods: 1- LineCharts
-    
-    def plot_energy_profile_byMo (self,
-                                  data,
-                                  start_, 
-                                  end_, 
-                                  var):
-        # daily energy profile by Month (each line is an avergage month)
-        # 1. select rows (time interval) and columns (variable)
-        tSlicer=(slice(start_,end_))
-        data=pd.DataFrame(data.loc[tSlicer,var])
+    def output(self):
+        num_inputs = len(self.data_set.bs1_in.columns)
+        out_var = self.data_set.bs1_out.columns[0]
+        print(self.data_set.bs1_out.to_json())
+        print(self.data_set.eval_out.to_json())
         
-        # 2. add time columns
-        data=self.add_timeColumn(data, ["TOD","YR-MO"])
+        # TODO: Figure out how to serialize dict with numpy types
+        # Likely fix: change data structure or serialize manually
+        #print(json.dumps(self.calc_scores(self.data_set.bs1_out, num_inputs, out_var).tolist()))
         
-        # 3. reshape unstacking
-        data_unstacked=data.groupby(["TOD","YR-MO"]).mean().unstack()
-        
-        # 4. format plot
-        n=len(data_unstacked.columns)
-        #color=cm.rainbow(np.linspace(0,1,n))
-        
-        # 5. plot
-        data_unstacked.plot(figsize=(15,5),label=var, title=var,ylim=[0,data_unstacked.max().max()*1.1])
-        
-        return
-        
-        
-    # plotting methods: 2- ScatterPlots
-              
-    def plot_scatter_WD_WE (self,
-                    data, 
-                    start_, 
-                    end_, 
-                    var_out,
-                    var_in):
-        
-        # 1. select rows (time interval) and columns (variable)
-        tSlicer=(slice(start_,end_))
-        data=pd.DataFrame(data.loc[tSlicer,[var_in,var_out]])
-
-        # 2. setup plots
-        fig, ax = plt.subplots()
-
-        # 3. select/plot WD
-
-        WD_data=self.filterWeekDay(data)
-        WD_data.loc[tSlicer, :].plot(figsize=(18,5), kind="scatter", x=var_in,y=var_out,
-                                     label='WeekDay', color='r', ax=ax).set_title(var_out+" Week Days");
-
-        # 4. select/plot WE
-
-        WE_data=self.filterWeekEnd(data)
-        WE_data.loc[tSlicer, :].plot(figsize=(18,5), kind="scatter", x=var_in,y=var_out,
-                                     label='WeekEnd', color='g', ax=ax).set_title(var_out+" Week Days");
-            
-        return
-
-
-    
-### need to rewrite after this
-
-    def plot_scatter_Per1vsPer2 (self,
-                      data_per1,
-                      data_per2,
-                      var_out,
-                      var_in,
-                      var_out2=None,
-                      var_in2=None      
-                                ):
-        
-#        if var_in2:
-        var_in2=var_in
-
-#        if var_out2:
-        var_out2=var_out
-        
-        # this method assumes the datasets are already separated and sliced in time
-        # it also assumes the two in/out variables have the same name
-
-        # 2. setup plots
-        fig, ax = plt.subplots()
-
-        # 3. plot per1
-
-        data_per1.plot(figsize=(18,5), kind="scatter", x=var_in,y=var_out,
-                                     label='Period 1', color='r', ax=ax).set_title(var_out+" Period 1");
-
-        # 4. plot per2
-
-        WE_data.plot(figsize=(18,5), kind="scatter", x=var_in2,y=var_out2,
-                                     label='WeekEnd', color='g', ax=ax).set_title(var_out+" Week Days");
-            
- 
-        return
-
-    def plot_compare (self,
-                      compare_data,
-                      plot_start,
-                      plot_end,
-                      tar):
-        compare = compare_data.loc[plot_start:plot_end,:]#.plot(figsize=(15,5),title=tar)#.set_title("month = %d" %month)
-        
-        return compare 
-        #plt.show() 
-
-    def plot_PrePost_byMo (self,
-                           data, 
-                           tar):
-        last_mo=data[data["PrePost"]==1].index.max().month
-        temp=data.groupby(["MONTH","YEAR"])[tar].mean().unstack()
-        temp[(temp.index<=last_mo)].plot(figsize=(15,5), kind="bar",title=tar)
-        plt.show()
-
-    def plot_ModPost_byMo (self,
-                           compare_sav, 
-                           tar):
-        cols=["target_predicted", "target_actual"]
-        compare_sav = compare_sav.ix[:, cols]
-        compare_sav.groupby(compare_sav.index.month).mean().plot(figsize=(15,5), kind="bar",title=tar)
-        plt.show()
-
-    def plot_PrePostSav_byMo(self,
-                             data, 
-                             tar):
-        '''
-            No PrePost field retrieved from data; gives an error
-            hardcoding to 1 for now
-        '''
-        last_mo=1#data[data["PrePost"]==1].index.max().month
-        temp=data.groupby(["MONTH","YEAR"])[tar].mean().unstack()
-        prepostsav = (temp[(temp.index<=last_mo)].diff(axis=1)*(-1))#.plot(figsize=(15,5), kind="bar",title=tar)
-        
-        return prepostsav
-        #plt.show()
-
-    def plot_ModPostSav_byMo(self,
-                             compare_sav, 
-                             tar):
-        cols=["target_predicted", "target_actual"]
-        compare_sav = compare_sav.ix[:, cols]
-        modpostsav = (compare_sav.groupby(compare_sav.index.month).mean().diff(axis=1)*(-1))#.plot(figsize=(15,5), kind="bar",title=tar)
-        
-        return modpostsav
-        #plt.show() 
-        
-        
-    # plotting methods: 3- BarCharts
-    
-    
-    
-    # plotting methods: 4- BoxPlot
-
-    
-    
-    # plotting methods: 5- Heat Mapsd
-
+        #print()
 if __name__ == '__main__':
     try:
         main()

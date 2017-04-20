@@ -89,9 +89,9 @@ var bindDateRangeValidation = function (f, s, e) {
 };
 
 
-// baseline1 period --JQuery
+//baseline1 period --JQuery
 $(function () {
-    var sd = new Date(), ed = new Date();
+    var sd = new Date(2014, 0, 1), ed = new Date(2014, 5, 1);
   
     $('#startDate').datetimepicker({ 
       pickTime: false, 
@@ -114,7 +114,7 @@ $(function () {
 
 // baseline2 period --JQuery
 $(function () {
-    var sd = new Date(), ed = new Date();
+    var sd = new Date(2014, 5, 1), ed = new Date(2014, 11, 1);
   
     $('#startDate2').datetimepicker({ 
       pickTime: false, 
@@ -137,7 +137,7 @@ $(function () {
 
 // evaluation period --JQuery
 $(function () {
-    var sd = new Date(), ed = new Date();
+    var sd = new Date(2015, 0, 1), ed = new Date(2015, 11, 1);
   
     $('#startDate3').datetimepicker({ 
       pickTime: false, 
@@ -159,14 +159,14 @@ $(function () {
 
 // Optional --JQuery
 $(function () {
-    var sd = new Date(), ed = new Date();
+    var sd = new Date(2016, 0, 1), ed = new Date(2016, 11, 1);
   
-    /*$('#startDate4').datetimepicker({ 
+    $('#startDate4').datetimepicker({ 
       pickTime: false, 
       format: "YYYY/MM/DD", 
       defaultDate: sd, 
       maxDate: ed 
-    });*/
+    });
   
     $('#endDate4').datetimepicker({ 
       pickTime: false, 

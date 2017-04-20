@@ -14,7 +14,7 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min.js"></script>
 
 
-      <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css">
 
 
 </head>
@@ -25,151 +25,156 @@
   <h1 class="header_logo">Building Energy Performance Report | UC Davis CEED</h1>
 </div>
 
-<div id="input-container" class="container">
+<div class="content">
+  <div id="input-container" class="container">
 
-  <div class="row">
-    <!-- building dropdown menu  -->
-    <div class="col-md-4">
-      <label for="sbx">Select Building</label>
-      <div class="sbx">
-         <span class="cus_selt" id="sel_txt1">Select a Building*</span>
-        <select id="sel_val1" class="styled" required>
-            <option selected value="">Select a Building*</option>
-            <option>Ghausi</option>
-            <option>Bainer</option>
-            <option>Meyer</option>
-            <option>Briggs</option>
-            <option>EPS</option>
-            <option>Physics</option>
-            <option>Hutchison</option>
-          </select>
+    <div class="row">
+      <!-- building dropdown menu  -->
+      <div class="col-md-4">
+        <label for="sbx">Select Building</label>
+        <div class="sbx">
+           <span class="cus_selt" id="sel_txt1">Select a Building*</span>
+          <select id="sel_val1" class="styled" required>
+              <option selected value="">Select a Building*</option>
+              <option>Ghausi</option>
+              <option>Bainer</option>
+              <option>Meyer</option>
+              <option>Briggs</option>
+              <option>EPS</option>
+              <option>Physics</option>
+              <option>Hutchison</option>
+            </select>
+         </div>
        </div>
-     </div>
 
 
-    <!-- fuel dropdown menu  -->
-    <div class="col-md-4">
-      <label for="sbx">Select Fuel Type</label>
-      <div class="sbx">
-         <span class="cus_selt" id="sel_txt2">Select a Type of Fuel*</span>
-        <select id="sel_val2" class="styled" required>
-            <option value="" selected>Select a Type of Fuel*</option>
-            <option value="ChilledWater">Chilled Water</option>
-            <option value="Electricity">Electricity</option>
-            <option value="NaturalGas">Natural Gas</option>
-            <option value="Steam">Steam</option>
-          </select>
+      <!-- fuel dropdown menu  -->
+      <div class="col-md-4">
+        <label for="sbx">Select Fuel Type</label>
+        <div class="sbx">
+           <span class="cus_selt" id="sel_txt2">Select a Type of Fuel*</span>
+          <select id="sel_val2" class="styled" required>
+              <option value="" selected>Select a Type of Fuel*</option>
+              <option value="ChilledWater">Chilled Water</option>
+              <option value="Electricity">Electricity</option>
+              <option value="NaturalGas">Natural Gas</option>
+              <option value="Steam">Steam</option>
+            </select>
+         </div>
        </div>
-     </div>
 
-    <!-- model dropdown menu  -->
-    <div class="col-md-4">
-      <label for="sbx">Select Model Type</label>
-      <div class="sbx">
-        <span class="cus_selt" id="sel_txt3">Linear Regression</span>
-        <select id="sel_val3" class="styled" disabled="true">
-          <option selected>Linear Regression</option>
-        </select>
+      <!-- model dropdown menu  -->
+      <div class="col-md-4">
+        <label for="sbx">Select Model Type</label>
+        <div class="sbx">
+          <span class="cus_selt" id="sel_txt3">Linear Regression</span>
+          <select id="sel_val3" class="styled" disabled="true">
+            <option selected>Linear Regression</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+
+
+
+
+    <div class="row">
+      <!-- baseline1 period -->
+      <div class="input-period">
+      <label for="" style="padding-left: 15px">Select Baseline1</label>
+      <form id="form" name="form" class="form-inline">
+          <div class="form-group">
+              <div class="col-md-6">
+                <label for="startDate">Start Date</label>
+                <input id="startDate" name="startDate" type="text" class="form-control" />
+              </div>
+              <div class="col-md-6">
+                <label for="endDate">End Date</label>
+                <input id="endDate" name="endDate" type="text" class="form-control" />
+              </div>
+          </div>
+      </form>
       </div>
     </div>
 
-  </div>
-
-
-
-
-
-  <div class="row">
-    <!-- baseline1 period -->
-    <div class="input-period">
-    <label for="" style="padding-left: 15px">Select Baseline1</label>
-    <form id="form" name="form" class="form-inline">
-        <div class="form-group">
+    <!-- baseline2 period -->
+    <div class="row">
+      <div class="input-period">
+      <label for="" style="padding-left: 15px">Select Baseline2</label>
+      <form id="form2" name="form2" class="form-inline">
+          <div class="form-group">
             <div class="col-md-6">
-              <label for="startDate">Start Date</label>
-              <input id="startDate" name="startDate" type="text" class="form-control" />
+              <label for="startDate2">Start Date</label>
+              <input id="startDate2" name="startDate2" type="text" class="form-control" />
             </div>
             <div class="col-md-6">
-              <label for="endDate">End Date</label>
-              <input id="endDate" name="endDate" type="text" class="form-control" />
+              <label for="endDate2">End Date</label>
+              <input id="endDate2" name="endDate2" type="text" class="form-control" />
             </div>
-        </div>
-    </form>
+          </div>
+      </form>
+      </div>
     </div>
-  </div>
 
-  <!-- baseline2 period -->
-  <div class="row">
-    <div class="input-period">
-    <label for="" style="padding-left: 15px">Select Baseline2</label>
-    <form id="form2" name="form2" class="form-inline">
-        <div class="form-group">
-          <div class="col-md-6">
-            <label for="startDate2">Start Date</label>
-            <input id="startDate2" name="startDate2" type="text" class="form-control" />
+    <!-- evaluation period  -->
+    <div class="row">
+      <div class="input-period">
+      <label for="" style="padding-left: 15px">Evaluation Period</label>
+      <form id="form3" name="form3" class="form-inline">
+          <div class="form-group">
+            <div class="col-md-6">
+              <label for="startDate3">Start Date</label>
+              <input id="startDate3" name="startDate3" type="text" class="form-control" />
+            </div>
+            <div class="col-md-6">
+              <label for="endDate3">End Date</label>
+              <input id="endDate3" name="endDate3" type="text" class="form-control" />
+            </div>
           </div>
-          <div class="col-md-6">
-            <label for="endDate2">End Date</label>
-            <input id="endDate2" name="endDate2" type="text" class="form-control" />
-          </div>
-        </div>
-    </form>
+      </form>
+      </div>
     </div>
-  </div>
 
-  <!-- evaluation period  -->
-  <div class="row">
-    <div class="input-period">
-    <label for="" style="padding-left: 15px">Evaluation Period</label>
-    <form id="form3" name="form3" class="form-inline">
-        <div class="form-group">
-          <div class="col-md-6">
-            <label for="startDate3">Start Date</label>
-            <input id="startDate3" name="startDate3" type="text" class="form-control" />
+    <!-- optional  -->
+    <div class="row">
+      <div class="input-period">
+      <label for="" style="padding-left: 15px">Extrapolated Performance Period</label>
+      <form id="form4" name="form4" class="form-inline">
+          <div class="form-group">
+            <div class="col-md-6">
+              <label for="startDate4">Start Date</label>
+              <input id="startDate4" name="startDate4" type="text" class="form-control" />
+            </div>
+            <div class="col-md-6">
+              <label for="endDate4">End Date</label>
+              <input id="endDate4" name="endDate4" type="text" class="form-control" />
+            </div>
           </div>
-          <div class="col-md-6">
-            <label for="endDate3">End Date</label>
-            <input id="endDate3" name="endDate3" type="text" class="form-control" />
-          </div>
-        </div>
-    </form>
+      </form>
+      </div>
     </div>
-  </div>
 
-  <!-- optional  -->
-  <div class="row">
-    <div class="input-period">
-    <label for="" style="padding-left: 15px">Extrapolated Performance Period</label>
-    <form id="form4" name="form4" class="form-inline">
-        <div class="form-group">
-          <div class="col-md-6">
-            <label for="startDate4">Start Date</label>
-            <input id="startDate4" name="startDate4" type="text" class="form-control" />
-          </div>
-          <div class="col-md-6">
-            <label for="endDate4">End Date</label>
-            <input id="endDate4" name="endDate4" type="text" class="form-control" />
-          </div>
-        </div>
-    </form>
-    </div>
+
   </div>
 
 
-</div>
+  <!-- evaluate button  -->
+  <a href="#" class="button" id="evaluate">EVALUATE</a>
 
-<!-- evaluate button  -->
-<a href="#" class="button" id="evaluate">EVALUATE</a>
+  <!-- output part == highchart  -->
+  <div class="output">
+    <div id="highstock" class="chart"></div>
+    <div id="highstock2" class="chart"></div>
+  </div>
 
-<!-- output part == highchart  -->
-<div class="output">
-  <div class="highstock"></div>
-</div>
+</div> <!-- End Content -->
 
-    <script src="js/index.js"></script>
-    <script src="js/evaluate.js"></script>
-    <script src="http://code.highcharts.com/stock/highstock.js"></script>
-    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+<script src="js/index.js"></script>
+<script src="js/evaluate.js"></script>
+<script src="http://code.highcharts.com/stock/highstock.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
 
 
 

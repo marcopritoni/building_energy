@@ -6,7 +6,7 @@ var url = require("url");
 var PythonShell = require('python-shell');
 var options = {
   mode: 'text',
-  pythonPath: 'D:/anaconda/python',//change pythonPath to your pc's python path
+  pythonPath: 'C:/Users/zeusa/Anaconda2/python',//change pythonPath to your pc's python path
   pythonOptions: ['-u','-W ignore']
 };
 var app = express();
@@ -17,13 +17,15 @@ app.get('/', function(req, res){
 });
 
 app.get('/python.json', function(req, res){
+	console.log(req.query);
+	options['args'] = Object.keys(req.query).map(function(key){ return req.query[key]; });
   PythonShell.run('mv_model_main.py', options, function(err, results) {
-  	console.log(err);
-  	console.log("results are " + results);
+  	console.log("error: " + err);
+  	console.log("Completed.");
     res.json(results);
   });
 });
 
-app.listen(8080);
+app.listen(8000);
 
-console.log('Server running at http://127.0.0.1:8080');
+console.log('Server running at http://127.0.0.1:8000');
