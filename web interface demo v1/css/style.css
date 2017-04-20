@@ -1,8 +1,55 @@
 body{
-  padding: 20px;
+/*  padding: 20px;*/
   background-position: center;
   background-attachment: fixed;
   background-image: url(http://wallpapercave.com/wp/F0uViyV.png)
+}
+
+/*Header*/
+.header {
+  position: fixed;
+  margin: auto;
+  width: 100%;
+  height: 80px;
+  top: 0px;
+  font-weight: bold;
+  text-align: center;
+  background: gold;
+  transition: .3s;
+  box-shadow: 0 0 5px rgba(black, .2);
+  z-index: 1;
+}
+
+.header_logo {
+  font-family: 'Oswald', sans-serif;
+  margin: 0;
+  padding-top: 10px;
+  font-size: 50px;
+  text-shadow: 3px 4px rgba(black, .1);
+  transition: .3s;
+}
+
+.content {
+  margin-top: 80px;
+  z-index: 0;
+}
+
+/*input-container*/
+#input-container{
+  display: block;
+  margin: auto;
+  max-width: 60%;
+  margin-top: 100px;
+  /*flex-flow: row wrap;
+  justify-content: center;*/
+
+}
+
+.input-period{
+  display: block;
+  margin-top: 20px;
+  margin: auto;
+  width: 100%;
 }
 
 /*Evaluate Button*/
@@ -33,10 +80,10 @@ a.button:hover {
 
 
 /*building/fuel/model dropdown menu*/
-.wrapper{
+/*.wrapper{
   width:12%;
   display: inline-block;
-}
+}*/
 
 .sbx{
   border: 1px solid #d3d9d7;
@@ -64,9 +111,7 @@ a.button:hover {
 .form-group {
   width: 100%;
 }
-input.form-control {
-  width: 100%;
-}
+
 /*model dropdown menu - end*/
 
 /* output part == highchart  */
@@ -74,8 +119,14 @@ input.form-control {
   margin-top:50px;
   width:80%;
   margin-left:10%;
+  margin-right:10%;
 }
 
 .chart {
   margin-bottom: 50px;
+  width:100%;
+}
+
+.highcharts-container {
+  width:100%;
 }
