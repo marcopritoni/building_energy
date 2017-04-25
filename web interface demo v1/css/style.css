@@ -130,3 +130,11 @@ a.button:hover {
 .highcharts-container {
   width:100%;
 }
+
+#spinner{
+  display: none;
+  width: 100px;
+  height: 100px;
+  margin: auto;
+  padding-bottom: 50px;
+}
