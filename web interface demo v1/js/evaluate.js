@@ -22,6 +22,8 @@ var main = function() {
 	parameters['predictstart'] = (predictdate.slice(0,2).join('-'));
 	predictdate2 = $('#endDate4').val().split('/');
 	parameters['predictend'] = (predictdate2.slice(0,2).join('-'));
+	modeltype = $('#sel_val3').val();
+	parameters['modeltype'] = modeltype;
 
   (function(){
   	
@@ -133,6 +135,60 @@ var main = function() {
           },
           color : "red"
         }]
+      });
+
+      var data3 = [];
+      var ghausi3 = JSON.parse(response[2]);
+			for (var key in ghausi3) {
+				if (ghausi3.hasOwnProperty(key)) {
+					data3.push([parseInt(key), ghausi3[key]]);
+				}
+			}
+			// console.log(data3[0][1]);
+			// var realdata = [];
+			// var real = data3[0][1];
+			// for (var key in real) {
+			// 	if (real.hasOwnProperty(key)) {
+			// 		realdata.push([parseInt(key), real[key]]);
+			// 	}
+			// }
+			// console.log(realdata);
+			// var preditiondata = [];
+			// var predition = data2[1][1];
+			// for (var key in predition) {
+			// 	if (predition.hasOwnProperty(key)) {
+			// 		preditiondata.push([parseInt(key), predition[key]]);
+			// 	}
+			// }
+
+      $('#highstock3').highcharts('StockChart', {
+        rangeSelector : {
+          selected : 1
+        },
+        xAxis: {
+          gridLineWidth: 1
+        },
+        title : {
+          text : "Savings"
+        },
+        legend : {
+        	enabled : true
+        },
+        series : [{
+          name : "Savings",
+          data : data3,
+          tooltip: {
+            valueDecimals: 2
+          },
+          color : "gold"
+        }]//, {
+        //   name : data[1][0],
+        //   data : preditiondata,
+        //   tooltip: {
+        //     valueDecimals: 2
+        //   },
+        //   color : "red"
+        // }]
       });
 
     });

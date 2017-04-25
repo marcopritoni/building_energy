@@ -68,8 +68,9 @@
         <label for="sbx">Select Model Type</label>
         <div class="sbx">
           <span class="cus_selt" id="sel_txt3">Linear Regression</span>
-          <select id="sel_val3" class="styled" disabled="true">
-            <option selected>Linear Regression</option>
+          <select id="sel_val3" class="styled">
+            <option value="LinearRegression" selected>Linear Regression</option>
+            <option value="RandomForest">Random Forest</option>
           </select>
         </div>
       </div>
@@ -167,6 +168,7 @@
   <div class="output">
     <div id="highstock" class="chart"></div>
     <div id="highstock2" class="chart"></div>
+    <div id="highstock3" class="chart"></div>
   </div>
 
 </div> <!-- End Content -->
