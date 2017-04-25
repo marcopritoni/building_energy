@@ -28,6 +28,7 @@ var main = function() {
   (function(){
   	
     $.getJSON("/python.json", parameters, function (response) {
+    	$("#dropdown").click();
 			console.log(response);
 			var data = [];
 			var ghausi = JSON.parse(response[0]);
@@ -144,22 +145,6 @@ var main = function() {
 					data3.push([parseInt(key), ghausi3[key]]);
 				}
 			}
-			// console.log(data3[0][1]);
-			// var realdata = [];
-			// var real = data3[0][1];
-			// for (var key in real) {
-			// 	if (real.hasOwnProperty(key)) {
-			// 		realdata.push([parseInt(key), real[key]]);
-			// 	}
-			// }
-			// console.log(realdata);
-			// var preditiondata = [];
-			// var predition = data2[1][1];
-			// for (var key in predition) {
-			// 	if (predition.hasOwnProperty(key)) {
-			// 		preditiondata.push([parseInt(key), predition[key]]);
-			// 	}
-			// }
 
       $('#highstock3').highcharts('StockChart', {
         rangeSelector : {
@@ -181,14 +166,7 @@ var main = function() {
             valueDecimals: 2
           },
           color : "gold"
-        }]//, {
-        //   name : data[1][0],
-        //   data : preditiondata,
-        //   tooltip: {
-        //     valueDecimals: 2
-        //   },
-        //   color : "red"
-        // }]
+        }]
       });
 
     });
