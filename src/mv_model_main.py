@@ -52,10 +52,10 @@ def main():
     predict_end = '2016-12'
 
     # Check if number of command-line arguments is correctly set
-    if len(sys.argv) == 11:
+    if len(sys.argv) == 12:
         building_name = sys.argv[1]
         energy_type = sys.argv[2]
-        model_type = 0
+        # model_type = 0
         base_start = sys.argv[3]
         base_end = sys.argv[4]
         base_start2 = sys.argv[5]
@@ -64,6 +64,14 @@ def main():
         eval_end = sys.argv[8]
         predict_start = sys.argv[9]
         predict_end = sys.argv[10]
+        # change model type depending on command line argument
+        if sys.argv[11] == 'LinearRegression':
+            model_type = 0
+        elif sys.argv[11] == 'RandomForest':
+            model_type = 1
+        else:
+            # default linear regression
+            model_type = 0
 
     else:
         logging.error("Incorrect number of command-line arguments!")
@@ -296,7 +304,13 @@ class DataSet(object):
 class Model(object):
 
     def __init__(self, model_type, data_set=None):
-        self.clf = linear_model.LinearRegression()
+        if model_type == 0:
+            self.clf = linear_model.LinearRegression()
+        elif model_type == 1:
+            self.clf = ensemble.RandomForestClassifier()
+        else:
+            # default 
+            self.clf = linear_model.LinearRegression()
         self.data_set = data_set
         self.savings = None
 
