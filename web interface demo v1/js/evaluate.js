@@ -2,7 +2,8 @@
 //data formating not working yet
 
 var main = function() {
-
+	document.getElementById("spinner").style.display="block";
+	
 	parameters = {};
 	parameters['building'] = ($('#sel_val1').val());
 	parameters['energy'] = ($('#sel_val2').val());
@@ -190,7 +191,8 @@ var main = function() {
         //   color : "red"
         // }]
       });
-
+      
+      document.getElementById("spinner").style.display="none";
     });
   })();
 };
