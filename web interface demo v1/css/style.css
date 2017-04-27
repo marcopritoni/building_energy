@@ -1,8 +1,5 @@
 body{
-  
-  background-position: center;
-  background-attachment: fixed;
-  background-image: url(http://wallpapercave.com/wp/F0uViyV.png)
+  background-color:#002855;
 }
 
 /*Header*/
@@ -10,7 +7,7 @@ body{
   position: fixed;
   margin: auto;
   width: 100%;
-  height: 80px;
+  height: 10vh;
   top: 0px;
   font-weight: bold;
   text-align: center;
@@ -30,8 +27,10 @@ body{
 }
 
 .content {
-  margin-top: 80px;
+  margin-top: 10vh;
   z-index: 0;
+  background-color: #e5e9ef;
+  min-height:90vh;
 }
 
 /*input-container*/
@@ -39,7 +38,8 @@ body{
   display: block;
   margin: auto;
   max-width: 60%;
-  margin-top: 100px;
+  margin-top: 10px;
+  border-bottom: 1px solid #c7cad0;
   /*flex-flow: row wrap;
   justify-content: center;*/
 
@@ -129,4 +129,12 @@ a.button:hover {
 
 .highcharts-container {
   width:100%;
+}
+
+#spinner{
+  display: none;
+  width: 100px;
+  height: 100px;
+  margin: auto;
+  margin-bottom: 50px;
 }
