@@ -307,7 +307,7 @@ class Model(object):
         if model_type == 0:
             self.clf = linear_model.LinearRegression()
         elif model_type == 1:
-            self.clf = ensemble.RandomForestClassifier()
+            self.clf = ensemble.RandomForestRegressor()
         else:
             # default 
             self.clf = linear_model.LinearRegression()
