@@ -30,6 +30,7 @@ var main = function() {
   	
     $.getJSON("/python.json", parameters, function (response) {
     	$("#dropdown").click();
+    	$(".chart").css("border", "2px solid black")
 			console.log(response);
 			var data = [];
 			var ghausi = JSON.parse(response[0]);

@@ -188,11 +188,11 @@ $( "#sel_val3" ).change(function() {
 var hidden = false;
 $( "#dropdown" ).click(function() {
   if (!hidden){
-    $(this).parent().siblings().hide(500);
+    $(this).parent().parent().siblings().animate({opacity:0}, {start: function(){ $(this).hide(400) }});
     hidden = true;
   }
   else{
-    $(this).parent().siblings().show(500);
+    $(this).parent().parent().siblings().animate({opacity:1}, {start: function(){ $(this).show(400) }});
     hidden = false;
   }
 })
