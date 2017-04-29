@@ -46,6 +46,8 @@ def main():
     model_type = 'LinearRegression'
     base_start = '2014-01'
     base_end = '2014-12'
+    base_start2 = '2016-01'
+    base_end2 = '2016-12'
     eval_start = '2015-01'
     eval_end = '2015-12'
     predict_start = '2016-01'
@@ -82,6 +84,7 @@ def main():
 
     data_name = '_'.join([building_name, energy_type, 'Demand_kBtu'])
     base_slice = (slice(base_start, base_end))
+    base_slice2 = (slice(base_start2, base_end2))
     eval_slice = (slice(eval_start, eval_end))
     predict_slice = (slice(predict_start, predict_end))
 
@@ -107,8 +110,12 @@ def main():
                   u'MONTH_11', u'MONTH_12']
 
     data_set = DataSet(data, base_slice, base_slice, eval_slice, output_vars, input_vars)
-    model = Model(model_type)
-    model.train(data_set)
+    data_set2 = DataSet(data, base_slice2, base_slice2, eval_slice, output_vars, input_vars)
+    model = Model(1)
+    model.train(data_set, 1)
+    model.project(data_set, 1)
+    model.train(data_set2, 2)
+    model.project(data_set2, 2)
     model.output()
     # model.predict(data_set.eval_in.values)
 
@@ -307,21 +314,41 @@ class Model(object):
         if model_type == 0:
             self.clf = linear_model.LinearRegression()
         elif model_type == 1:
-            self.clf = ensemble.RandomForestClassifier()
+            self.clf = ensemble.RandomForestRegressor()
         else:
             # default 
             self.clf = linear_model.LinearRegression()
         self.data_set = data_set
         self.savings = None
 
-    def train(self, data_set):
+    def train(self, data_set, bs):
         self.data_set = data_set
+        
+        # don't know how to make a variable name depending on the baseline period so I'm just
+        # passing in a number to determine which baseline it is and add to model
+        if(bs == 1):        # baseline 1
+            self.clf.fit(data_set.bs1_in, data_set.bs1_out)
+            data_set.bs1_out['Model'] = self.clf.predict(data_set.bs1_in.values)
+        if(bs == 2):        # baseline 2
+            self.clf.fit(data_set.bs2_in, data_set.bs2_out)
+            data_set.bs2_out['Model'] = self.clf.predict(data_set.bs2_in.values)
+        else:
+            print("No baseline period")
+            
+        # separate train and evaluation functions
+        '''
         self.clf.fit(data_set.bs1_in, data_set.bs1_out)
         data_set.bs1_out['Model'] = self.clf.predict(data_set.bs1_in.values)
         data_set.eval_out['Model'] = self.clf.predict(data_set.eval_in.values)
         out_var = self.data_set.eval_out.columns[0]
         self.savings = data_set.eval_out['Model'] - data_set.eval_out[out_var]
+        '''
 
+    def project(self, data_set, period):
+        data_set.eval_out['Model'] = self.clf.predict(data_set.eval_in.values)
+        out_var = self.data_set.eval_out.columns[0]
+        self.savings = data_set.eval_out['Model'] - data_set.eval_out[out_var]
+        
     def predict(self, data):
         return self.clf.predict(data)
 
@@ -345,11 +372,14 @@ class Model(object):
 
     def output(self):
         num_inputs = len(self.data_set.bs1_in.columns)
+        num_inputs2 = len(self.data_set.bs2_in.columns)
         out_var = self.data_set.bs1_out.columns[0]
-        print(self.data_set.bs1_out.to_json())
+        out_var2 = self.data_set.bs2_out.columns[0]
+        print(self.data_set.bs2_out.to_json())
         print(self.data_set.eval_out.to_json())
         print(self.savings.to_json())
         print(json.dumps(self.calc_scores(self.data_set.bs1_out, num_inputs, out_var)))
+        # print(json.dumps(self.calc_scores(self.data_set.bs2_out, num_inputs2, out_var2)))
 
         # TODO: Figure out how to serialize dict with numpy types
         # Likely fix: change data structure or serialize manually
