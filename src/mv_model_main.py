@@ -22,8 +22,6 @@ from sklearn import svm, cross_validation, linear_model, preprocessing, ensemble
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 
-import matplotlib.pyplot as plt
-
 # Local imports
 #  new modules - marco.pritoni@gmail.com
 from data_preprocessor import DataPreprocessor
@@ -57,7 +55,7 @@ def main():
     if len(sys.argv) == 12:
         building_name = sys.argv[1]
         energy_type = sys.argv[2]
-        # model_type = 0
+        model_type = sys.argv[4]
         base_start = sys.argv[3]
         base_end = sys.argv[4]
         base_start2 = sys.argv[5]
@@ -66,14 +64,6 @@ def main():
         eval_end = sys.argv[8]
         predict_start = sys.argv[9]
         predict_end = sys.argv[10]
-        # change model type depending on command line argument
-        if sys.argv[11] == 'LinearRegression':
-            model_type = 0
-        elif sys.argv[11] == 'RandomForest':
-            model_type = 1
-        else:
-            # default linear regression
-            model_type = 0
 
     else:
         logging.error("Incorrect number of command-line arguments!")
@@ -108,87 +98,24 @@ def main():
                   u'DOW_5', u'DOW_6', u'MONTH_1', u'MONTH_2', u'MONTH_3', u'MONTH_4',
                   u'MONTH_5', u'MONTH_6', u'MONTH_7', u'MONTH_8', u'MONTH_9', u'MONTH_10',
                   u'MONTH_11', u'MONTH_12']
-
-    data_set = DataSet(data, base_slice, base_slice, eval_slice, output_vars, input_vars)
-    data_set2 = DataSet(data, base_slice2, base_slice2, eval_slice, output_vars, input_vars)
-    model = Model(1)
+    
+    # Idea: Create two different models 
+    data_set = DataSet(data, base_slice, base_slice2, eval_slice, output_vars, input_vars)
+    data_set2 = DataSet(data, base_slice, base_slice2, eval_slice, output_vars, input_vars)
+    
+    model = Model(model_type)
     model.train(data_set, 1)
     model.project(data_set, 1)
+    model.output()
     model.train(data_set2, 2)
     model.project(data_set2, 2)
     model.output()
     # model.predict(data_set.eval_in.values)
 
     # model.output()
-    '''
-    # Old Simple Model
-    # 1 filter data periods
-    # 2 separate data-sets
-    # 3 separate output and input
-    
-    training_data = np.array([data.loc[base_slice, data_name]])
-    training_data = np.transpose(training_data)
-    target_values = np.array([data.loc[base_slice, energy_type]])
-    target_values = np.transpose(target_values)
-    
-    # 4 train a model
-    clf = linear_model.LinearRegression()
-    clf.fit(training_data, target_values)
-    base_prediction = clf.predict(training_data)
-    r2 = r2_score(target_values, base_prediction)
-    print base_prediction
-    print r2
 
-    # 5 get scores for the model = validation
-    
-    eval_training_data = np.array([data.loc[eval_slice, data_name]])
-    eval_training_data = np.transpose(eval_training_data)
-    eval_target = np.array([data.loc[eval_slice, energy_type]])
-    eval_target = np.transpose(eval_target)
-    eval_predict = clf.predict(eval_training_data)
-    r2 = r2_score(eval_target, eval_predict)
-    print eval_predict
-    print r2
-    '''
-
-    # Model variables
-    '''
-    out = [data_name]
-    inp = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
-           u'TOD_3', u'TOD_4', u'TOD_5', u'TOD_6', u'TOD_7', u'TOD_8', u'TOD_9',
-           u'TOD_10', u'TOD_11', u'TOD_12', u'TOD_13', u'TOD_14', u'TOD_15',
-           u'TOD_16', u'TOD_17', u'TOD_18', u'TOD_19', u'TOD_20', u'TOD_21',
-           u'TOD_22', u'TOD_23', u'DOW_0', u'DOW_1', u'DOW_2', u'DOW_3', u'DOW_4',
-           u'DOW_5', u'DOW_6', u'MONTH_1', u'MONTH_2', u'MONTH_3', u'MONTH_4',
-           u'MONTH_5', u'MONTH_6', u'MONTH_7', u'MONTH_8', u'MONTH_9', u'MONTH_10',
-           u'MONTH_11', u'MONTH_12']
-     
-    clf = linear_model.LinearRegression()
-    data_set = DataSet(data, base_slice, eval_slice, predict_slice, out, inp)
-    model = clf.fit(data_set.bs1_in, data_set.bs1_out)
-    score = model.score(data_set.eval_in.values, data_set.eval_out.values)
-    
-    output = data_set.bs2_out
-    output["prediction"] = model.predict(data_set.bs2_in.values)
-     
-    print output.to_json()
-    print(score)
-    '''
-
-    '''
-    # 6 predict
-    
-    predict_training_data = np.array([data_cleaned.loc[predict_slice, data_name]])
-    predict_training_data = np.transpose(predict_training_data)
-    predict_target = np.array([data_cleaned.loc[predict_slice, energy_type]])
-    predict_target = np.transpose(predict_target)
-    extrapolated_data = clf.predict(predict_training_data)
-    print extrapolated_data
-    '''
 
 '''Logging code'''
-
-
 class StreamWriter():
     '''Custom logger to wrap around file streams'''
 
@@ -311,21 +238,23 @@ class DataSet(object):
 class Model(object):
 
     def __init__(self, model_type, data_set=None):
-        if model_type == 0:
+        if model_type == 'LinearRegression':
             self.clf = linear_model.LinearRegression()
-        elif model_type == 1:
+        elif model_type == 'RandomForest':
             self.clf = ensemble.RandomForestRegressor()
         else:
-            # default 
             self.clf = linear_model.LinearRegression()
+            
         self.data_set = data_set
         self.savings = None
-
-    def train(self, data_set, bs):
-        self.data_set = data_set
         
-        # don't know how to make a variable name depending on the baseline period so I'm just
-        # passing in a number to determine which baseline it is and add to model
+        if data_set != None:
+            self.train(data_set.bs1_in)
+            
+            
+    def train(self, data_set, bs=1):
+        self.data_set = data_set
+
         if(bs == 1):        # baseline 1
             self.clf.fit(data_set.bs1_in, data_set.bs1_out)
             data_set.bs1_out['Model'] = self.clf.predict(data_set.bs1_in.values)
@@ -370,20 +299,16 @@ class Model(object):
         scores["NMBE"] = np.asscalar(NMBE)
         return scores
 
+    # prints model outputs and relevant statistics
     def output(self):
         num_inputs = len(self.data_set.bs1_in.columns)
-        num_inputs2 = len(self.data_set.bs2_in.columns)
         out_var = self.data_set.bs1_out.columns[0]
-        out_var2 = self.data_set.bs2_out.columns[0]
+        out_var2 = self.data_set.bs2_out.columns[0] 
         print(self.data_set.bs2_out.to_json())
         print(self.data_set.eval_out.to_json())
         print(self.savings.to_json())
         print(json.dumps(self.calc_scores(self.data_set.bs1_out, num_inputs, out_var)))
         # print(json.dumps(self.calc_scores(self.data_set.bs2_out, num_inputs2, out_var2)))
-
-        # TODO: Figure out how to serialize dict with numpy types
-        # Likely fix: change data structure or serialize manually
-        #print(json.dumps(self.calc_scores(self.data_set.bs1_out, num_inputs, out_var).tolist()))
 
         # print()
 if __name__ == '__main__':
