@@ -2,6 +2,7 @@
 //data formating not working yet
 
 var main = function() {
+	document.getElementById("loader").style.display="block";
 	document.getElementById("spinner").style.display="block";
 	
 	parameters = {};
@@ -29,7 +30,16 @@ var main = function() {
   (function(){
   	
     $.getJSON("/python.json", parameters, function (response) {
+    	$("#dropdown").click();
+    	$(".chart").css("border", "2px solid black")
 			console.log(response);
+
+			var modelstats = JSON.parse(response[3]);
+			$("#R2").text(modelstats["Adj_R2"].toFixed(2));
+			$("#cvrmse").text(modelstats["CV_RMSE"].toFixed(2));
+			$("#nmbe").text(modelstats["NMBE"].toFixed(2));
+			$("#rmse").text(modelstats["RMSE"].toFixed(2));
+
 			var data = [];
 			var ghausi = JSON.parse(response[0]);
 			for (var key in ghausi) {
@@ -145,24 +155,19 @@ var main = function() {
 					data3.push([parseInt(key), ghausi3[key]]);
 				}
 			}
-			// console.log(data3[0][1]);
-			// var realdata = [];
-			// var real = data3[0][1];
-			// for (var key in real) {
-			// 	if (real.hasOwnProperty(key)) {
-			// 		realdata.push([parseInt(key), real[key]]);
-			// 	}
-			// }
-			// console.log(realdata);
-			// var preditiondata = [];
-			// var predition = data2[1][1];
-			// for (var key in predition) {
-			// 	if (predition.hasOwnProperty(key)) {
-			// 		preditiondata.push([parseInt(key), predition[key]]);
-			// 	}
-			// }
 
       $('#highstock3').highcharts('StockChart', {
+
+      	chart : {
+      		events : {
+      			redraw: function(){
+      				shownTimestamps = this.series[0].processedXData;
+      				shownData = this.series[0].processedYData;
+      				var savingsTotal = calculateTotalSavings(shownTimestamps, shownData);
+      				$("#CHANGETHIS").text(savingsTotal.toFixed(2)+" kBtu*hr");
+      			}
+      		}
+      	},
         rangeSelector : {
           selected : 1
         },
@@ -182,16 +187,13 @@ var main = function() {
             valueDecimals: 2
           },
           color : "gold"
-        }]//, {
-        //   name : data[1][0],
-        //   data : preditiondata,
-        //   tooltip: {
-        //     valueDecimals: 2
-        //   },
-        //   color : "red"
-        // }]
+        }]
       });
+
+      var savingsChart = $('#highstock3').highcharts();
+      console.log(savingsChart);
       
+      document.getElementById("loader").style.display="none";
       document.getElementById("spinner").style.display="none";
     });
   })();

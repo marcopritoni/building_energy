@@ -27,7 +27,9 @@
 
 <div class="content col-md-10 col-md-offset-1">
   <div id="input-container" class="container">
-
+    <div class="row">
+      <h3 class="text-center">Select Parameters<span class="glyphicon glyphicon-chevron-down pull-right" id="dropdown" style="font-size:x-large;padding-right:10px;cursor: pointer;"></span></h3>
+    </div>
     <div class="row">
       <!-- building dropdown menu  -->
       <div class="col-md-4">
@@ -156,26 +158,99 @@
       </form>
       </div>
     </div>
-
-
+    <!-- evaluate button  -->
+    <a href="#" class="button" id="evaluate">EVALUATE</a>
   </div>
 
 
-  <!-- evaluate button  -->
-  <a href="#" class="button" id="evaluate">EVALUATE</a>
 
   <!-- output part == highchart  -->
   <div class="output">
     <div id="loader">
       <div id="spinner"></div>
     </div>
-    <div id="highstock" class="chart"></div>
-    <div id="highstock2" class="chart"></div>
-    <div id="highstock3" class="chart"></div>
+    <div class="chart container">
+      <div class="col-md-10">
+        <div id="highstock"></div>
+      </div>
+      <div id="modelStats" class="col-md-2">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Adj_R^2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="R2"></td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>CV_RMSE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="cvrmse"></td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>NMBE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="nmbe"></td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>RMSE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="rmse"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="chart">
+      <div id="highstock2"></div>
+    </div>
+    <div class="chart container">
+      <div class="col-md-10">
+        <div id="highstock3"></div>
+      </div>
+      <div id="savingsStats" class="col-md-2">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Total Savings in Selected Period</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="CHANGETHIS"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
 </div> <!-- End Content -->
 
+<script src="js/calculateTotalSavings.js"></script>
 <script src="js/index.js"></script>
 <script src="js/evaluate.js"></script>
 <script src="http://code.highcharts.com/stock/highstock.js"></script>

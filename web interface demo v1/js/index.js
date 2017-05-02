@@ -184,3 +184,15 @@ $( "#sel_val3" ).change(function() {
   var option = $(this).find('option:selected').val();
   $('#sel_txt3').text(option);
 });
+
+var hidden = false;
+$( "#dropdown" ).click(function() {
+  if (!hidden){
+    $(this).parent().parent().siblings().animate({opacity:0}, {start: function(){ $(this).hide(400) }});
+    hidden = true;
+  }
+  else{
+    $(this).parent().parent().siblings().animate({opacity:1}, {start: function(){ $(this).show(400) }});
+    hidden = false;
+  }
+})
