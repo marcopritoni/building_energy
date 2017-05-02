@@ -191,7 +191,10 @@ var main = function() {
       });
 
       var savingsChart = $('#highstock3').highcharts();
-      console.log(savingsChart);
+      var startTimestamps = savingsChart.series[0].processedXData;
+      var startData = savingsChart.series[0].processedYData;
+      var savingsTotal = calculateTotalSavings(startTimestamps, startData);
+      $("#CHANGETHIS").text(savingsTotal.toFixed(2)+" kBtu*hr");
       
       document.getElementById("loader").style.display="none";
       document.getElementById("spinner").style.display="none";
