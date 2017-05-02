@@ -7,27 +7,24 @@ import time
 import traceback
 
 # Start logging temporarily with file object
-sys.stderr = open('../logs/error.log', 'w')
-info_log = open('../logs/info.log', 'w')
+sys.stderr = open("../logs/error.log", "w")
+info_log = open("../logs/info.log", "w")
 info_log.close()
-date_format = time.strftime('%m/%d/%Y %H:%M:%S %p ')
-sys.stderr.write(date_format + ' - root - [WARNING] - ')
+date_format = time.strftime("%m/%d/%Y %H:%M:%S %p ")
+sys.stderr.write(date_format + " - root - [WARNING] - ")
 
 # Third-party library imports
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import yaml
 
 from sklearn import svm, cross_validation, linear_model, preprocessing, ensemble
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 
-import matplotlib.pyplot as plt
-
 # Local imports
-#  new modules - marco.pritoni@gmail.com
+# New modules - marco.pritoni@gmail.com
 from data_preprocessor import DataPreprocessor
-#from mv_script_marco import *
 from PIPy_Datalink import pipy_datalink
 
 
@@ -41,21 +38,23 @@ def main():
     np.set_printoptions(threshold=np.nan)
 
     # Test example
-    building_name = 'Ghausi'
-    energy_type = 'ChilledWater'
-    model_type = 'LinearRegression'
-    base_start = '2014-01'
-    base_end = '2014-12'
-    eval_start = '2015-01'
-    eval_end = '2015-12'
-    predict_start = '2016-01'
-    predict_end = '2016-12'
+    building_name = "Ghausi"
+    energy_type = "ChilledWater"
+    model_type = "LinearRegression"
+    base_start = "2014-01"
+    base_end = "2014-12"
+    base_start2 = "2016-01"
+    base_end2 = "2016-12"
+    eval_start = "2015-01"
+    eval_end = "2015-12"
+    predict_start = "2016-01"
+    predict_end = "2016-12"
 
     # Check if number of command-line arguments is correctly set
     if len(sys.argv) == 12:
         building_name = sys.argv[1]
         energy_type = sys.argv[2]
-        # model_type = 0
+        model_type = sys.argv[4]
         base_start = sys.argv[3]
         base_end = sys.argv[4]
         base_start2 = sys.argv[5]
@@ -64,126 +63,61 @@ def main():
         eval_end = sys.argv[8]
         predict_start = sys.argv[9]
         predict_end = sys.argv[10]
-        # change model type depending on command line argument
-        if sys.argv[11] == 'LinearRegression':
-            model_type = 0
-        elif sys.argv[11] == 'RandomForest':
-            model_type = 1
-        else:
-            # default linear regression
-            model_type = 0
 
     else:
         logging.error("Incorrect number of command-line arguments!")
 
     # Time period to request data from PI system
-    start = '2014'
-    end = 't'
+    start = "2014"
+    end = "t"
 
-    data_name = '_'.join([building_name, energy_type, 'Demand_kBtu'])
+    data_name = "_".join([building_name, energy_type, "Demand_kBtu"])
     base_slice = (slice(base_start, base_end))
+    base_slice2 = (slice(base_start2, base_end2))
     eval_slice = (slice(eval_start, eval_end))
     predict_slice = (slice(predict_start, predict_end))
 
     downloader = pipy_datalink()
-    data_raw = downloader.get_stream_by_point([data_name, 'OAT'], start, end)
+    data_raw = downloader.get_stream_by_point([data_name, "OAT"], start, end)
 
     preprocessor = DataPreprocessor(data_raw)
     preprocessor.clean_data()
     preprocessor.add_degree_days(preprocessor.data_cleaned)
     preprocessor.add_time_features(preprocessor.data_preprocessed)
     preprocessor.create_dummies(preprocessor.data_preprocessed,
-                                var_to_expand=['TOD', 'DOW', 'MONTH'])
+                                var_to_expand=["TOD", "DOW", "MONTH"])
     data = preprocessor.data_preprocessed
 
     output_vars = [data_name]
-    input_vars = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
-                  u'TOD_3', u'TOD_4', u'TOD_5', u'TOD_6', u'TOD_7', u'TOD_8', u'TOD_9',
-                  u'TOD_10', u'TOD_11', u'TOD_12', u'TOD_13', u'TOD_14', u'TOD_15',
-                  u'TOD_16', u'TOD_17', u'TOD_18', u'TOD_19', u'TOD_20', u'TOD_21',
-                  u'TOD_22', u'TOD_23', u'DOW_0', u'DOW_1', u'DOW_2', u'DOW_3', u'DOW_4',
-                  u'DOW_5', u'DOW_6', u'MONTH_1', u'MONTH_2', u'MONTH_3', u'MONTH_4',
-                  u'MONTH_5', u'MONTH_6', u'MONTH_7', u'MONTH_8', u'MONTH_9', u'MONTH_10',
-                  u'MONTH_11', u'MONTH_12']
-
-    data_set = DataSet(data, base_slice, base_slice, eval_slice, output_vars, input_vars)
-    model = Model(model_type)
-    model.train(data_set)
-    model.output()
+    input_vars = ["hdh", "cdh", u"TOD_0", u"TOD_1", u"TOD_2",
+                  u"TOD_3", u"TOD_4", u"TOD_5", u"TOD_6", u"TOD_7", u"TOD_8", u"TOD_9",
+                  u"TOD_10", u"TOD_11", u"TOD_12", u"TOD_13", u"TOD_14", u"TOD_15",
+                  u"TOD_16", u"TOD_17", u"TOD_18", u"TOD_19", u"TOD_20", u"TOD_21",
+                  u"TOD_22", u"TOD_23", u"DOW_0", u"DOW_1", u"DOW_2", u"DOW_3", u"DOW_4",
+                  u"DOW_5", u"DOW_6", u"MONTH_1", u"MONTH_2", u"MONTH_3", u"MONTH_4",
+                  u"MONTH_5", u"MONTH_6", u"MONTH_7", u"MONTH_8", u"MONTH_9", u"MONTH_10",
+                  u"MONTH_11", u"MONTH_12"]
+    
+    # Idea: Create two different models 
+    data_set = DataSet(data, base_slice, base_slice2, eval_slice, output_vars, input_vars)
+    
+    model_1 = Model(model_type)
+    model_1.train(data_set.baseline1)
+    model_1.project(data_set.eval)
+    model_1.output()
+    
+    model_2 = Model(model_type)
+    model_2.train(data_set.baseline2)
+    model_2.project(data_set.eval)
+    model_2.output()
     # model.predict(data_set.eval_in.values)
 
     # model.output()
-    '''
-    # Old Simple Model
-    # 1 filter data periods
-    # 2 separate data-sets
-    # 3 separate output and input
-    
-    training_data = np.array([data.loc[base_slice, data_name]])
-    training_data = np.transpose(training_data)
-    target_values = np.array([data.loc[base_slice, energy_type]])
-    target_values = np.transpose(target_values)
-    
-    # 4 train a model
-    clf = linear_model.LinearRegression()
-    clf.fit(training_data, target_values)
-    base_prediction = clf.predict(training_data)
-    r2 = r2_score(target_values, base_prediction)
-    print base_prediction
-    print r2
-
-    # 5 get scores for the model = validation
-    
-    eval_training_data = np.array([data.loc[eval_slice, data_name]])
-    eval_training_data = np.transpose(eval_training_data)
-    eval_target = np.array([data.loc[eval_slice, energy_type]])
-    eval_target = np.transpose(eval_target)
-    eval_predict = clf.predict(eval_training_data)
-    r2 = r2_score(eval_target, eval_predict)
-    print eval_predict
-    print r2
-    '''
-
-    # Model variables
-    '''
-    out = [data_name]
-    inp = ['hdh', 'cdh', u'TOD_0', u'TOD_1', u'TOD_2',
-           u'TOD_3', u'TOD_4', u'TOD_5', u'TOD_6', u'TOD_7', u'TOD_8', u'TOD_9',
-           u'TOD_10', u'TOD_11', u'TOD_12', u'TOD_13', u'TOD_14', u'TOD_15',
-           u'TOD_16', u'TOD_17', u'TOD_18', u'TOD_19', u'TOD_20', u'TOD_21',
-           u'TOD_22', u'TOD_23', u'DOW_0', u'DOW_1', u'DOW_2', u'DOW_3', u'DOW_4',
-           u'DOW_5', u'DOW_6', u'MONTH_1', u'MONTH_2', u'MONTH_3', u'MONTH_4',
-           u'MONTH_5', u'MONTH_6', u'MONTH_7', u'MONTH_8', u'MONTH_9', u'MONTH_10',
-           u'MONTH_11', u'MONTH_12']
-     
-    clf = linear_model.LinearRegression()
-    data_set = DataSet(data, base_slice, eval_slice, predict_slice, out, inp)
-    model = clf.fit(data_set.bs1_in, data_set.bs1_out)
-    score = model.score(data_set.eval_in.values, data_set.eval_out.values)
-    
-    output = data_set.bs2_out
-    output["prediction"] = model.predict(data_set.bs2_in.values)
-     
-    print output.to_json()
-    print(score)
-    '''
-
-    '''
-    # 6 predict
-    
-    predict_training_data = np.array([data_cleaned.loc[predict_slice, data_name]])
-    predict_training_data = np.transpose(predict_training_data)
-    predict_target = np.array([data_cleaned.loc[predict_slice, energy_type]])
-    predict_target = np.transpose(predict_target)
-    extrapolated_data = clf.predict(predict_training_data)
-    print extrapolated_data
-    '''
-
-'''Logging code'''
 
 
+"""Logging code"""
 class StreamWriter():
-    '''Custom logger to wrap around file streams'''
+    """Custom logger to wrap around file streams"""
 
     def __init__(self, name=__name__):
         self.logger = logging.getLogger(name)
@@ -193,28 +127,28 @@ class StreamWriter():
 
 
 class InfoFilter(logging.Filter):
-    '''Filter to allow only INFO level messages to appear in info.log'''
+    """Filter to allow only INFO level messages to appear in info.log"""
 
     def __init__(self):
-        super(InfoFilter, self).__init__('allow_info')
+        super(InfoFilter, self).__init__("allow_info")
 
     def filter(self, record):
-        if record.levelname == 'INFO':
+        if record.levelname == "INFO":
             return 1
         return 0
 
 
 def start_logger():
     # Source: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
-    default_path = 'logging.yaml'
+    default_path = "logging.yaml"
     default_level = logging.INFO
-    env_key = 'LOG_CFG'
+    env_key = "LOG_CFG"
     path = default_path
     value = os.getenv(env_key, None)
     if value:
         path = value
     if os.path.exists(path):
-        with open(path, 'rt') as f:
+        with open(path, "rt") as f:
             config = yaml.safe_load(f.read())
             logging.config.dictConfig(config)
     else:
@@ -223,71 +157,74 @@ def start_logger():
     sys.stderr.close()
     sys.stderr = StreamWriter()
 
-'''Data'''
+"""Data"""
 
 
 class DataSet(object):
-    '''
+    """
     Inspired by Paul Raftery Class:
     fist prototype
 
     the dataset_type field is to help standardize notation of different datasets:
-           'A':'measured pre-retrofit data',
-           'B':'pre-retrofit prediction with pre-retrofit model',
-           'C':'pre-retrofit prediction with post-retrofit model',
-           'D':'measured post-retrofit data',
-           'E':'post-retrofit prediction with pre-retrofit model',
-           'F':'post-retrofit prediction with pos-tretrofit model',
-           'G':'TMY prediction with pre-retrofit model',
-           'H':'TMY prediction with post-retrofit model'
+           "A":"measured pre-retrofit data",
+           "B":"pre-retrofit prediction with pre-retrofit model",
+           "C":"pre-retrofit prediction with post-retrofit model",
+           "D":"measured post-retrofit data",
+           "E":"post-retrofit prediction with pre-retrofit model",
+           "F":"post-retrofit prediction with pos-tretrofit model",
+           "G":"TMY prediction with pre-retrofit model",
+           "H":"TMY prediction with post-retrofit model"
     typical comparisons used by mave:
         Pre-retrofit model performance = A vs B
         Single model M&V = D vs E
         Post retrofit model performance  = D vs F
         Dual model M&V, normalized to tmy data = G vs H
-    '''
+    """
 
     def __init__(self, data,
                  tPeriod1=(slice(None)),
                  tPeriod2=(slice(None)),
                  tPeriod3=(slice(None)),
-                 out=[''],
-                 inp=['']
+                 out=[""],
+                 inp=[""]
                  ):
 
         # the attributes dynamically calculated using indices and column names
         # first draft duplicates datasets
-        #self.baseline1_par={'inpt':{'slicer':(slice(None)), 'col':['']},'outpt':{'slicer':(slice(None)), 'col':['']}}
-        #self.baseline1_par={'inpt': {'col': ['OAT'], 'slicer':(slice(None))}, 'outpt': {'col': ['Ghausi_Electricity_Demand_kBtu'], 'slicer':(slice(None))}}
+        #self.baseline1_par={"inpt":{"slicer":(slice(None)), "col":[""]},"outpt":{"slicer":(slice(None)), "col":[""]}}
+        #self.baseline1_par={"inpt": {"col": ["OAT"], "slicer":(slice(None))}, "outpt": {"col": ["Ghausi_Electricity_Demand_kBtu"], "slicer":(slice(None))}}
 
         self.fulldata = data
+        self.baseline1 = {}
+        self.baseline2 = {}
+        self.eval = {}
         try:
-            self.bs1_in = data.loc[tPeriod1, inp]
+            self.baseline1["in"] = data.loc[tPeriod1, inp]
         except:
             pass
 
         try:
-            self.bs1_out = data.loc[tPeriod1, out]
+            self.baseline1["out"] = data.loc[tPeriod1, out]
         except:
             pass
 
         try:
-            self.bs2_in = data.loc[tPeriod2, inp]
+            self.baseline2["in"] = data.loc[tPeriod2, inp]
         except:
             pass
 
         try:
-            self.bs2_out = data.loc[tPeriod2, out]
+            self.baseline2["out"] = data.loc[tPeriod2, out]
         except:
             pass
 
         try:
-            self.eval_in = data.loc[tPeriod3, inp]
+            self.eval["in"] = data.loc[tPeriod3, inp]
         except:
             pass
 
         try:
-            self.eval_out = data.loc[tPeriod3, out]
+            self.eval["out"] = data.loc[tPeriod3, out]
         except:
             pass
 
@@ -302,26 +239,71 @@ class DataSet(object):
 
 
 class Model(object):
-
+    """
+    Measurement Verification Model.
+    
+    Parameters:
+    model_type: String that describes the model type
+    data_set: DataSet used to fit model and create projection
+    
+    Attributes:
+    
+    """
+    
     def __init__(self, model_type, data_set=None):
-        if model_type == 0:
+        if model_type == "LinearRegression":
             self.clf = linear_model.LinearRegression()
-        elif model_type == 1:
+        elif model_type == "RandomForest":
             self.clf = ensemble.RandomForestRegressor()
         else:
-            # default 
             self.clf = linear_model.LinearRegression()
+            
         self.data_set = data_set
-        self.savings = None
-
-    def train(self, data_set):
-        self.data_set = data_set
-        self.clf.fit(data_set.bs1_in, data_set.bs1_out)
-        data_set.bs1_out['Model'] = self.clf.predict(data_set.bs1_in.values)
-        data_set.eval_out['Model'] = self.clf.predict(data_set.eval_in.values)
-        out_var = self.data_set.eval_out.columns[0]
-        self.savings = data_set.eval_out['Model'] - data_set.eval_out[out_var]
-
+        self.baseline = {}
+        self.eval = {}
+        self.savings = {}
+        self.scores = {}
+        
+        if data_set != None:
+            self.baseline = data_set.baseline1
+            self.eval = data_set.eval
+            self.train(self.baseline)
+            self.project(self.eval)
+            
+            
+    def train(self, baseline):
+        """Trains the model using baseline period data
+        
+        Parameters: 
+        baseline: A dictionary with keys "in" and "out" that map to a pandas DataFrame
+        """
+        
+        # Fit the data
+        self.baseline = baseline
+        self.clf.fit(baseline["in"], baseline["out"])
+        baseline["out"]["Model"] = self.predict(baseline["in"].values)
+        
+        # Calculate scores 
+        num_inputs = len(baseline["out"].columns)
+        out_var = baseline["out"].columns[0]
+        self.scores = self.calc_scores(baseline["out"], num_inputs, out_var)
+            
+        # separate train and evaluation functions
+        """
+        self.clf.fit(baseline.bs1_in, baseline.bs1_out)
+        baseline.bs1_out["Model"] = self.clf.predict(baseline.bs1_in.values)
+        baseline.eval_out["Model"] = self.clf.predict(baseline.eval_in.values)
+        out_var = self.baseline.eval_out.columns[0]
+        self.savings = baseline.eval_out["Model"] - baseline.eval_out[out_var]
+        """
+    def project(self, eval_data):
+        self.eval = eval_data
+        eval_data["out"]["Model"] = self.clf.predict(eval_data["in"].values)
+        out_var = eval_data["out"].columns[0]
+        self.savings = eval_data["out"]["Model"] - eval_data["out"][out_var]
+        eval_data["savings"] = self.savings
+        return self.savings
+        
     def predict(self, data):
         return self.clf.predict(data)
 
@@ -343,20 +325,15 @@ class Model(object):
         scores["NMBE"] = np.asscalar(NMBE)
         return scores
 
+    # prints model outputs and relevant statistics
     def output(self):
-        num_inputs = len(self.data_set.bs1_in.columns)
-        out_var = self.data_set.bs1_out.columns[0]
-        print(self.data_set.bs1_out.to_json())
-        print(self.data_set.eval_out.to_json())
+        print(self.baseline["out"].to_json())
+        print(self.eval["out"].to_json())
         print(self.savings.to_json())
-        print(json.dumps(self.calc_scores(self.data_set.bs1_out, num_inputs, out_var)))
-
-        # TODO: Figure out how to serialize dict with numpy types
-        # Likely fix: change data structure or serialize manually
-        #print(json.dumps(self.calc_scores(self.data_set.bs1_out, num_inputs, out_var).tolist()))
+        print(json.dumps(self.scores))
 
         # print()
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         main()
     except:
