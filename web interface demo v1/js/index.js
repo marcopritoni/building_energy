@@ -196,3 +196,27 @@ $( "#dropdown" ).click(function() {
     hidden = false;
   }
 })
+
+var TMYMode = false;
+$("#TMYSwitch").click(function() {
+  if (!TMYMode) {
+    $(this).removeClass("btn-default");
+    $(this).addClass("active");
+    $(this).addClass("btn-primary");
+
+    $(".defaultRow").hide();
+    $(".TMYRow").show();
+
+    TMYMode = true;
+  }
+  else{
+    $(this).removeClass("btn-primary");
+    $(this).removeClass("active");
+    $(this).addClass("btn-default");
+
+    $(".TMYRow").hide();
+    $(".defaultRow").show();
+    
+    TMYMode = false;
+  }
+})

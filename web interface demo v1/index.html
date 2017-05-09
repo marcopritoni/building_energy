@@ -31,6 +31,11 @@
       <h3 class="text-center">Select Parameters<span class="glyphicon glyphicon-chevron-down pull-right" id="dropdown" style="font-size:x-large;padding-right:10px;cursor: pointer;"></span></h3>
     </div>
     <div class="row">
+      <div class = "col-md-2">
+        <button type="button" class="btn btn-default" id="TMYSwitch">TMY Mode</button>
+      </div>
+    </div>
+    <div class="row">
       <!-- building dropdown menu  -->
       <div class="col-md-4">
         <label for="sbx">Select Building</label>
@@ -83,7 +88,7 @@
 
 
 
-    <div class="row">
+    <div class="row defaultRow TMYRow">
       <!-- baseline1 period -->
       <div class="input-period">
       <label for="" style="padding-left: 15px">Select Baseline1</label>
@@ -103,7 +108,7 @@
     </div>
 
     <!-- baseline2 period -->
-    <div class="row">
+    <div class="row TMYRow" style="display: none">
       <div class="input-period">
       <label for="" style="padding-left: 15px">Select Baseline2</label>
       <form id="form2" name="form2" class="form-inline">
@@ -122,7 +127,7 @@
     </div>
 
     <!-- evaluation period  -->
-    <div class="row">
+    <div class="row defaultRow">
       <div class="input-period">
       <label for="" style="padding-left: 15px">Evaluation Period</label>
       <form id="form3" name="form3" class="form-inline">
@@ -141,7 +146,7 @@
     </div>
 
     <!-- optional  -->
-    <div class="row">
+    <div class="row defaultRow">
       <div class="input-period">
       <label for="" style="padding-left: 15px">Extrapolated Performance Period</label>
       <form id="form4" name="form4" class="form-inline">
@@ -153,6 +158,25 @@
             <div class="col-md-6">
               <label for="endDate4">End Date</label>
               <input id="endDate4" name="endDate4" type="text" class="form-control" />
+            </div>
+          </div>
+      </form>
+      </div>
+    </div>
+
+    <!-- optional  -->
+    <div class="row TMYRow" style="display:none">
+      <div class="input-period">
+      <label for="" style="padding-left: 15px">TMY MODE INPUT</label>
+      <form id="form5" name="form5" class="form-inline">
+          <div class="form-group">
+            <div class="col-md-6">
+              <label for="startDate5">Start Date</label>
+              <input id="startDate5" name="startDate5" type="text" class="form-control" />
+            </div>
+            <div class="col-md-6">
+              <label for="endDate5">End Date</label>
+              <input id="endDate5" name="endDate4" type="text" class="form-control" />
             </div>
           </div>
       </form>

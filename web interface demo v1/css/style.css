@@ -130,6 +130,7 @@ a.button:hover {
 .chart {
   margin-bottom: 50px;
   width:100%;
+  display:none;
 }
 
 
