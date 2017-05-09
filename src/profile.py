@@ -1,6 +1,7 @@
 import cProfile
 import os
 import pstats
+import sys 
 
 import line_profiler
 
@@ -37,7 +38,6 @@ def import_test():
     
     print "import_test done"
 
-
 """
 # Function-level profiling
 with open("profile-func.txt", "w") as file:
@@ -54,5 +54,10 @@ with open("profile-line.txt", "w") as file:
     profiler.runcall(import_test)
     import mv_model_main
     profiler.add_function(mv_model_main.main)
-    profiler.runcall(mv_model_main.main)
+    
+    with open("output.txt", "w") as output:
+        sys.stdout = output
+        profiler.runcall(mv_model_main.main)
+        os.remove("output.txt")
+        
     profiler.print_stats(stream=file)
