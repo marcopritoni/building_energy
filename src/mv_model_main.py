@@ -15,7 +15,7 @@ sys.stderr.write(date_format + " - root - [WARNING] - ")
 
 # Third-party library imports
 import numpy as np
-#import pandas as pd
+import pandas as pd
 import yaml
 
 from sklearn import svm, cross_validation, linear_model, preprocessing, ensemble
@@ -27,6 +27,7 @@ from sklearn.metrics import mean_squared_error
 from data_preprocessor import DataPreprocessor
 from PIPy_Datalink import pipy_datalink
 
+tmy_path = "../data/tmy.csv"
 
 def main():
     # TODO: Documentation
@@ -76,7 +77,7 @@ def main():
     base_slice2 = (slice(base_start2, base_end2))
     eval_slice = (slice(eval_start, eval_end))
     predict_slice = (slice(predict_start, predict_end))
-
+    
     downloader = pipy_datalink()
     data_raw = downloader.get_stream_by_point([data_name, "OAT"], start, end)
 
@@ -105,15 +106,45 @@ def main():
     model_1.train(data_set.baseline1)
     model_1.project(data_set.eval)
     model_1.output()
+ 
+    """
+    # BUG: When reading CSV the index is no longer the date
+    # TODO: THIS CODE IS MESSY AS SHIT PUT IN DIFF FUNCTIONS
+    if os.path.isfile(tmy_path):
+        tmy_raw = pd.read_csv(tmy_path, index_col=0)
+    else:
+        # TODO: Updater code
+        print "Needa update"
+    """
+    web_id = "P09KoOKByvc0-uxyvoTV1UfQBNkCAAVVRJTC1QSS1QXE5TUkRCLjEzNjcwOC5PQVQuVE1Z"
+    tmy_raw = downloader.get_stream(Web_ID=web_id,_start="2016-04-01", _end="t")
+    tmy_raw.rename(columns={tmy_raw.columns[0]: "OAT"}, inplace=True)
+    tmy_raw.dropna()   
+    
+    preprocessor = DataPreprocessor(tmy_raw)
+    preprocessor.clean_data()
+    preprocessor.add_degree_days(preprocessor.data_cleaned)
+    preprocessor.add_time_features(preprocessor.data_preprocessed)
+    preprocessor.create_dummies(preprocessor.data_preprocessed,
+                                var_to_expand=["TOD", "DOW", "MONTH"])
+    tmy_data = preprocessor.data_preprocessed  
+    
+    eval_data = {}
+    eval_data["in"] = tmy_data[input_vars]
+    eval_data["out"] = tmy_data[["OAT"]]
     
     model_2 = Model(model_type)
     model_2.train(data_set.baseline2)
     model_2.project(data_set.eval)
     model_2.output()
-    # model.predict(data_set.eval_in.values)
-
-    # model.output()
-
+    
+    model_1.project(eval_data)
+    eval_data["out"]["Baseline 1"] = eval_data["out"]["Model"].copy()
+    model_2.project(eval_data)
+    eval_data["out"]["Baseline 2"] = eval_data["out"]["Model"].copy()
+    
+    eval_data["out"].drop(["OAT", "Model"], inplace=True, axis=1)
+    print(eval_data["out"].to_json())
 
 """Logging code"""
 class StreamWriter():
@@ -297,10 +328,14 @@ class Model(object):
         self.savings = baseline.eval_out["Model"] - baseline.eval_out[out_var]
         """
     def project(self, eval_data):
+        # Predicts in the period specified by eval_data
         self.eval = eval_data
         eval_data["out"]["Model"] = self.clf.predict(eval_data["in"].values)
+
+        # Computes difference between model and actual
         out_var = eval_data["out"].columns[0]
-        self.savings = eval_data["out"]["Model"] - eval_data["out"][out_var]
+        self.savings = eval_data["out"]["Model"].copy()
+        self.savings.sub(eval_data["out"][out_var], fill_value=0)
         eval_data["savings"] = self.savings
         return self.savings
         
@@ -328,8 +363,10 @@ class Model(object):
     # prints model outputs and relevant statistics
     def output(self):
         print(self.baseline["out"].to_json())
-        print(self.eval["out"].to_json())
-        print(self.savings.to_json())
+        
+        if len(self.eval) > 0:
+            print(self.eval["out"].to_json())
+            print(self.savings.to_json())
         print(json.dumps(self.scores))
 
         # print()
