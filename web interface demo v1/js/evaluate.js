@@ -30,16 +30,24 @@ var main = function() {
   (function(){
   	
     $.getJSON("/python.json", parameters, function (response) {
-    	$("#dropdown").click();
-    	$(".chart").css("display", "block");
-      $(".chart").css("border", "2px solid black");
+    	// $("#dropdown").click();
+      var tmy_mode_on = $("#TMYSwitch").hasClass("active");
+      if (tmy_mode_on){
+        $(".tmychart").css("display", "block");
+        $(".tmychart").css("border", "2px solid black");
+      }
+      else{
+        $(".defchart").css("display", "block");
+        $(".defchart").css("border", "2px solid black");
+      }     
+    	
 			console.log(response);
 
-			var modelstats = JSON.parse(response[3]);
-			$("#R2").text(modelstats["Adj_R2"].toFixed(2));
-			$("#cvrmse").text(modelstats["CV_RMSE"].toFixed(2));
-			$("#nmbe").text(modelstats["NMBE"].toFixed(2));
-			$("#rmse").text(modelstats["RMSE"].toFixed(2));
+			var model1stats = JSON.parse(response[3]);
+			$("#modelStats #R2").text(model1stats["Adj_R2"].toFixed(2));
+			$("#modelStats #cvrmse").text(model1stats["CV_RMSE"].toFixed(2));
+			$("#modelStats #nmbe").text(model1stats["NMBE"].toFixed(2));
+			$("#modelStats #rmse").text(model1stats["RMSE"].toFixed(2));
 
 			var data = [];
 			var ghausi = JSON.parse(response[0]);
@@ -48,7 +56,6 @@ var main = function() {
 					data.push([key, ghausi[key]]);
 				}
 			}
-			console.log(data[0][1]);
 			var realdata = [];
 			var real = data[0][1];
 			for (var key in real) {
@@ -56,7 +63,6 @@ var main = function() {
 					realdata.push([parseInt(key), real[key]]);
 				}
 			}
-			console.log(realdata);
 			var preditiondata = [];
 			var predition = data[1][1];
 			for (var key in predition) {
@@ -64,7 +70,6 @@ var main = function() {
 					preditiondata.push([parseInt(key), predition[key]]);
 				}
 			}
-			console.log(preditiondata);
       $('#highstock').highcharts('StockChart', {
         rangeSelector : {
           selected : 1
@@ -95,108 +100,224 @@ var main = function() {
         }]
       });
 
-      var data2 = [];
-      var ghausi2 = JSON.parse(response[1]);
-			for (var key in ghausi2) {
-				if (ghausi2.hasOwnProperty(key)) {
-					data2.push([key, ghausi2[key]]);
-				}
-			}
-			console.log(data2[0][1]);
-			var realdata = [];
-			var real = data2[0][1];
-			for (var key in real) {
-				if (real.hasOwnProperty(key)) {
-					realdata.push([parseInt(key), real[key]]);
-				}
-			}
-			console.log(realdata);
-			var preditiondata = [];
-			var predition = data2[1][1];
-			for (var key in predition) {
-				if (predition.hasOwnProperty(key)) {
-					preditiondata.push([parseInt(key), predition[key]]);
-				}
-			}
+      if (tmy_mode_on){
+        var model2stats = JSON.parse(response[7]);
+        $("#modelStats2 #R2").text(model2stats["Adj_R2"].toFixed(2));
+        $("#modelStats2 #cvrmse").text(model2stats["CV_RMSE"].toFixed(2));
+        $("#modelStats2 #nmbe").text(model2stats["NMBE"].toFixed(2));
+        $("#modelStats2 #rmse").text(model2stats["RMSE"].toFixed(2));
 
-      $('#highstock2').highcharts('StockChart', {
-        rangeSelector : {
-          selected : 1
-        },
-        xAxis: {
-          gridLineWidth: 1
-        },
-        title : {
-          text : "Model Against Evaluation Period"
-        },
-        legend : {
-        	enabled : true
-        },
-        series : [{
-          name : data2[0][0],
-          data : realdata,
-          tooltip: {
-            valueDecimals: 2
+        var data6 = [];
+        var ghausi6 = JSON.parse(response[4]);
+        for (var key in ghausi6) {
+          if (ghausi6.hasOwnProperty(key)) {
+            data6.push([key, ghausi6[key]]);
+          }
+        }
+        var realdata = [];
+        var real = data6[0][1];
+        for (var key in real) {
+          if (real.hasOwnProperty(key)) {
+            realdata.push([parseInt(key), real[key]]);
+          }
+        }
+        var preditiondata = [];
+        var predition = data6[1][1];
+        for (var key in predition) {
+          if (predition.hasOwnProperty(key)) {
+            preditiondata.push([parseInt(key), predition[key]]);
+          }
+        }
+        $('#highstock2').highcharts('StockChart', {
+          rangeSelector : {
+            selected : 1
           },
-          color : "green"
-        }, {
-          name : data[1][0],
-          data : preditiondata,
-          tooltip: {
-            valueDecimals: 2
+          xAxis: {
+            gridLineWidth: 1
           },
-          color : "red"
-        }]
-      });
-
-      var data3 = [];
-      var ghausi3 = JSON.parse(response[2]);
-			for (var key in ghausi3) {
-				if (ghausi3.hasOwnProperty(key)) {
-					data3.push([parseInt(key), ghausi3[key]]);
-				}
-			}
-
-      $('#highstock3').highcharts('StockChart', {
-
-      	chart : {
-      		events : {
-      			redraw: function(){
-      				shownTimestamps = this.series[0].processedXData;
-      				shownData = this.series[0].processedYData;
-      				var savingsTotal = calculateTotalSavings(shownTimestamps, shownData);
-      				$("#CHANGETHIS").text(savingsTotal.toFixed(2)+" kBtu*hr");
-      			}
-      		}
-      	},
-        rangeSelector : {
-          selected : 1
-        },
-        xAxis: {
-          gridLineWidth: 1
-        },
-        title : {
-          text : "Savings"
-        },
-        legend : {
-        	enabled : true
-        },
-        series : [{
-          name : "Savings",
-          data : data3,
-          tooltip: {
-            valueDecimals: 2
+          title : {
+            text : "Model2 Against Baseline 2"
           },
-          color : "gold"
-        }]
-      });
+          legend : {
+            enabled: true
+          },
+          series : [{
+            name : data6[0][0],
+            data : realdata,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color : "green"
+          }, {
+            name : data6[1][0],
+            data : preditiondata,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color: "red"
+          }]
+        });
+      }
 
-      var savingsChart = $('#highstock3').highcharts();
-      var startTimestamps = savingsChart.series[0].processedXData;
-      var startData = savingsChart.series[0].processedYData;
-      var savingsTotal = calculateTotalSavings(startTimestamps, startData);
-      $("#CHANGETHIS").text(savingsTotal.toFixed(2)+" kBtu*hr");
+      if (!tmy_mode_on){
+        var data2 = [];
+        var ghausi2 = JSON.parse(response[1]);
+  			for (var key in ghausi2) {
+  				if (ghausi2.hasOwnProperty(key)) {
+  					data2.push([key, ghausi2[key]]);
+  				}
+  			}
+  			var realdata = [];
+  			var real = data2[0][1];
+  			for (var key in real) {
+  				if (real.hasOwnProperty(key)) {
+  					realdata.push([parseInt(key), real[key]]);
+  				}
+  			}
+  			var preditiondata = [];
+  			var predition = data2[1][1];
+  			for (var key in predition) {
+  				if (predition.hasOwnProperty(key)) {
+  					preditiondata.push([parseInt(key), predition[key]]);
+  				}
+  			}
+
+        $('#highstock3').highcharts('StockChart', {
+          rangeSelector : {
+            selected : 1
+          },
+          xAxis: {
+            gridLineWidth: 1
+          },
+          title : {
+            text : "Model Against Evaluation Period"
+          },
+          legend : {
+          	enabled : true
+          },
+          series : [{
+            name : data2[0][0],
+            data : realdata,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color : "green"
+          }, {
+            name : data2[1][0],
+            data : preditiondata,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color : "red"
+          }]
+        });
+
+
+        var data3 = [];
+        var ghausi3 = JSON.parse(response[2]);
+  			for (var key in ghausi3) {
+  				if (ghausi3.hasOwnProperty(key)) {
+  					data3.push([parseInt(key), ghausi3[key]]);
+  				}
+  			}
+
+        $('#highstock4').highcharts('StockChart', {
+
+        	chart : {
+        		events : {
+        			redraw: function(){
+        				shownTimestamps = this.series[0].processedXData;
+        				shownData = this.series[0].processedYData;
+        				var savingsTotal = calculateTotalSavings(shownTimestamps, shownData);
+        				$("#savings").text(savingsTotal.toFixed(2)+" kBtu*hr");
+        			}
+        		}
+        	},
+          rangeSelector : {
+            selected : 1
+          },
+          xAxis: {
+            gridLineWidth: 1
+          },
+          title : {
+            text : "Savings"
+          },
+          legend : {
+          	enabled : true
+          },
+          series : [{
+            name : "Savings",
+            data : data3,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color : "gold"
+          }]
+        });
+
+        var savingsChart = $('#highstock4').highcharts();
+        var startTimestamps = savingsChart.series[0].processedXData;
+        var startData = savingsChart.series[0].processedYData;
+        var savingsTotal = calculateTotalSavings(startTimestamps, startData);
+        $("#savings").text(savingsTotal.toFixed(2)+" kBtu*hr");
+      }
       
+
+      if (tmy_mode_on){
+        var data7 = [];
+        var ghausi7 = JSON.parse(response[8]);
+        for (var key in ghausi7) {
+          if (ghausi7.hasOwnProperty(key)) {
+            data7.push([key, ghausi7[key]]);
+          }
+        }
+        var realdata = [];
+        var real = data7[0][1];
+        for (var key in real) {
+          if (real.hasOwnProperty(key)) {
+            realdata.push([parseInt(key), real[key]]);
+          }
+        }
+        var preditiondata = [];
+        var predition = data7[1][1];
+        for (var key in predition) {
+          if (predition.hasOwnProperty(key)) {
+            preditiondata.push([parseInt(key), predition[key]]);
+          }
+        }
+
+        $('#highstock5').highcharts('StockChart', {
+          rangeSelector : {
+            selected : 1
+          },
+          xAxis: {
+            gridLineWidth: 1
+          },
+          title : {
+            text : "Model 1 Against Model 2 with TMY Input"
+          },
+          legend : {
+            enabled : true
+          },
+          series : [{
+            name : data7[0][0],
+            data : realdata,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color : "green"
+          }, {
+            name : data7[1][0],
+            data : preditiondata,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color : "red"
+          }]
+        });
+      }
+
+
       document.getElementById("loader").style.display="none";
       document.getElementById("spinner").style.display="none";
     });

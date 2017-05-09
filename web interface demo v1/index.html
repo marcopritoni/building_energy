@@ -146,7 +146,7 @@
     </div>
 
     <!-- optional  -->
-    <div class="row defaultRow">
+    <div class="row" hidden>
       <div class="input-period">
       <label for="" style="padding-left: 15px">Extrapolated Performance Period</label>
       <form id="form4" name="form4" class="form-inline">
@@ -165,7 +165,7 @@
     </div>
 
     <!-- optional  -->
-    <div class="row TMYRow" style="display:none">
+    <!-- <div class="row TMYRow" style="display:none">
       <div class="input-period">
       <label for="" style="padding-left: 15px">TMY MODE INPUT</label>
       <form id="form5" name="form5" class="form-inline">
@@ -181,7 +181,7 @@
           </div>
       </form>
       </div>
-    </div>
+    </div> -->
     <!-- evaluate button  -->
     <a href="#" class="button" id="evaluate">EVALUATE</a>
   </div>
@@ -193,7 +193,7 @@
     <div id="loader">
       <div id="spinner"></div>
     </div>
-    <div class="chart container">
+    <div class="chart container defchart tmychart">
       <div class="col-md-10">
         <div id="highstock"></div>
       </div>
@@ -248,12 +248,70 @@
         </table>
       </div>
     </div>
-    <div class="chart">
-      <div id="highstock2"></div>
-    </div>
-    <div class="chart container">
+
+    <div class="chart container tmychart">
       <div class="col-md-10">
-        <div id="highstock3"></div>
+        <div id="highstock2"></div>
+      </div>
+      <div id="modelStats2" class="col-md-2">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Adj_R^2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="R2"></td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>CV_RMSE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="cvrmse"></td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>NMBE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="nmbe"></td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>RMSE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="rmse"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="chart defchart">
+      <div id="highstock3"></div>
+    </div>
+
+    <div class="chart container defchart">
+      <div class="col-md-10">
+        <div id="highstock4"></div>
       </div>
       <div id="savingsStats" class="col-md-2">
         <table class="table">
@@ -264,12 +322,17 @@
           </thead>
           <tbody>
             <tr>
-              <td id="CHANGETHIS"></td>
+              <td id="savings"></td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <div class="chart tmychart">
+      <div id="highstock5"></div>
+    </div>
+
   </div>
 
 </div> <!-- End Content -->
