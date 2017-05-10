@@ -1,9 +1,22 @@
 body{
   background-color:#002855;
+  font-family: 'Roboto', sans-serif;
 }
 
+label{
+  font-family: 'Lato', sans-serif;
+  font-weight: 500;
+  font-size: 1.2em;
+  margin: 8px;
+}
+
+input{
+  font-family: 'Raleway', sans-serif;
+  font-weight: 800;
+}
 /*Header*/
 .header {
+  font-family: 'Raleway', sans-serif;
   position: fixed;
   margin: auto;
   width: 100%;
@@ -18,7 +31,7 @@ body{
 }
 
 .header_logo {
-  font-family: 'Oswald', sans-serif;
+  font-weight: bold;
   margin: 0;
   padding-top: 10px;
   font-size: 35px;
@@ -66,6 +79,7 @@ a {
   display: block;
   margin: 20px auto;
   max-width: 180px;
+  font-size: 1.2em;
   text-decoration: none;
   text-align: center;
   border-radius: 4px;
@@ -74,11 +88,13 @@ a {
 
 a.button {
   color: black;
+  text-decoration: none;
   box-shadow: #002855 0 0px 0px 5px inset;
 }
 
 a.button:hover {
   color: white;
+  text-decoration: none;
   box-shadow: #002855 0 0px 0px 40px inset;
 }/*Evaluate Button - end*/
 
@@ -94,7 +110,7 @@ a.button:hover {
   border-radius: 5px;
   margin:0;
   width:100%;
-  font-family:arial;
+  font-family: 'Lato', sans-serif;
   background: #eee url("http://blog.idevelopweb.site/wp-content/uploads/2016/05/nw_selarw.png") no-repeat scroll 97.5% center;
 }
 
@@ -115,6 +131,8 @@ a.button:hover {
 
 .form-group {
   width: 100%;
+  font-weight: 300;
+  font-size: 0.9em;
 }
 
 /*model dropdown menu - end*/
@@ -138,50 +156,33 @@ a.button:hover {
   width:100%;
 }
 
-#loader{
+#loader {
   display: none;
-  width: 50px;
-  height: 50px;
-  border-radius: 100%;
-  position: relative;
-  margin: 0 auto;
-}
-#spinner:before, #spinner:after{
-  display: none;
-  content: "";
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  width: 100%;
-  height: 100%;
   margin: auto;
-  margin-bottom: 50px;
-  border-radius: 100%;
-  border: 10px solid transparent;
-  border-top-color: #3498db;
+  margin-bottom: 20px;
+  border: 8px solid #dadada;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 70px;
+  height: 70px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
 }
 
-#spinner:before{
-  z-index: 100;
-  animation: spin 1s infinite;
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-bottom {
+  position: relative;
+  -webkit-animation-name: animatebottom;
+  -webkit-animation-duration: 1s;
+  animation-name: animatebottom;
+  animation-duration: 1s
 }
 
-#spinner:after{
-  border: 10px solid #ccc;
-}
-
-@keyframes spin{
-  0%{
-    -webkit-transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-
-  100%{
-    -webkit-transform: rotate(360deg);
-    -ms-transform: rotate(360deg);
-    -o-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
+@keyframes animatebottom {
+  from{ bottom:-100px; opacity:0 }
+  to{ bottom:0; opacity:1 }
 }
