@@ -3,8 +3,8 @@
 
 var main = function() {
 	document.getElementById("loader").style.display="block";
-	document.getElementById("spinner").style.display="block";
-	
+
+
 	parameters = {};
 	parameters['building'] = ($('#sel_val1').val());
 	parameters['energy'] = ($('#sel_val2').val());
@@ -28,7 +28,7 @@ var main = function() {
 	parameters['modeltype'] = modeltype;
 
   (function(){
-  	
+
     $.getJSON("/python.json", parameters, function (response) {
     	// $("#dropdown").click();
       var tmy_mode_on = $("#TMYSwitch").hasClass("active");
@@ -39,8 +39,8 @@ var main = function() {
       else{
         $(".defchart").css("display", "block");
         $(".defchart").css("border", "2px solid black");
-      }     
-    	
+      }
+
 			console.log(response);
 
 			var model1stats = JSON.parse(response[3]);
@@ -261,7 +261,7 @@ var main = function() {
         var savingsTotal = calculateTotalSavings(startTimestamps, startData);
         $("#savings").text(savingsTotal.toFixed(2)+" kBtu*hr");
       }
-      
+
 
       if (tmy_mode_on){
         var data7 = [];
@@ -319,7 +319,7 @@ var main = function() {
 
 
       document.getElementById("loader").style.display="none";
-      document.getElementById("spinner").style.display="none";
+      
     });
   })();
 };
