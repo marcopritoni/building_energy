@@ -5,6 +5,7 @@ import os
 import sys
 import time
 import traceback
+import argparse
 
 # Start logging temporarily with file object
 sys.stderr = open("../logs/error.log", "w")
@@ -39,6 +40,7 @@ def main():
     np.set_printoptions(threshold=np.nan)
 
     # Test example
+    """
     building_name = "Ghausi"
     energy_type = "ChilledWater"
     model_type = "LinearRegression"
@@ -50,44 +52,30 @@ def main():
     eval_end = "2015-12"
     predict_start = "2016-01"
     predict_end = "2016-12"
+    """
 
-    # Check if number of command-line arguments is correctly set
-    if len(sys.argv) == 12:
-        building_name = sys.argv[1]
-        energy_type = sys.argv[2]
-        model_type = sys.argv[4]
-        base_start = sys.argv[3]
-        base_end = sys.argv[4]
-        base_start2 = sys.argv[5]
-        base_end2 = sys.argv[6]
-        eval_start = sys.argv[7]
-        eval_end = sys.argv[8]
-        predict_start = sys.argv[9]
-        predict_end = sys.argv[10]
+    # Change parsing/getting command line arguments
+    parser = argparse.ArgumentParser(description='A tool for mechanical engineers at the UC Davis Energy Conservation Office to analyze the energy performance of UC Davis buildings.', 
+        fromfile_prefix_chars='@')
+    parser.add_argument("--tmy", action='store_true', help="option to select tmy evaluation and projection")
+    parser.add_argument("building_name", choices=['Ghausi', 'Bainer', 'Meyer', 'Briggs', 'EPS', 'Physics', 'Hutchinson'], help="building to perform analysis on")
+    parser.add_argument("energy_type", choices=['ChilledWater', 'Electricity', 'NaturalGas', 'Steam'], help="data for selected fuel type")
+    parser.add_argument("model_type", choices=['LinearRegression', 'RandomForest'])
+    parser.add_argument("base_start", help="starting period of baseline 1. YEAR-MONTH (ex. 2016-01)")
+    parser.add_argument("base_end", help="end period of baseline 2. YEAR-MONTH (ex. 2016-01)")
+    parser.add_argument("base_start2", help="starting period of baseline 2")
+    parser.add_argument("base_end2", help="end period of baseline 2")
+    parser.add_argument("eval_start", help="evaluation start period")
+    parser.add_argument("eval_end", help="evaluation end period")
+    parser.add_argument("predict_start", help="prediction start period")
+    parser.add_argument("predict_end", help="prediction end period")
+    args = parser.parse_args()
 
-    else:
-        logging.error("Incorrect number of command-line arguments!")
-
-    # Time period to request data from PI system
-    start = "2014"
-    end = "t"
-
-    data_name = "_".join([building_name, energy_type, "Demand_kBtu"])
-    base_slice = (slice(base_start, base_end))
-    base_slice2 = (slice(base_start2, base_end2))
-    eval_slice = (slice(eval_start, eval_end))
-    predict_slice = (slice(predict_start, predict_end))
-    
-    downloader = pipy_datalink()
-    data_raw = downloader.get_stream_by_point([data_name, "OAT"], start, end)
-
-    preprocessor = DataPreprocessor(data_raw)
-    preprocessor.clean_data()
-    preprocessor.add_degree_days(preprocessor.data_cleaned)
-    preprocessor.add_time_features(preprocessor.data_preprocessed)
-    preprocessor.create_dummies(preprocessor.data_preprocessed,
-                                var_to_expand=["TOD", "DOW", "MONTH"])
-    data = preprocessor.data_preprocessed
+    data_name = "_".join([args.building_name, args.energy_type, "Demand_kBtu"])
+    base_slice = (slice(args.base_start, args.base_end))
+    base_slice2 = (slice(args.base_start2, args.base_end2))
+    eval_slice = (slice(args.eval_start, args.eval_end))
+    predict_slice = (slice(args.predict_start, args.predict_end))
 
     output_vars = [data_name]
     input_vars = ["hdh", "cdh", u"TOD_0", u"TOD_1", u"TOD_2",
@@ -98,11 +86,21 @@ def main():
                   u"DOW_5", u"DOW_6", u"MONTH_1", u"MONTH_2", u"MONTH_3", u"MONTH_4",
                   u"MONTH_5", u"MONTH_6", u"MONTH_7", u"MONTH_8", u"MONTH_9", u"MONTH_10",
                   u"MONTH_11", u"MONTH_12"]
+
+    # Time period to request data from PI system
+    start = "2014"
+    end = "t"
+    
+    downloader = pipy_datalink()
+    data_raw = downloader.get_stream_by_point([data_name, "OAT"], start, end)
+
+    # moved code to process data into its own function
+    data = process_data(data_raw)
     
     # Idea: Create two different models 
     data_set = DataSet(data, base_slice, base_slice2, eval_slice, output_vars, input_vars)
     
-    model_1 = Model(model_type)
+    model_1 = Model(args.model_type)
     model_1.train(data_set.baseline1)
     model_1.project(data_set.eval)
     model_1.output()
@@ -120,20 +118,12 @@ def main():
     tmy_raw = downloader.get_stream(Web_ID=web_id,_start="2016-04-01", _end="t")
     tmy_raw.rename(columns={tmy_raw.columns[0]: "OAT"}, inplace=True)
     tmy_raw.dropna()   
+
+    tmy_data = process_data(tmy_raw)  
     
-    preprocessor = DataPreprocessor(tmy_raw)
-    preprocessor.clean_data()
-    preprocessor.add_degree_days(preprocessor.data_cleaned)
-    preprocessor.add_time_features(preprocessor.data_preprocessed)
-    preprocessor.create_dummies(preprocessor.data_preprocessed,
-                                var_to_expand=["TOD", "DOW", "MONTH"])
-    tmy_data = preprocessor.data_preprocessed  
+    eval_data = evaluate(tmy_data, input_vars)
     
-    eval_data = {}
-    eval_data["in"] = tmy_data[input_vars]
-    eval_data["out"] = tmy_data[["OAT"]]
-    
-    model_2 = Model(model_type)
+    model_2 = Model(args.model_type)
     model_2.train(data_set.baseline2)
     model_2.project(data_set.eval)
     model_2.output()
@@ -187,6 +177,22 @@ def start_logger():
 
     sys.stderr.close()
     sys.stderr = StreamWriter()
+
+def process_data(data):
+    preprocessor = DataPreprocessor(data)
+    preprocessor.clean_data()
+    preprocessor.add_degree_days(preprocessor.data_cleaned)
+    preprocessor.add_time_features(preprocessor.data_preprocessed)
+    preprocessor.create_dummies(preprocessor.data_preprocessed,
+                                var_to_expand=["TOD", "DOW", "MONTH"])
+    return preprocessor.data_preprocessed
+
+
+def evaluate(tmy_data, input_vars):
+    eval_data = {}
+    eval_data["in"] = tmy_data[input_vars]
+    eval_data["out"] = tmy_data[["OAT"]]
+    return eval_data
 
 """Data"""
 
@@ -318,15 +324,7 @@ class Model(object):
         num_inputs = len(baseline["out"].columns)
         out_var = baseline["out"].columns[0]
         self.scores = self.calc_scores(baseline["out"], num_inputs, out_var)
-            
-        # separate train and evaluation functions
-        """
-        self.clf.fit(baseline.bs1_in, baseline.bs1_out)
-        baseline.bs1_out["Model"] = self.clf.predict(baseline.bs1_in.values)
-        baseline.eval_out["Model"] = self.clf.predict(baseline.eval_in.values)
-        out_var = self.baseline.eval_out.columns[0]
-        self.savings = baseline.eval_out["Model"] - baseline.eval_out[out_var]
-        """
+
     def project(self, eval_data):
         # Predicts in the period specified by eval_data
         self.eval = eval_data
