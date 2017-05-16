@@ -215,6 +215,11 @@ var main = function() {
               color : "red"
             }]
           });
+<<<<<<< HEAD
+          var myChart = $('#highstock3').highcharts();
+          console.log(myChart.series);
+=======
+>>>>>>> c80b046... Full logic for TMY mode
 
 
           var data3 = [];

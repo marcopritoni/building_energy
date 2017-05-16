@@ -307,30 +307,37 @@
 
     <div class="chart defchart">
       <div id="highstock3"></div>
+      <button type="button" class="btn btn-default" class="export">Export data as CSV</button>
     </div>
 
     <div class="chart container defchart">
-      <div class="col-md-10">
-        <div id="highstock4"></div>
+      <div class="row">
+        <div class="col-md-10">
+          <div id="highstock4"></div>
+        </div>
+        <div id="savingsStats" class="col-md-2">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Total Savings in Selected Period</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="savings"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div id="savingsStats" class="col-md-2">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Total Savings in Selected Period</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="savings"></td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="row">
+        <button type="button" class="btn btn-default" class="export">Export data as CSV</button>
       </div>
     </div>
 
     <div class="chart tmychart">
       <div id="highstock5"></div>
+      <button type="button" class="btn btn-default" class="export">Export data as CSV</button>
     </div>
 
   </div>
