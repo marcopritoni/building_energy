@@ -194,126 +194,140 @@
     <div id="loader"></div>
 
     <div class="chart container defchart tmychart">
-      <div class="col-md-10">
-        <div id="highstock"></div>
+      <div class="row">
+        <div class="col-md-10">
+          <div id="highstock" class="histock"></div>
+        </div>
+        <div id="modelStats" class="col-md-2">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Adj_R^2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="R2"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>CV_RMSE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="cvrmse"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>NMBE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="nmbe"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>RMSE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="rmse"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div id="modelStats" class="col-md-2">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Adj_R^2</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="R2"></td>
-            </tr>
-          </tbody>
-        </table>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>CV_RMSE</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="cvrmse"></td>
-            </tr>
-          </tbody>
-        </table>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>NMBE</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="nmbe"></td>
-            </tr>
-          </tbody>
-        </table>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>RMSE</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="rmse"></td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="row">
+        <button type="button" class="btn btn-default col-md-2 export">Export data as CSV</button>
       </div>
     </div>
 
     <div class="chart container tmychart">
-      <div class="col-md-10">
-        <div id="highstock2"></div>
+      <div class="row">
+        <div class="col-md-10">
+          <div id="highstock2" class="histock"></div>
+        </div>
+        <div id="modelStats2" class="col-md-2">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Adj_R^2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="R2"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>CV_RMSE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="cvrmse"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>NMBE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="nmbe"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>RMSE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="rmse"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div id="modelStats2" class="col-md-2">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Adj_R^2</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="R2"></td>
-            </tr>
-          </tbody>
-        </table>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>CV_RMSE</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="cvrmse"></td>
-            </tr>
-          </tbody>
-        </table>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>NMBE</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="nmbe"></td>
-            </tr>
-          </tbody>
-        </table>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>RMSE</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="rmse"></td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="row">
+        <button type="button" class="btn btn-default col-md-2 export">Export data as CSV</button>
       </div>
     </div>
 
-    <div class="chart defchart">
-      <div id="highstock3"></div>
-      <button type="button" class="btn btn-default" class="export">Export data as CSV</button>
+    <div class="chart defchart container">
+      <div class="row">
+        <div id="highstock3" class="histock"></div>
+      </div>
+      <div class="row">
+        <button type="button" class="btn btn-default col-md-2 export">Export data as CSV</button>
+      </div>
     </div>
 
     <div class="chart container defchart">
       <div class="row">
         <div class="col-md-10">
-          <div id="highstock4"></div>
+          <div id="highstock4" class="histock"></div>
         </div>
         <div id="savingsStats" class="col-md-2">
           <table class="table">
@@ -331,19 +345,26 @@
         </div>
       </div>
       <div class="row">
-        <button type="button" class="btn btn-default" class="export">Export data as CSV</button>
+        <button type="button" class="btn btn-default col-md-2 export">Export data as CSV</button>
       </div>
     </div>
 
-    <div class="chart tmychart">
-      <div id="highstock5"></div>
-      <button type="button" class="btn btn-default" class="export">Export data as CSV</button>
+    <div class="chart tmychart container">
+      <div class="row">
+        <div class="col-md-12">
+          <div id="highstock5" class="histock"></div>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" class="btn btn-default col-md-2 export">Export data as CSV</button>
+      </div>
     </div>
 
   </div>
 
 </div> <!-- End Content -->
 
+<script src="js/exportChartAsCSV.js"></script>
 <script src="js/calculateTotalSavings.js"></script>
 <script src="js/index.js"></script>
 <script src="js/evaluate.js"></script>

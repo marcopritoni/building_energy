@@ -104,227 +104,231 @@ var main = function() {
           }]
         });
 
-        if (tmy_mode_on){
-          var model2stats = JSON.parse(response[7]);
-          $("#modelStats2 #R2").text(model2stats["Adj_R2"].toFixed(2));
-          $("#modelStats2 #cvrmse").text(model2stats["CV_RMSE"].toFixed(2));
-          $("#modelStats2 #nmbe").text(model2stats["NMBE"].toFixed(2));
-          $("#modelStats2 #rmse").text(model2stats["RMSE"].toFixed(2));
+        var model2stats = JSON.parse(response[7]);
+        $("#modelStats2 #R2").text(model2stats["Adj_R2"].toFixed(2));
+        $("#modelStats2 #cvrmse").text(model2stats["CV_RMSE"].toFixed(2));
+        $("#modelStats2 #nmbe").text(model2stats["NMBE"].toFixed(2));
+        $("#modelStats2 #rmse").text(model2stats["RMSE"].toFixed(2));
 
-          var data6 = [];
-          var ghausi6 = JSON.parse(response[4]);
-          for (var key in ghausi6) {
-            if (ghausi6.hasOwnProperty(key)) {
-              data6.push([key, ghausi6[key]]);
-            }
+        var data6 = [];
+        var ghausi6 = JSON.parse(response[4]);
+        for (var key in ghausi6) {
+          if (ghausi6.hasOwnProperty(key)) {
+            data6.push([key, ghausi6[key]]);
           }
-          var realdata = [];
-          var real = data6[0][1];
-          for (var key in real) {
-            if (real.hasOwnProperty(key)) {
-              realdata.push([parseInt(key), real[key]]);
-            }
+        }
+        var realdata = [];
+        var real = data6[0][1];
+        for (var key in real) {
+          if (real.hasOwnProperty(key)) {
+            realdata.push([parseInt(key), real[key]]);
           }
-          var preditiondata = [];
-          var predition = data6[1][1];
-          for (var key in predition) {
-            if (predition.hasOwnProperty(key)) {
-              preditiondata.push([parseInt(key), predition[key]]);
-            }
+        }
+        var preditiondata = [];
+        var predition = data6[1][1];
+        for (var key in predition) {
+          if (predition.hasOwnProperty(key)) {
+            preditiondata.push([parseInt(key), predition[key]]);
           }
-          $('#highstock2').highcharts('StockChart', {
-            rangeSelector : {
-              selected : 1
+        }
+        $('#highstock2').highcharts('StockChart', {
+          rangeSelector : {
+            selected : 1
+          },
+          xAxis: {
+            gridLineWidth: 1
+          },
+          title : {
+            text : "Model2 Against Baseline 2"
+          },
+          legend : {
+            enabled: true
+          },
+          series : [{
+            name : data6[0][0],
+            data : realdata,
+            tooltip: {
+              valueDecimals: 2
             },
-            xAxis: {
-              gridLineWidth: 1
+            color : "green"
+          }, {
+            name : data6[1][0],
+            data : preditiondata,
+            tooltip: {
+              valueDecimals: 2
             },
-            title : {
-              text : "Model2 Against Baseline 2"
+            color: "red"
+          }]
+        });
+      
+
+        var data2 = [];
+        var ghausi2 = JSON.parse(response[1]);
+  			for (var key in ghausi2) {
+  				if (ghausi2.hasOwnProperty(key)) {
+  					data2.push([key, ghausi2[key]]);
+  				}
+  			}
+  			var realdata = [];
+  			var real = data2[0][1];
+  			for (var key in real) {
+  				if (real.hasOwnProperty(key)) {
+  					realdata.push([parseInt(key), real[key]]);
+  				}
+  			}
+  			var preditiondata = [];
+  			var predition = data2[1][1];
+  			for (var key in predition) {
+  				if (predition.hasOwnProperty(key)) {
+  					preditiondata.push([parseInt(key), predition[key]]);
+  				}
+  			}
+
+        $('#highstock3').highcharts('StockChart', {
+          rangeSelector : {
+            selected : 1
+          },
+          xAxis: {
+            gridLineWidth: 1
+          },
+          title : {
+            text : "Model Against Evaluation Period"
+          },
+          legend : {
+          	enabled : true
+          },
+          series : [{
+            name : data2[0][0],
+            data : realdata,
+            tooltip: {
+              valueDecimals: 2
             },
-            legend : {
-              enabled: true
+            color : "green"
+          }, {
+            name : data2[1][0],
+            data : preditiondata,
+            tooltip: {
+              valueDecimals: 2
             },
-            series : [{
-              name : data6[0][0],
-              data : realdata,
-              tooltip: {
-                valueDecimals: 2
-              },
-              color : "green"
-            }, {
-              name : data6[1][0],
-              data : preditiondata,
-              tooltip: {
-                valueDecimals: 2
-              },
-              color: "red"
-            }]
-          });
+            color : "red"
+          }]
+        });
+
+        var myChart = $('#highstock3').highcharts();
+        console.log(myChart.series);
+
+
+
+        var data3 = [];
+        var ghausi3 = JSON.parse(response[2]);
+  			for (var key in ghausi3) {
+  				if (ghausi3.hasOwnProperty(key)) {
+  					data3.push([parseInt(key), ghausi3[key]]);
+  				}
+  			}
+
+        $('#highstock4').highcharts('StockChart', {
+
+        	chart : {
+        		events : {
+        			redraw: function(){
+        				shownTimestamps = this.series[0].processedXData;
+        				shownData = this.series[0].processedYData;
+        				var savingsTotal = calculateTotalSavings(shownTimestamps, shownData);
+        				$("#savings").text(savingsTotal.toFixed(2)+" kBtu*hr");
+        			}
+        		}
+        	},
+          rangeSelector : {
+            selected : 1
+          },
+          xAxis: {
+            gridLineWidth: 1
+          },
+          title : {
+            text : "Savings"
+          },
+          legend : {
+          	enabled : true
+          },
+          series : [{
+            name : "Savings",
+            data : data3,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color : "gold"
+          }]
+        });
+
+        var savingsChart = $('#highstock4').highcharts();
+        var startTimestamps = savingsChart.series[0].processedXData;
+        var startData = savingsChart.series[0].processedYData;
+        var savingsTotal = calculateTotalSavings(startTimestamps, startData);
+        $("#savings").text(savingsTotal.toFixed(2)+" kBtu*hr");
+      
+
+
+        var data7 = [];
+        var ghausi7 = JSON.parse(response[8]);
+        for (var key in ghausi7) {
+          if (ghausi7.hasOwnProperty(key)) {
+            data7.push([key, ghausi7[key]]);
+          }
+        }
+        var realdata = [];
+        var real = data7[0][1];
+        for (var key in real) {
+          if (real.hasOwnProperty(key)) {
+            realdata.push([parseInt(key), real[key]]);
+          }
+        }
+        var preditiondata = [];
+        var predition = data7[1][1];
+        for (var key in predition) {
+          if (predition.hasOwnProperty(key)) {
+            preditiondata.push([parseInt(key), predition[key]]);
+          }
         }
 
-        if (!tmy_mode_on){
-          var data2 = [];
-          var ghausi2 = JSON.parse(response[1]);
-    			for (var key in ghausi2) {
-    				if (ghausi2.hasOwnProperty(key)) {
-    					data2.push([key, ghausi2[key]]);
-    				}
-    			}
-    			var realdata = [];
-    			var real = data2[0][1];
-    			for (var key in real) {
-    				if (real.hasOwnProperty(key)) {
-    					realdata.push([parseInt(key), real[key]]);
-    				}
-    			}
-    			var preditiondata = [];
-    			var predition = data2[1][1];
-    			for (var key in predition) {
-    				if (predition.hasOwnProperty(key)) {
-    					preditiondata.push([parseInt(key), predition[key]]);
-    				}
-    			}
+        $('#highstock5').highcharts('StockChart', {
+          rangeSelector : {
+            selected : 1
+          },
+          xAxis: {
+            gridLineWidth: 1
+          },
+          title : {
+            text : "Model 1 Against Model 2 with TMY Input"
+          },
+          legend : {
+            enabled : true
+          },
+          series : [{
+            name : data7[0][0],
+            data : realdata,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color : "green"
+          }, {
+            name : data7[1][0],
+            data : preditiondata,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color : "red"
+          }]
+        });
+      
 
-          $('#highstock3').highcharts('StockChart', {
-            rangeSelector : {
-              selected : 1
-            },
-            xAxis: {
-              gridLineWidth: 1
-            },
-            title : {
-              text : "Model Against Evaluation Period"
-            },
-            legend : {
-            	enabled : true
-            },
-            series : [{
-              name : data2[0][0],
-              data : realdata,
-              tooltip: {
-                valueDecimals: 2
-              },
-              color : "green"
-            }, {
-              name : data2[1][0],
-              data : preditiondata,
-              tooltip: {
-                valueDecimals: 2
-              },
-              color : "red"
-            }]
-          });
-<<<<<<< HEAD
-          var myChart = $('#highstock3').highcharts();
-          console.log(myChart.series);
-=======
->>>>>>> c80b046... Full logic for TMY mode
-
-
-          var data3 = [];
-          var ghausi3 = JSON.parse(response[2]);
-    			for (var key in ghausi3) {
-    				if (ghausi3.hasOwnProperty(key)) {
-    					data3.push([parseInt(key), ghausi3[key]]);
-    				}
-    			}
-
-          $('#highstock4').highcharts('StockChart', {
-
-          	chart : {
-          		events : {
-          			redraw: function(){
-          				shownTimestamps = this.series[0].processedXData;
-          				shownData = this.series[0].processedYData;
-          				var savingsTotal = calculateTotalSavings(shownTimestamps, shownData);
-          				$("#savings").text(savingsTotal.toFixed(2)+" kBtu*hr");
-          			}
-          		}
-          	},
-            rangeSelector : {
-              selected : 1
-            },
-            xAxis: {
-              gridLineWidth: 1
-            },
-            title : {
-              text : "Savings"
-            },
-            legend : {
-            	enabled : true
-            },
-            series : [{
-              name : "Savings",
-              data : data3,
-              tooltip: {
-                valueDecimals: 2
-              },
-              color : "gold"
-            }]
-          });
-
-          var savingsChart = $('#highstock4').highcharts();
-          var startTimestamps = savingsChart.series[0].processedXData;
-          var startData = savingsChart.series[0].processedYData;
-          var savingsTotal = calculateTotalSavings(startTimestamps, startData);
-          $("#savings").text(savingsTotal.toFixed(2)+" kBtu*hr");
-        }
-
-
-        if (tmy_mode_on){
-          var data7 = [];
-          var ghausi7 = JSON.parse(response[8]);
-          for (var key in ghausi7) {
-            if (ghausi7.hasOwnProperty(key)) {
-              data7.push([key, ghausi7[key]]);
-            }
-          }
-          var realdata = [];
-          var real = data7[0][1];
-          for (var key in real) {
-            if (real.hasOwnProperty(key)) {
-              realdata.push([parseInt(key), real[key]]);
-            }
-          }
-          var preditiondata = [];
-          var predition = data7[1][1];
-          for (var key in predition) {
-            if (predition.hasOwnProperty(key)) {
-              preditiondata.push([parseInt(key), predition[key]]);
-            }
-          }
-
-          $('#highstock5').highcharts('StockChart', {
-            rangeSelector : {
-              selected : 1
-            },
-            xAxis: {
-              gridLineWidth: 1
-            },
-            title : {
-              text : "Model 1 Against Model 2 with TMY Input"
-            },
-            legend : {
-              enabled : true
-            },
-            series : [{
-              name : data7[0][0],
-              data : realdata,
-              tooltip: {
-                valueDecimals: 2
-              },
-              color : "green"
-            }, {
-              name : data7[1][0],
-              data : preditiondata,
-              tooltip: {
-                valueDecimals: 2
-              },
-              color : "red"
-            }]
-          });
-        }
+        $(".chart").each(function(index, chart){
+          console.log(chart);
+          var highchart = $(chart).find(".histock").highcharts();
+          console.log(highchart);
+          if (highchart)
+            $(chart).find(".export").click(highchart,exportChartAsCSV);
+        });
       }
 
       else { // ERROR RECEIVED

@@ -1,8 +1,9 @@
-function registerExportButton (chart, button) {
+var exportChartAsCSV = function (chart) {
+	console.log("haHAA we innit", chart);
 	var csvdata = [];
-	csvdata.push(chart.series[0].xData); // Timestamps are first column, all series should share these so just pull it from first entry
+	csvdata.push(chart.data.series[0].xData); // Timestamps are first column, all series should share these so just pull it from first entry
 
-	chart.series.slice(0,-1).forEach(function(series){ // The series array also includes a series 
+	chart.data.series.slice(0,-1).forEach(function(series){ // The series array also includes a series 
 																										 // for the scrollable navigation line of the chart,
 																										 // slicing out the last entry will ignore this
 		csvdata.push(series.yData);																									 
@@ -10,9 +11,9 @@ function registerExportButton (chart, button) {
 
 	//csvdata now is an array with arrays for each column we will want in our csv
 	var csv = "Timestamps";
-	for (var i=1; i<=csvdata.length; i++) {
+	for (var i=1; i<csvdata.length; i++) {
 
-		csv += ",Series"+i;
+		csv += ","+chart.data.series[i-1].name;
 	}
 	csv += "\n"
 
@@ -28,7 +29,6 @@ function registerExportButton (chart, button) {
 	var hiddenElement = document.createElement('a');
 	hiddenElement.href = 'data:text/csv;charset=utf-8,'+encodeURI(csv);
 	hiddenElement.target = '_blank';
-	hiddenElement.download = 'CSVExport.csv';
+	hiddenElement.download = chart.data.title.textStr+'.csv';
 	hiddenElement.click();
-
 }
