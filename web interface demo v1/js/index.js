@@ -234,7 +234,6 @@ $( "#dropdown" ).click(function() {
     // $(this).parent().parent().siblings().animate({opacity:1}, {start: function(){ $(this).show(400) }});
     hidden = false;
   }
-})
 });
 
 //side-bar

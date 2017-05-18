@@ -1,5 +1,4 @@
 var exportChartAsCSV = function (chart) {
-	console.log("haHAA we innit", chart);
 	var csvdata = [];
 	csvdata.push(chart.data.series[0].xData); // Timestamps are first column, all series should share these so just pull it from first entry
 

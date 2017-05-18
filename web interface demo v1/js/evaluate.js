@@ -323,10 +323,9 @@ var main = function() {
       
 
         $(".chart").each(function(index, chart){
-          console.log(chart);
           var highchart = $(chart).find(".histock").highcharts();
-          console.log(highchart);
           if (highchart)
+            $(chart).find(".export").off("click");
             $(chart).find(".export").click(highchart,exportChartAsCSV);
         });
       }
