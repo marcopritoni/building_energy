@@ -30,77 +30,80 @@ var main = function() {
   (function(){
 
     $.getJSON("/python.json", parameters, function (response) {
-    	// $("#dropdown").click();
-      var tmy_mode_on = $("#TMYSwitch").hasClass("active");
-      if (tmy_mode_on){
-        $(".tmychart").css("display", "block");
-        $(".tmychart").css("border", "2px solid black");
-      }
-      else{
-        $(".defchart").css("display", "block");
-        $(".defchart").css("border", "2px solid black");
-      }
+      document.getElementById("loader").style.display="none";
+      if (!response.error) {
+        console.log("No error!");
+        console.log(response);
+        $("#dropdown").click();
+        var tmy_mode_on = $("#TMYSwitch").hasClass("active");
+        if (tmy_mode_on){
+          $(".defchart").css("display", "none");
+          $(".tmychart").css("display", "block");
+          $(".tmychart").css("border", "2px solid black");
+        }
+        else{
+          $(".tmychart").css("display", "none");
+          $(".defchart").css("display", "block");
+          $(".defchart").css("border", "2px solid black");
+        }
 
-			console.log(response);
+  			var model1stats = JSON.parse(response[3]);
+  			$("#modelStats #R2").text(model1stats["Adj_R2"].toFixed(2));
+  			$("#modelStats #cvrmse").text(model1stats["CV_RMSE"].toFixed(2));
+  			$("#modelStats #nmbe").text(model1stats["NMBE"].toFixed(2));
+  			$("#modelStats #rmse").text(model1stats["RMSE"].toFixed(2));
 
-			var model1stats = JSON.parse(response[3]);
-			$("#modelStats #R2").text(model1stats["Adj_R2"].toFixed(2));
-			$("#modelStats #cvrmse").text(model1stats["CV_RMSE"].toFixed(2));
-			$("#modelStats #nmbe").text(model1stats["NMBE"].toFixed(2));
-			$("#modelStats #rmse").text(model1stats["RMSE"].toFixed(2));
-
-			var data = [];
-			var ghausi = JSON.parse(response[0]);
-			for (var key in ghausi) {
-				if (ghausi.hasOwnProperty(key)) {
-					data.push([key, ghausi[key]]);
-				}
-			}
-			var realdata = [];
-			var real = data[0][1];
-			for (var key in real) {
-				if (real.hasOwnProperty(key)) {
-					realdata.push([parseInt(key), real[key]]);
-				}
-			}
-			var preditiondata = [];
-			var predition = data[1][1];
-			for (var key in predition) {
-				if (predition.hasOwnProperty(key)) {
-					preditiondata.push([parseInt(key), predition[key]]);
-				}
-			}
-      $('#highstock').highcharts('StockChart', {
-        rangeSelector : {
-          selected : 1
-        },
-        xAxis: {
-          gridLineWidth: 1
-        },
-        title : {
-          text : "Model Against Baseline 1"
-        },
-        legend : {
-        	enabled: true
-        },
-        series : [{
-          name : data[0][0],
-          data : realdata,
-          tooltip: {
-            valueDecimals: 2
+  			var data = [];
+  			var ghausi = JSON.parse(response[0]);
+  			for (var key in ghausi) {
+  				if (ghausi.hasOwnProperty(key)) {
+  					data.push([key, ghausi[key]]);
+  				}
+  			}
+  			var realdata = [];
+  			var real = data[0][1];
+  			for (var key in real) {
+  				if (real.hasOwnProperty(key)) {
+  					realdata.push([parseInt(key), real[key]]);
+  				}
+  			}
+  			var preditiondata = [];
+  			var predition = data[1][1];
+  			for (var key in predition) {
+  				if (predition.hasOwnProperty(key)) {
+  					preditiondata.push([parseInt(key), predition[key]]);
+  				}
+  			}
+        $('#highstock').highcharts('StockChart', {
+          rangeSelector : {
+            selected : 1
           },
-          color : "green"
-        }, {
-          name : data[1][0],
-          data : preditiondata,
-          tooltip: {
-            valueDecimals: 2
+          xAxis: {
+            gridLineWidth: 1
           },
-          color: "red"
-        }]
-      });
+          title : {
+            text : "Model Against Baseline 1"
+          },
+          legend : {
+          	enabled: true
+          },
+          series : [{
+            name : data[0][0],
+            data : realdata,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color : "green"
+          }, {
+            name : data[1][0],
+            data : preditiondata,
+            tooltip: {
+              valueDecimals: 2
+            },
+            color: "red"
+          }]
+        });
 
-      if (tmy_mode_on){
         var model2stats = JSON.parse(response[7]);
         $("#modelStats2 #R2").text(model2stats["Adj_R2"].toFixed(2));
         $("#modelStats2 #cvrmse").text(model2stats["CV_RMSE"].toFixed(2));
@@ -157,9 +160,8 @@ var main = function() {
             color: "red"
           }]
         });
-      }
+      
 
-      if (!tmy_mode_on){
         var data2 = [];
         var ghausi2 = JSON.parse(response[1]);
   			for (var key in ghausi2) {
@@ -212,6 +214,10 @@ var main = function() {
           }]
         });
 
+        var myChart = $('#highstock3').highcharts();
+        console.log(myChart.series);
+
+
 
         var data3 = [];
         var ghausi3 = JSON.parse(response[2]);
@@ -260,10 +266,9 @@ var main = function() {
         var startData = savingsChart.series[0].processedYData;
         var savingsTotal = calculateTotalSavings(startTimestamps, startData);
         $("#savings").text(savingsTotal.toFixed(2)+" kBtu*hr");
-      }
+      
 
 
-      if (tmy_mode_on){
         var data7 = [];
         var ghausi7 = JSON.parse(response[8]);
         for (var key in ghausi7) {
@@ -315,10 +320,22 @@ var main = function() {
             color : "red"
           }]
         });
+      
+
+        $(".chart").each(function(index, chart){
+          var highchart = $(chart).find(".histock").highcharts();
+          if (highchart)
+            $(chart).find(".export").off("click");
+            $(chart).find(".export").click(highchart,exportChartAsCSV);
+        });
       }
 
+      else { // ERROR RECEIVED
+        alert("We ran into an error building your models, check that your settings are correct and try again.\n\n"+response.error);
+      }
+      
 
-      document.getElementById("loader").style.display="none";
+
       
     });
   })();
