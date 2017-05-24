@@ -1,3 +1,7 @@
+# marco.pritoni@gmail.com
+
+
+
 # Standard library imports
 import json
 import logging.config
@@ -19,183 +23,17 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from sklearn import svm, cross_validation, linear_model, preprocessing, ensemble
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 
 # Local imports
-# New modules - marco.pritoni@gmail.com
 from data_preprocessor import DataPreprocessor
-from PIPy_Datalink import pipy_datalink
+from PIPy_Datalink import pipy_datalink 
+from test import *
 
 tmy_path = "../data/tmy.csv"
-
-def main():
-    # TODO: Documentation
-    # TODO: Caching to speed up
-
-    start_logger()
-
-    # Do not truncate numpy arrays when printing
-    np.set_printoptions(threshold=np.nan)
-
-    # Test example
-    """
-    building_name = "Ghausi"
-    energy_type = "ChilledWater"
-    model_type = "LinearRegression"
-    base_start = "2014-01"
-    base_end = "2014-12"
-    base_start2 = "2016-01"
-    base_end2 = "2016-12"
-    eval_start = "2015-01"
-    eval_end = "2015-12"
-    predict_start = "2016-01"
-    predict_end = "2016-12"
-    """
-
-    # Change parsing/getting command line arguments
-    parser = argparse.ArgumentParser(description='A tool for mechanical engineers at the UC Davis Energy Conservation Office to analyze the energy performance of UC Davis buildings.', 
-        fromfile_prefix_chars='@')
-    parser.add_argument("--tmy", action='store_true', help="option to select tmy evaluation and projection")
-    parser.add_argument("building_name", choices=['Ghausi', 'Bainer', 'Meyer', 'Briggs', 'EPS', 'Physics', 'Hutchinson'], help="building to perform analysis on")
-    parser.add_argument("energy_type", choices=['ChilledWater', 'Electricity', 'NaturalGas', 'Steam'], help="data for selected fuel type")
-    parser.add_argument("model_type", choices=['LinearRegression', 'RandomForest'])
-    parser.add_argument("base_start", help="starting period of baseline 1. YEAR-MONTH (ex. 2016-01)")
-    parser.add_argument("base_end", help="end period of baseline 2. YEAR-MONTH (ex. 2016-01)")
-    parser.add_argument("base_start2", help="starting period of baseline 2")
-    parser.add_argument("base_end2", help="end period of baseline 2")
-    parser.add_argument("eval_start", help="evaluation start period")
-    parser.add_argument("eval_end", help="evaluation end period")
-    parser.add_argument("predict_start", help="prediction start period")
-    parser.add_argument("predict_end", help="prediction end period")
-    args = parser.parse_args()
-
-    data_name = "_".join([args.building_name, args.energy_type, "Demand_kBtu"])
-    base_slice = (slice(args.base_start, args.base_end))
-    base_slice2 = (slice(args.base_start2, args.base_end2))
-    eval_slice = (slice(args.eval_start, args.eval_end))
-    predict_slice = (slice(args.predict_start, args.predict_end))
-
-    output_vars = [data_name]
-    input_vars = ["hdh", "cdh", u"TOD_0", u"TOD_1", u"TOD_2",
-                  u"TOD_3", u"TOD_4", u"TOD_5", u"TOD_6", u"TOD_7", u"TOD_8", u"TOD_9",
-                  u"TOD_10", u"TOD_11", u"TOD_12", u"TOD_13", u"TOD_14", u"TOD_15",
-                  u"TOD_16", u"TOD_17", u"TOD_18", u"TOD_19", u"TOD_20", u"TOD_21",
-                  u"TOD_22", u"TOD_23", u"DOW_0", u"DOW_1", u"DOW_2", u"DOW_3", u"DOW_4",
-                  u"DOW_5", u"DOW_6", u"MONTH_1", u"MONTH_2", u"MONTH_3", u"MONTH_4",
-                  u"MONTH_5", u"MONTH_6", u"MONTH_7", u"MONTH_8", u"MONTH_9", u"MONTH_10",
-                  u"MONTH_11", u"MONTH_12"]
-
-    # Time period to request data from PI system
-    start = "2014"
-    end = "t"
-    
-    downloader = pipy_datalink()
-    data_raw = downloader.get_stream_by_point([data_name, "OAT"], start, end)
-
-    # moved code to process data into its own function
-    data = process_data(data_raw)
-    
-    # Idea: Create two different models 
-    data_set = DataSet(data, base_slice, base_slice2, eval_slice, output_vars, input_vars)
-    
-    model_1 = Model(args.model_type)
-    model_1.train(data_set.baseline1)
-    model_1.project(data_set.eval)
-    model_1.output()
- 
-    """
-    # BUG: When reading CSV the index is no longer the date
-    # TODO: THIS CODE IS MESSY AS SHIT PUT IN DIFF FUNCTIONS
-    if os.path.isfile(tmy_path):
-        tmy_raw = pd.read_csv(tmy_path, index_col=0)
-    else:
-        # TODO: Updater code
-        print "Needa update"
-    """
-    web_id = "P09KoOKByvc0-uxyvoTV1UfQBNkCAAVVRJTC1QSS1QXE5TUkRCLjEzNjcwOC5PQVQuVE1Z"
-    tmy_raw = downloader.get_stream(Web_ID=web_id,_start="2016-04-01", _end="t")
-    tmy_raw.rename(columns={tmy_raw.columns[0]: "OAT"}, inplace=True)
-    tmy_raw.dropna()   
-
-    tmy_data = process_data(tmy_raw)  
-    
-    eval_data = evaluate(tmy_data, input_vars)
-    
-    model_2 = Model(args.model_type)
-    model_2.train(data_set.baseline2)
-    model_2.project(data_set.eval)
-    model_2.output()
-    
-    model_1.project(eval_data)
-    eval_data["out"]["Baseline 1"] = eval_data["out"]["Model"].copy()
-    model_2.project(eval_data)
-    eval_data["out"]["Baseline 2"] = eval_data["out"]["Model"].copy()
-    
-    eval_data["out"].drop(["OAT", "Model"], inplace=True, axis=1)
-    print(eval_data["out"].to_json())
-
-"""Logging code"""
-class StreamWriter():
-    """Custom logger to wrap around file streams"""
-
-    def __init__(self, name=__name__):
-        self.logger = logging.getLogger(name)
-
-    def write(self, message):
-        self.logger.warn(message)
-
-
-class InfoFilter(logging.Filter):
-    """Filter to allow only INFO level messages to appear in info.log"""
-
-    def __init__(self):
-        super(InfoFilter, self).__init__("allow_info")
-
-    def filter(self, record):
-        if record.levelname == "INFO":
-            return 1
-        return 0
-
-
-def start_logger():
-    # Source: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
-    default_path = "logging.yaml"
-    default_level = logging.INFO
-    env_key = "LOG_CFG"
-    path = default_path
-    value = os.getenv(env_key, None)
-    if value:
-        path = value
-    if os.path.exists(path):
-        with open(path, "rt") as f:
-            config = yaml.safe_load(f.read())
-            logging.config.dictConfig(config)
-    else:
-        logging.basicConfig(level=default_level)
-
-    sys.stderr.close()
-    sys.stderr = StreamWriter()
-
-def process_data(data):
-    preprocessor = DataPreprocessor(data)
-    preprocessor.clean_data()
-    preprocessor.add_degree_days(preprocessor.data_cleaned)
-    preprocessor.add_time_features(preprocessor.data_preprocessed)
-    preprocessor.create_dummies(preprocessor.data_preprocessed,
-                                var_to_expand=["TOD", "DOW", "MONTH"])
-    return preprocessor.data_preprocessed
-
-
-def evaluate(tmy_data, input_vars):
-    eval_data = {}
-    eval_data["in"] = tmy_data[input_vars]
-    eval_data["out"] = tmy_data[["OAT"]]
-    return eval_data
-
-"""Data"""
-
 
 class DataSet(object):
     """
@@ -235,6 +73,7 @@ class DataSet(object):
         self.baseline1 = {}
         self.baseline2 = {}
         self.eval = {}
+        
         try:
             self.baseline1["in"] = data.loc[tPeriod1, inp]
         except:
@@ -289,11 +128,11 @@ class Model(object):
     
     def __init__(self, model_type, data_set=None):
         if model_type == "LinearRegression":
-            self.clf = linear_model.LinearRegression()
+            self.clf = LinearRegression()
         elif model_type == "RandomForest":
-            self.clf = ensemble.RandomForestRegressor()
+            self.clf = RandomForestRegressor()
         else:
-            self.clf = linear_model.LinearRegression()
+            self.clf = LinearRegression()
             
         self.data_set = data_set
         self.baseline = {}
@@ -367,7 +206,142 @@ class Model(object):
             print(self.savings.to_json())
         print(json.dumps(self.scores))
 
-        # print()
+
+"""Logging code"""
+class StreamWriter():
+    """Custom logger to wrap around file streams"""
+
+    def __init__(self, name=__name__):
+        self.logger = logging.getLogger(name)
+
+    def write(self, message):
+        self.logger.warn(message)
+
+
+class InfoFilter(logging.Filter):
+    """Filter to allow only INFO level messages to appear in info.log"""
+
+    def __init__(self):
+        super(InfoFilter, self).__init__("allow_info")
+
+    def filter(self, record):
+        if record.levelname == "INFO":
+            return 1
+        return 0
+    
+    
+def main():
+    # TODO: Documentation
+    # TODO: Caching to speed up
+
+    start_logger()
+
+    # Do not truncate numpy arrays when printing
+    np.set_printoptions(threshold=np.nan)
+    
+    # Parses command line arguments
+    parser = argparse.ArgumentParser(description='A tool for mechanical engineers at the UC Davis Energy Conservation Office to analyze the energy performance of UC Davis buildings.', 
+        fromfile_prefix_chars='@')
+    parser.add_argument("--tmy", action='store_true', help="option to select tmy evaluation and projection")
+    parser.add_argument("building_name", help="building to perform analysis on")
+    parser.add_argument("energy_type", help="data for selected fuel type")
+    parser.add_argument("model_type", choices=['LinearRegression', 'RandomForest'])
+    parser.add_argument("base_start", help="starting period of baseline 1. YEAR-MONTH (ex. 2016-01)")
+    parser.add_argument("base_end", help="end period of baseline 2. YEAR-MONTH (ex. 2016-01)")
+    parser.add_argument("base_start2", help="starting period of baseline 2")
+    parser.add_argument("base_end2", help="end period of baseline 2")
+    parser.add_argument("eval_start", help="evaluation start period")
+    parser.add_argument("eval_end", help="evaluation end period")
+    parser.add_argument("tmy_start", help="tmy start period")
+    parser.add_argument("tmy_end", help="tmy end period")
+
+    args = parser.parse_args()
+
+    data_name = "_".join([args.building_name, args.energy_type, "Demand_kBtu"])
+    base_slice = (slice(args.base_start, args.base_end))
+    base_slice2 = (slice(args.base_start2, args.base_end2))
+    eval_slice = (slice(args.eval_start, args.eval_end))
+    tmy_slice = (slice(args.tmy_start, args.tmy_end))
+
+    output_vars = [data_name]
+    input_vars = ["hdh", "cdh", u"TOD_0", u"TOD_1", u"TOD_2",
+                  u"TOD_3", u"TOD_4", u"TOD_5", u"TOD_6", u"TOD_7", u"TOD_8", u"TOD_9",
+                  u"TOD_10", u"TOD_11", u"TOD_12", u"TOD_13", u"TOD_14", u"TOD_15",
+                  u"TOD_16", u"TOD_17", u"TOD_18", u"TOD_19", u"TOD_20", u"TOD_21",
+                  u"TOD_22", u"TOD_23", u"DOW_0", u"DOW_1", u"DOW_2", u"DOW_3", u"DOW_4",
+                  u"DOW_5", u"DOW_6"]
+
+    # Time period to request data from PI system
+    start = "2014"
+    end = "t"
+    
+    data_raw = get_point([data_name, "OAT"], start, end)
+    data = preprocess(data_raw)
+    
+    data_set = DataSet(data, base_slice, base_slice2, eval_slice, output_vars, input_vars)
+    
+    model_1 = Model(args.model_type)
+    model_1.train(data_set.baseline1)
+    model_1.project(data_set.eval)
+    model_1.output()
+    
+    # think about getting tmy using point_name instead?
+    if os.path.isfile(tmy_path):
+        tmy_raw = pd.read_csv(tmy_path, index_col=0, parse_dates=True)
+
+    tmy_data = preprocess(tmy_raw)  
+    eval_data = evaluate(tmy_data, tmy_slice, input_vars)
+    
+    model_2 = Model(args.model_type)
+    model_2.train(data_set.baseline2)
+    model_2.project(data_set.eval)
+    model_2.output()
+    
+    model_1.project(eval_data)
+    eval_data["out"]["Baseline 1"] = eval_data["out"]["Model"].copy()
+    model_2.project(eval_data)
+    eval_data["out"]["Baseline 2"] = eval_data["out"]["Model"].copy()
+    
+    eval_data["out"].drop(["OAT", "Model"], inplace=True, axis=1)
+    print(eval_data["out"].to_json())
+
+def start_logger():
+    # Source: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+    default_path = "logging.yaml"
+    default_level = logging.INFO
+    env_key = "LOG_CFG"
+    path = default_path
+    value = os.getenv(env_key, None)
+    if value:
+        path = value
+    if os.path.exists(path):
+        with open(path, "rt") as f:
+            config = yaml.safe_load(f.read())
+            logging.config.dictConfig(config)
+    else:
+        logging.basicConfig(level=default_level)
+
+    sys.stderr.close()
+    sys.stderr = StreamWriter()
+
+def preprocess(data):
+    preprocessor = DataPreprocessor(data)
+    preprocessor.clean_data()
+    preprocessor.add_degree_days(preprocessor.data_cleaned)
+    preprocessor.add_time_features(preprocessor.data_preprocessed)
+    preprocessor.create_dummies(preprocessor.data_preprocessed,
+                                var_to_expand=["TOD", "DOW", "MONTH"])
+    return preprocessor.data_preprocessed
+
+
+def evaluate(tmy_data, tmy_slice, input_vars):
+    eval_data = {}
+    eval_data["in"] = tmy_data.loc[tmy_slice, input_vars]
+    eval_data["out"] = tmy_data.loc[tmy_slice, ["OAT"]]
+    return eval_data
+
+
+
 if __name__ == "__main__":
     try:
         main()

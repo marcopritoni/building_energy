@@ -18,13 +18,14 @@ TODO:
 
 '''
 
-import logging
-import pandas as pd
-import os
-import requests as req
+# Standard library imports
 import json
-import numpy as np
+import logging
 
+# Third-party library imports
+import numpy as np
+import pandas as pd
+import requests as req
 
 class pipy_datalink(object):
 

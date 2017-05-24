@@ -13,8 +13,10 @@ TODO:
 version 0.1
 '''
 
+# Standard library imports
 import logging
 
+# Third-party library imports
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -151,7 +153,7 @@ class DataPreprocessor(object):
                 self.flagNA(data, removeNAhow)
                 selector=self.droppedNA
                 
-                print "_dataset NA flagged"
+                logging.info("_dataset NA flagged")
             except:
                 pass
             
@@ -162,7 +164,7 @@ class DataPreprocessor(object):
                 self.flagOutlier(data, sd_val)
                 selector=selector | self.droppedOutliers
                 
-                print "_outliers flagged"
+                logging.info("_outliers flagged")
 
             except:
                 pass
@@ -176,7 +178,7 @@ class DataPreprocessor(object):
                 self.flagOutOfBound(data, low_bound,high_bound)
                 selector=selector | self.droppedOutOfBound
                 
-                print "_outOfBound points flagged"
+                logging.info("_outOfBound points flagged")
 
             except:
                 pass
