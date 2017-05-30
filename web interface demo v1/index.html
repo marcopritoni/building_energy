@@ -25,6 +25,7 @@
     <script src="js/moment.min.js"></script>
     <script src="js/bootstrapValidator.min.js"></script>
     <script src="js/bootstrap-datetimepicker.min.js"></script>
+    <script src="js/papaparse.min.js"></script>
 
     <link rel="stylesheet" href="css/style.css">
 
@@ -36,11 +37,11 @@
   <h1 class="header_logo">Building Energy Performance Report | UC Davis CEED</h1>
 </div>
 
-<img class="side-bar-button" src="image/ham.png" alt="">
+<!-- <img class="side-bar-button" src="image/ham.png" alt="">
 
 <div class="side-bar">
   <p>sidebar</p>
-</div>
+</div> -->
 
 <div class="content col-md-10 col-md-offset-1">
   <div id="input-container" class="container">
@@ -60,13 +61,6 @@
            <span class="cus_selt" id="sel_txt1">Select a Building*</span>
           <select id="sel_val1" class="styled" required>
               <option selected value="">Select a Building*</option>
-              <option>Ghausi</option>
-              <option>Bainer</option>
-              <option>Meyer</option>
-              <option>Briggs</option>
-              <option>EPS</option>
-              <option>Physics</option>
-              <option>Hutchison</option>
             </select>
          </div>
        </div>
@@ -79,10 +73,6 @@
            <span class="cus_selt" id="sel_txt2">Select a Type of Fuel*</span>
           <select id="sel_val2" class="styled" required>
               <option value="" selected>Select a Type of Fuel*</option>
-              <option value="ChilledWater">Chilled Water</option>
-              <option value="Electricity">Electricity</option>
-              <option value="NaturalGas">Natural Gas</option>
-              <option value="Steam">Steam</option>
             </select>
          </div>
        </div>
@@ -263,6 +253,18 @@
               </tr>
             </tbody>
           </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Data points used in Model</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="numpts"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
       <div class="row">
@@ -324,6 +326,18 @@
               </tr>
             </tbody>
           </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Data points used in Model</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="numpts"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
       <div class="row">
@@ -380,6 +394,7 @@
 
 </div> <!-- End Content -->
 
+<script src="js/getBuildingSensors.js"></script>
 <script src="js/exportChartAsCSV.js"></script>
 <script src="js/calculateTotalSavings.js"></script>
 <script src="js/index.js"></script>

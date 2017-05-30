@@ -47,12 +47,6 @@ var main = function() {
           $(".defchart").css("border", "2px solid black");
         }
 
-  			var model1stats = JSON.parse(response[3]);
-  			$("#modelStats #R2").text(model1stats["Adj_R2"].toFixed(2));
-  			$("#modelStats #cvrmse").text(model1stats["CV_RMSE"].toFixed(2));
-  			$("#modelStats #nmbe").text(model1stats["NMBE"].toFixed(2));
-  			$("#modelStats #rmse").text(model1stats["RMSE"].toFixed(2));
-
   			var data = [];
   			var ghausi = JSON.parse(response[0]);
   			for (var key in ghausi) {
@@ -104,11 +98,12 @@ var main = function() {
           }]
         });
 
-        var model2stats = JSON.parse(response[7]);
-        $("#modelStats2 #R2").text(model2stats["Adj_R2"].toFixed(2));
-        $("#modelStats2 #cvrmse").text(model2stats["CV_RMSE"].toFixed(2));
-        $("#modelStats2 #nmbe").text(model2stats["NMBE"].toFixed(2));
-        $("#modelStats2 #rmse").text(model2stats["RMSE"].toFixed(2));
+        var model1stats = JSON.parse(response[3]);
+        $("#modelStats #R2").text(model1stats["Adj_R2"].toFixed(2));
+        $("#modelStats #cvrmse").text(model1stats["CV_RMSE"].toFixed(2));
+        $("#modelStats #nmbe").text(model1stats["NMBE"].toFixed(2));
+        $("#modelStats #rmse").text(model1stats["RMSE"].toFixed(2));
+        $("#modelStats #numpts").text(preditiondata.length);
 
         var data6 = [];
         var ghausi6 = JSON.parse(response[4]);
@@ -160,7 +155,13 @@ var main = function() {
             color: "red"
           }]
         });
-      
+
+        var model2stats = JSON.parse(response[7]);
+        $("#modelStats2 #R2").text(model2stats["Adj_R2"].toFixed(2));
+        $("#modelStats2 #cvrmse").text(model2stats["CV_RMSE"].toFixed(2));
+        $("#modelStats2 #nmbe").text(model2stats["NMBE"].toFixed(2));
+        $("#modelStats2 #rmse").text(model2stats["RMSE"].toFixed(2));
+        $("#modelStats2 #numpts").text(preditiondata.length);      
 
         var data2 = [];
         var ghausi2 = JSON.parse(response[1]);

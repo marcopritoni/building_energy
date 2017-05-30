@@ -213,3 +213,13 @@ a.button:hover {
   z-index: 100;
   opacity: 0;
 }
+
+.btn-default {
+  color:#ccc;
+}
+.btn-default:focus {
+  color:#ccc;
+}
+.btn-default:hover {
+  color:#ccc;
+}

@@ -1,12 +1,12 @@
 /*building dropdown menu - JQuery*/
 $( "#sel_val1" ).change(function() {
-  var option = $(this).find('option:selected').val();
+  var option = $(this).find('option:selected').text();
   $('#sel_txt1').text(option);
 });
 
 /*fuel dropdown menu - JQuery*/
 $( "#sel_val2" ).change(function() {
-  var option = $(this).find('option:selected').val();
+  var option = $(this).find('option:selected').text();
   $('#sel_txt2').text(option);
 });
 
