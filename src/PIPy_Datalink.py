@@ -204,7 +204,7 @@ class pipy_datalink(object):
             Web_ID, _start, _end, _calculation, _interval, _sumType, _label)
 
         # prints for testing: <Response [200]> means it works
-        logging.debug(response)
+        logging.info(response)
 
         # parse the response
         if _calculation == (("interpolated") or ("recorded")):

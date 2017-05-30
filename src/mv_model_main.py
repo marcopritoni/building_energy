@@ -7,7 +7,6 @@ import json
 import logging.config
 import os
 import sys
-import time
 import traceback
 import argparse
 
@@ -15,8 +14,8 @@ import argparse
 sys.stderr = open("../logs/error.log", "w")
 info_log = open("../logs/info.log", "w")
 info_log.close()
-date_format = time.strftime("%m/%d/%Y %H:%M:%S %p ")
-sys.stderr.write(date_format + " - root - [WARNING] - ")
+# date_format = time.strftime("%m/%d/%Y %H:%M:%S %p ")
+# sys.stderr.write(date_format + " - root - [WARNING] - ")
 
 # Third-party library imports
 import numpy as np
@@ -30,8 +29,7 @@ from sklearn.metrics import mean_squared_error
 
 # Local imports
 from data_preprocessor import DataPreprocessor
-from PIPy_Datalink import pipy_datalink 
-from test import *
+from test import get_point
 
 tmy_path = "../data/tmy.csv"
 
@@ -232,15 +230,15 @@ class InfoFilter(logging.Filter):
     
 def main():
     # TODO: Documentation
-    # TODO: Caching to speed up
-
+    # TODO: Merging
     start_logger()
 
     # Do not truncate numpy arrays when printing
     np.set_printoptions(threshold=np.nan)
     
+    # TODO: Fix Command Line Arguments?
     # Parses command line arguments
-    parser = argparse.ArgumentParser(description='A tool for mechanical engineers at the UC Davis Energy Conservation Office to analyze the energy performance of UC Davis buildings.', 
+    parser = argparse.ArgumentParser(descrition='A tool for mechanical engineers at the UC Davis Energy Conservation Office to analyze the energy performance of UC Davis buildings.', 
         fromfile_prefix_chars='@')
     parser.add_argument("--tmy", action='store_true', help="option to select tmy evaluation and projection")
     parser.add_argument("building_name", help="building to perform analysis on")
@@ -254,6 +252,7 @@ def main():
     parser.add_argument("eval_end", help="evaluation end period")
     parser.add_argument("tmy_start", help="tmy start period")
     parser.add_argument("tmy_end", help="tmy end period")
+    
 
     args = parser.parse_args()
 
@@ -272,6 +271,7 @@ def main():
                   u"DOW_5", u"DOW_6"]
 
     # Time period to request data from PI system
+    # TODO: Change to actual dates?
     start = "2014"
     end = "t"
     
@@ -285,12 +285,12 @@ def main():
     model_1.project(data_set.eval)
     model_1.output()
     
-    # think about getting tmy using point_name instead?
+    # TODO: Use TMY Point name instead so can use get_point instead
     if os.path.isfile(tmy_path):
         tmy_raw = pd.read_csv(tmy_path, index_col=0, parse_dates=True)
 
     tmy_data = preprocess(tmy_raw)  
-    eval_data = evaluate(tmy_data, tmy_slice, input_vars)
+    eval_data = format_eval(tmy_data, tmy_slice, input_vars)
     
     model_2 = Model(args.model_type)
     model_2.train(data_set.baseline2)
@@ -304,9 +304,13 @@ def main():
     
     eval_data["out"].drop(["OAT", "Model"], inplace=True, axis=1)
     print(eval_data["out"].to_json())
+    print(eval_data["savings"].to_json())
 
 def start_logger():
     # Source: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+    logger = logging.getLogger(__name__)
+    logger.addFilter(InfoFilter())
+    
     default_path = "logging.yaml"
     default_level = logging.INFO
     env_key = "LOG_CFG"
@@ -334,7 +338,7 @@ def preprocess(data):
     return preprocessor.data_preprocessed
 
 
-def evaluate(tmy_data, tmy_slice, input_vars):
+def format_eval(tmy_data, tmy_slice, input_vars):
     eval_data = {}
     eval_data["in"] = tmy_data.loc[tmy_slice, input_vars]
     eval_data["out"] = tmy_data.loc[tmy_slice, ["OAT"]]
