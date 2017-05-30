@@ -1,6 +1,6 @@
-import cProfile
+#import cProfile
 import os
-import pstats
+#import pstats
 import sys 
 
 import line_profiler
@@ -24,10 +24,11 @@ def import_test():
       
     # Third-party library imports
     import numpy as np
-    #import pandas as pd
+    import pandas as pd
     import yaml
     
-    from sklearn import linear_model, ensemble
+    from sklearn.linear_model import LinearRegression
+    from sklearn.ensemble import RandomForestRegressor
     from sklearn.metrics import r2_score
     from sklearn.metrics import mean_squared_error
 
@@ -49,7 +50,7 @@ with open("profile-func.txt", "w") as file:
 
 # Line-by-line profiling
 # See https://github.com/rkern/line_profiler for more details       
-with open("profile-line.txt", "w") as file:
+with open("profile-line.txt", "w") as profile:
     profiler = line_profiler.LineProfiler(import_test)
     profiler.runcall(import_test)
     import mv_model_main
@@ -57,7 +58,9 @@ with open("profile-line.txt", "w") as file:
     
     with open("output.txt", "w") as output:
         sys.stdout = output
+        sys.argv = ["", "@test_input.txt"]
         profiler.runcall(mv_model_main.main)
-        os.remove("output.txt")
         
-    profiler.print_stats(stream=file)
+    os.remove("output.txt")  
+    profiler.print_stats(stream=profile)
+    

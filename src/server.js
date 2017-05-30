@@ -6,7 +6,7 @@ var url = require("url");
 var PythonShell = require('python-shell');
 var options = {
   mode: 'text',
-  pythonPath: 'C:/Users/zeusa/Anaconda2/python',//change pythonPath to your pc's python path
+  pythonPath: 'C:/ProgramData/Anaconda2/python.exe',//change pythonPath to your pc's python path
   pythonOptions: ['-u','-W ignore']
 };
 var app = express();

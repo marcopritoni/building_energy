@@ -18,13 +18,14 @@ TODO:
 
 '''
 
-import logging
-import pandas as pd
-import os
-import requests as req
+# Standard library imports
 import json
-import numpy as np
+import logging
 
+# Third-party library imports
+import numpy as np
+import pandas as pd
+import requests as req
 
 class pipy_datalink(object):
 
@@ -203,7 +204,7 @@ class pipy_datalink(object):
             Web_ID, _start, _end, _calculation, _interval, _sumType, _label)
 
         # prints for testing: <Response [200]> means it works
-        logging.debug(response)
+        logging.info(response)
 
         # parse the response
         if _calculation == (("interpolated") or ("recorded")):

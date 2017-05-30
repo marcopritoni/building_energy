@@ -1,17 +1,89 @@
+import os
+import time 
+
+import pandas as pd
+
 from PIPy_Datalink import pipy_datalink
 
-def update_tmy():
+# tag name NSRDB.136708.OAT.TMY
+def cache_tmy(start="2016", end="t"):
     downloader = pipy_datalink()
     web_id = "P09KoOKByvc0-uxyvoTV1UfQBNkCAAVVRJTC1QSS1QXE5TUkRCLjEzNjcwOC5PQVQuVE1Z"
-    data = downloader.get_stream(Web_ID=web_id,_start="2016-04-01", _end="t")
-    data.rename(columns={data.columns[0]: "OAT"}, inplace=True)
-    data.dropna()
-    data.to_csv("../data/tmy.csv")    
+    stream = downloader.get_stream(web_id, start, end)
+    
+    # Renamed to OAT to be compatible with preprocessor
+    stream.rename(columns={stream.columns[0]: "OAT"}, inplace=True)
+    
+    # Remove NA entries that might be from the future and save space
+    stream.dropna(inplace=True)
+    stream.to_csv("../stream/tmy.csv")
+    return stream
 
+def cache_point(point_name, start="2014", end="t"):
+    path = "".join(["../data/", point_name, ".csv"])
     
+    # Imports previous CSV if it exists    
+    if os.path.isfile(path):
+        stream = pd.read_csv(path, index_col=0, parse_dates=True)
+    else:
+        stream = pd.DataFrame()
+        
+    downloader = pipy_datalink()
+    stream2 = downloader.get_stream_by_point(point_name, start, end)
+    
+    # Remove NA entries that might be from the future and save space
+    stream2.dropna(inplace=True) 
+    
+    # Join with previous CSV and is sorted
+    if stream.empty:
+        stream = stream2
+    else:
+        stream = stream.append(stream2)
+    
+    stream.to_csv(path)
+    return stream
+
+def get_point(point_names, start="2014", end="t"):
+    streams = pd.DataFrame()
+
+    if not isinstance(point_names, list):
+        point_names = [point_names]
+        
+    for point_name in point_names:
+        stream = pd.DataFrame()
+        path = "".join(["../data/", point_name, ".csv"])
+        
+        # Fetch point_name if found in cache
+        if os.path.isfile(path):
+            stream = pd.read_csv(path, index_col=0, parse_dates=True)
+            
+            # Rewrite "t" as date to search in csv
+            if end == "t":
+                end = time.strftime("%m/%d/%Y 00:00:00")
+
+            # Download if range is found in stream
+            if end not in stream.index:
+                last_update = stream.index[-1]
+                stream2 = cache_point(point_name, last_update, end)
+                stream2 = stream2.iloc[1:]
+                stream = stream.append(stream2)
+
+        # Download from PI database if not found 
+        else:
+            stream = cache_point(point_name)
+      
+        if streams.empty:
+            streams = stream
+        else:
+            streams = streams.join(stream, how="outer")
+         
+    return streams
+        
 def main():
-    update_tmy()
-    
+    downloader = pipy_datalink()
+    data = downloader.get_stream_by_point('OAT', '2014', 't') 
+    #cache_tmy()
+    cache_point("OAT")
 
 if __name__ == "__main__":
     main()  
