@@ -5,21 +5,7 @@ import pandas as pd
 
 from PIPy_Datalink import pipy_datalink
 
-# tag name NSRDB.136708.OAT.TMY
-def cache_tmy(start="2016", end="t"):
-    downloader = pipy_datalink()
-    web_id = "P09KoOKByvc0-uxyvoTV1UfQBNkCAAVVRJTC1QSS1QXE5TUkRCLjEzNjcwOC5PQVQuVE1Z"
-    stream = downloader.get_stream(web_id, start, end)
-    
-    # Renamed to OAT to be compatible with preprocessor
-    stream.rename(columns={stream.columns[0]: "OAT"}, inplace=True)
-    
-    # Remove NA entries that might be from the future and save space
-    stream.dropna(inplace=True)
-    stream.to_csv("../stream/tmy.csv")
-    return stream
-
-def cache_point(point_name, start="2014", end="t"):
+def cache_point(point_name, start="2014", end="t", remove_duplicates=True):
     path = "".join(["../data/", point_name, ".csv"])
     
     # Imports previous CSV if it exists    
@@ -39,6 +25,10 @@ def cache_point(point_name, start="2014", end="t"):
         stream = stream2
     else:
         stream = stream.append(stream2)
+        
+        if remove_duplicates:
+            stream = stream[~stream.index.duplicated()]
+            stream.sort_index(inplace=True)
     
     stream.to_csv(path)
     return stream
@@ -64,8 +54,8 @@ def get_point(point_names, start="2014", end="t"):
             # Download if range is found in stream
             if end not in stream.index:
                 last_update = stream.index[-1]
-                stream2 = cache_point(point_name, last_update, end)
-                stream2 = stream2.iloc[1:]
+                stream2 = cache_point(point_name, last_update, end, remove_duplicates=False)
+                stream2.drop(last_update, inplace=True)
                 stream = stream.append(stream2)
 
         # Download from PI database if not found 
@@ -80,10 +70,7 @@ def get_point(point_names, start="2014", end="t"):
     return streams
         
 def main():
-    downloader = pipy_datalink()
-    data = downloader.get_stream_by_point('OAT', '2014', 't') 
-    #cache_tmy()
-    cache_point("OAT")
+    cache_point("NSRDB.136708.OAT.TMY")
 
 if __name__ == "__main__":
     main()  

@@ -53,13 +53,19 @@ with open("profile-func.txt", "w") as file:
 with open("profile-line.txt", "w") as profile:
     profiler = line_profiler.LineProfiler(import_test)
     profiler.runcall(import_test)
+    
+    # import here to prevent import_test from being affected
     import mv_model_main
     profiler.add_function(mv_model_main.main)
+    
+    #import test 
+    #profiler.add_function(test.cache_point)
     
     with open("output.txt", "w") as output:
         sys.stdout = output
         sys.argv = ["", "@test_input.txt"]
         profiler.runcall(mv_model_main.main)
+        #profiler.runcall(test.cache_point, "NSRDB.136708.OAT.TMY")
         
     os.remove("output.txt")  
     profiler.print_stats(stream=profile)
