@@ -19,19 +19,17 @@ info_log.close()
 
 # Third-party library imports
 import numpy as np
-import pandas as pd
 import yaml
 
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import r2_score
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score, mean_squared_error
 
 # Local imports
 from data_preprocessor import DataPreprocessor
 from test import get_point
 
-tmy_path = "../data/tmy.csv"
+tmy_name = "NSRDB.136708.OAT.TMY"
 
 class DataSet(object):
     """
@@ -145,7 +143,7 @@ class Model(object):
             self.project(self.eval)
             
             
-    def train(self, baseline):
+    def train(self, baseline, out_var):
         """Trains the model using baseline period data
         
         Parameters: 
@@ -154,24 +152,23 @@ class Model(object):
         
         # Fit the data
         self.baseline = baseline
-        self.clf.fit(baseline["in"], baseline["out"])
+        self.clf.fit(baseline["in"], baseline["out"][out_var])
         baseline["out"]["Model"] = self.predict(baseline["in"].values)
         
         # Calculate scores 
         num_inputs = len(baseline["out"].columns)
-        out_var = baseline["out"].columns[0]
         self.scores = self.calc_scores(baseline["out"], num_inputs, out_var)
+        return self.scores 
 
-    def project(self, eval_data):
+    def project(self, eval_data, out_var):
         # Predicts in the period specified by eval_data
         self.eval = eval_data
         eval_data["out"]["Model"] = self.clf.predict(eval_data["in"].values)
 
         # Computes difference between model and actual
-        out_var = eval_data["out"].columns[0]
         self.savings = eval_data["out"]["Model"].copy()
         self.savings.sub(eval_data["out"][out_var], fill_value=0)
-        eval_data["savings"] = self.savings
+        eval_data["out"]["Savings"] = self.savings
         return self.savings
         
     def predict(self, data):
@@ -201,7 +198,7 @@ class Model(object):
         
         if len(self.eval) > 0:
             print(self.eval["out"].to_json())
-            print(self.savings.to_json())
+
         print(json.dumps(self.scores))
 
 
@@ -223,7 +220,7 @@ class InfoFilter(logging.Filter):
         super(InfoFilter, self).__init__("allow_info")
 
     def filter(self, record):
-        if record.levelname == "INFO":
+        if record.levelname == "INFO" or record.levelname == "DEBUG":
             return 1
         return 0
     
@@ -231,36 +228,32 @@ class InfoFilter(logging.Filter):
 def main():
     # TODO: Documentation
     # TODO: Merging
-    start_logger()
+    _start_logger()
 
     # Do not truncate numpy arrays when printing
     np.set_printoptions(threshold=np.nan)
-    
-    # TODO: Fix Command Line Arguments?
-    # Parses command line arguments
-    parser = argparse.ArgumentParser(descrition='A tool for mechanical engineers at the UC Davis Energy Conservation Office to analyze the energy performance of UC Davis buildings.', 
-        fromfile_prefix_chars='@')
-    parser.add_argument("--tmy", action='store_true', help="option to select tmy evaluation and projection")
-    parser.add_argument("building_name", help="building to perform analysis on")
-    parser.add_argument("energy_type", help="data for selected fuel type")
-    parser.add_argument("model_type", choices=['LinearRegression', 'RandomForest'])
-    parser.add_argument("base_start", help="starting period of baseline 1. YEAR-MONTH (ex. 2016-01)")
-    parser.add_argument("base_end", help="end period of baseline 2. YEAR-MONTH (ex. 2016-01)")
-    parser.add_argument("base_start2", help="starting period of baseline 2")
-    parser.add_argument("base_end2", help="end period of baseline 2")
-    parser.add_argument("eval_start", help="evaluation start period")
-    parser.add_argument("eval_end", help="evaluation end period")
-    parser.add_argument("tmy_start", help="tmy start period")
-    parser.add_argument("tmy_end", help="tmy end period")
-    
-
-    args = parser.parse_args()
-
+       
+    args = _parse_args()
     data_name = "_".join([args.building_name, args.energy_type, "Demand_kBtu"])
+
+    # Time period to request data from PI system
+    # TODO: Change to actual dates
+    start = "2014"
+    end = "t"
+
+    # Get data from PI system or local storage
+    data_raw = get_point([data_name, "OAT"], start, end)
+    data = preprocess(data_raw)
+
+    # Create time slice objects for data_set
     base_slice = (slice(args.base_start, args.base_end))
-    base_slice2 = (slice(args.base_start2, args.base_end2))
-    eval_slice = (slice(args.eval_start, args.eval_end))
-    tmy_slice = (slice(args.tmy_start, args.tmy_end))
+    base_slice2 = base_slice
+    eval_slice = base_slice
+    
+    if args.subparser_name == "simple":
+        eval_slice = (slice(args.eval_start, args.eval_end))   
+    elif args.subparser_name == "tmy":
+        base_slice2 = (slice(args.base_start2, args.base_end2))
 
     output_vars = [data_name]
     input_vars = ["hdh", "cdh", u"TOD_0", u"TOD_1", u"TOD_2",
@@ -269,44 +262,64 @@ def main():
                   u"TOD_16", u"TOD_17", u"TOD_18", u"TOD_19", u"TOD_20", u"TOD_21",
                   u"TOD_22", u"TOD_23", u"DOW_0", u"DOW_1", u"DOW_2", u"DOW_3", u"DOW_4",
                   u"DOW_5", u"DOW_6"]
-
-    # Time period to request data from PI system
-    # TODO: Change to actual dates?
-    start = "2014"
-    end = "t"
     
-    data_raw = get_point([data_name, "OAT"], start, end)
-    data = preprocess(data_raw)
-    
-    data_set = DataSet(data, base_slice, base_slice2, eval_slice, output_vars, input_vars)
+    data_set = DataSet(data, base_slice, base_slice2, eval_slice, output_vars, input_vars)   
+    data_set.baseline1["out"]["OAT"] = data.loc[base_slice, "OAT"]
+    data_set.baseline2["out"]["OAT"] = data.loc[base_slice2, "OAT"]
+    data_set.eval["out"]["OAT"] = data.loc[eval_slice, "OAT"]
     
     model_1 = Model(args.model_type)
-    model_1.train(data_set.baseline1)
-    model_1.project(data_set.eval)
-    model_1.output()
+    model_1.train(data_set.baseline1, data_name)
     
-    # TODO: Use TMY Point name instead so can use get_point instead
-    if os.path.isfile(tmy_path):
-        tmy_raw = pd.read_csv(tmy_path, index_col=0, parse_dates=True)
+    if args.subparser_name == "simple":
+        model_1.project(data_set.eval, data_name)
+        model_1.output()
+    
+    if args.subparser_name == "tmy":
+        tmy_slice = (slice(args.tmy_start, args.tmy_end))
+        tmy_raw = get_point(tmy_name, args.tmy_start, args.tmy_end)
+        
+        # Renamed to OAT to be compatible with preprocessor
+        tmy_raw.rename(columns={tmy_raw.columns[0]: "OAT"}, inplace=True)
+        
+        tmy_data = preprocess(tmy_raw)  
+        eval_data = format_eval(data, tmy_data, tmy_slice, input_vars, output_vars)
+        
+        model_2 = Model(args.model_type)
+        model_2.train(data_set.baseline2, data_name)
 
-    tmy_data = preprocess(tmy_raw)  
-    eval_data = format_eval(tmy_data, tmy_slice, input_vars)
-    
-    model_2 = Model(args.model_type)
-    model_2.train(data_set.baseline2)
-    model_2.project(data_set.eval)
-    model_2.output()
-    
-    model_1.project(eval_data)
-    eval_data["out"]["Baseline 1"] = eval_data["out"]["Model"].copy()
-    model_2.project(eval_data)
-    eval_data["out"]["Baseline 2"] = eval_data["out"]["Model"].copy()
-    
-    eval_data["out"].drop(["OAT", "Model"], inplace=True, axis=1)
-    print(eval_data["out"].to_json())
-    print(eval_data["savings"].to_json())
+        model_1.project(eval_data, "OAT")
+        eval_data["out"]["Baseline 1"] = eval_data["out"]["Model"].copy()
+        model_2.project(eval_data, "OAT")
+        eval_data["out"]["Baseline 2"] = eval_data["out"]["Model"].copy()
+        eval_data["out"].drop(["Model"], inplace=True, axis=1)
+        
+        savings = eval_data["out"]["Baseline 2"].copy()
+        savings = savings.sub(eval_data["out"]["Baseline 1"], fill_value=0)
+        eval_data["out"]["Savings"] = savings
 
-def start_logger():
+        print(eval_data["out"].to_json())
+
+def preprocess(data):
+    preprocessor = DataPreprocessor(data)
+    preprocessor.clean_data()
+    preprocessor.add_degree_days(preprocessor.data_cleaned)
+    preprocessor.add_time_features(preprocessor.data_preprocessed)
+    preprocessor.create_dummies(preprocessor.data_preprocessed,
+                                var_to_expand=["TOD", "DOW", "MONTH"])
+    return preprocessor.data_preprocessed
+
+def format_eval(data, tmy_data, tmy_slice, input_vars, output_vars):
+    eval_data = {}
+    eval_data["in"] = tmy_data.loc[tmy_slice, input_vars]
+    eval_data["out"] = tmy_data.loc[tmy_slice, ["OAT"]]
+    
+    for var in output_vars:
+        eval_data["out"][var] = data.loc[tmy_slice, var]
+        
+    return eval_data
+
+def _start_logger():
     # Source: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
     logger = logging.getLogger(__name__)
     logger.addFilter(InfoFilter())
@@ -328,27 +341,50 @@ def start_logger():
     sys.stderr.close()
     sys.stderr = StreamWriter()
 
-def preprocess(data):
-    preprocessor = DataPreprocessor(data)
-    preprocessor.clean_data()
-    preprocessor.add_degree_days(preprocessor.data_cleaned)
-    preprocessor.add_time_features(preprocessor.data_preprocessed)
-    preprocessor.create_dummies(preprocessor.data_preprocessed,
-                                var_to_expand=["TOD", "DOW", "MONTH"])
-    return preprocessor.data_preprocessed
+def _parse_args():
+    """Parses command line arguments using argparse"""
+    
+    parser = argparse.ArgumentParser(description="A tool for mechanical engineers at the UC Davis Energy Conservation Office to analyze the energy performance of UC Davis buildings.", 
+        fromfile_prefix_chars="@")
+    
+    subparsers = parser.add_subparsers(dest="subparser_name")
+    tmy_parser = subparsers.add_parser("tmy")
+    tmy_parser.add_argument("building_name", help="building to perform analysis on")
+    tmy_parser.add_argument("energy_type", help="data for selected fuel type")
+    tmy_parser.add_argument("model_type", choices=["LinearRegression", "RandomForest"])
+    tmy_parser.add_argument("base_start", help="starting period of baseline 1. YEAR-MONTH (ex. 2016-01)")
+    tmy_parser.add_argument("base_end", help="end period of baseline 2. YEAR-MONTH (ex. 2016-01)")
+    tmy_parser.add_argument("base_start2", help="starting period of baseline 2")
+    tmy_parser.add_argument("base_end2", help="end period of baseline 2")
+    tmy_parser.add_argument("tmy_start", help="tmy start period")
+    tmy_parser.add_argument("tmy_end", help="tmy end period")
 
-
-def format_eval(tmy_data, tmy_slice, input_vars):
-    eval_data = {}
-    eval_data["in"] = tmy_data.loc[tmy_slice, input_vars]
-    eval_data["out"] = tmy_data.loc[tmy_slice, ["OAT"]]
-    return eval_data
-
-
+    simple_parser = subparsers.add_parser("simple")
+    simple_parser.add_argument("building_name", help="building to perform analysis on")
+    simple_parser.add_argument("energy_type", help="data for selected fuel type")
+    simple_parser.add_argument("model_type", choices=["LinearRegression", "RandomForest"])
+    simple_parser.add_argument("base_start", help="starting period of baseline 1. YEAR-MONTH (ex. 2016-01)")
+    simple_parser.add_argument("base_end", help="end period of baseline 2. YEAR-MONTH (ex. 2016-01)")
+    simple_parser.add_argument("eval_start", help="evaluation start period")
+    simple_parser.add_argument("eval_end", help="evaluation end period")
+    
+    # See https://stackoverflow.com/a/29293080
+    # Prints help message on invalid input
+    try:
+        return parser.parse_args()
+    
+    except SystemExit as err:
+        if err.code == 2:
+            parser.print_help()
+        sys.exit()
 
 if __name__ == "__main__":
     try:
         main()
+        
+    except SystemExit:
+        sys.exit()      
+          
     except:
         # Logs and prints traceback
         logging.error(traceback.format_exc())
