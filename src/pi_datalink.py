@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 import requests as req
 
-class pipy_datalink(object):
+class PIDatalink(object):
 
     def __init__(self, root=None, calculation=None, interval=None, buildingMeterDB=None):
 

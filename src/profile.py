@@ -34,15 +34,15 @@ def import_test():
 
     # Local imports
     # New modules - marco.pritoni@gmail.com
-    from data_preprocessor import DataPreprocessor
-    from PIPy_Datalink import pipy_datalink
+    from preprocessor import DataPreprocessor
+    from pi_datalink import PIDatalink
     
     print "import_test done"
 
 """
 # Function-level profiling
 with open("profile-func.txt", "w") as file:
-    cProfile.run("execfile(\"mv_model_main.py\")", "profile")
+    cProfile.run("execfile(\"mv_model.py\")", "profile")
     stats = pstats.Stats("profile", stream=file)
     stats.sort_stats('cumulative').print_stats()
     os.remove("profile")
@@ -55,8 +55,8 @@ with open("profile-line.txt", "w") as profile:
     profiler.runcall(import_test)
     
     # import here to prevent import_test from being affected
-    import mv_model_main
-    profiler.add_function(mv_model_main.main)
+    import mv_model
+    profiler.add_function(mv_model.main)
     
     #import test 
     #profiler.add_function(test.cache_point)
@@ -64,7 +64,7 @@ with open("profile-line.txt", "w") as profile:
     with open("output.txt", "w") as output:
         sys.stdout = output
         sys.argv = ["", "@test_input.txt"]
-        profiler.runcall(mv_model_main.main)
+        profiler.runcall(mv_model.main)
         #profiler.runcall(test.cache_point, "NSRDB.136708.OAT.TMY")
         
     os.remove("output.txt")  

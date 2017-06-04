@@ -3,7 +3,7 @@ import time
 
 import pandas as pd
 
-from PIPy_Datalink import pipy_datalink
+from pi_datalink import PIDatalink
 
 def cache_point(point_name, start="2014", end="t", remove_duplicates=True):
     path = "".join(["../data/", point_name, ".csv"])
@@ -14,7 +14,7 @@ def cache_point(point_name, start="2014", end="t", remove_duplicates=True):
     else:
         stream = pd.DataFrame()
         
-    downloader = pipy_datalink()
+    downloader = PIDatalink()
     stream2 = downloader.get_stream_by_point(point_name, start, end)
     
     # Remove NA entries that might be from the future and save space
