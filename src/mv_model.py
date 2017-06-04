@@ -269,11 +269,13 @@ def create_models(args=None):
                   u"TOD_22", u"TOD_23", u"DOW_0", u"DOW_1", u"DOW_2", u"DOW_3", u"DOW_4",
                   u"DOW_5", u"DOW_6"]
     
+    # Create a DataSet with OAT values in output as column
     data_set = DataSet(data, base_slice, base_slice2, eval_slice, output_vars, input_vars)   
     data_set.baseline1["out"]["OAT"] = data.loc[base_slice, "OAT"]
     data_set.baseline2["out"]["OAT"] = data.loc[base_slice2, "OAT"]
     data_set.eval["out"]["OAT"] = data.loc[eval_slice, "OAT"]
     
+    # Create first model for baseline period 1 
     model_1 = Model(args.model_type)
     model_1.train(data_set.baseline1, data_name)
     
@@ -282,7 +284,7 @@ def create_models(args=None):
         model_1.output()
         return model_1
     
-    if args.subparser_name == "tmy":
+    elif args.subparser_name == "tmy":
         tmy_slice = (slice(args.tmy_start, args.tmy_end))
         tmy_raw = get_point(tmy_name, args.tmy_start, args.tmy_end)
         
@@ -292,15 +294,18 @@ def create_models(args=None):
         tmy_data = preprocess(tmy_raw)  
         eval_data = format_eval(data, tmy_data, tmy_slice, input_vars, output_vars)
         
+         # Create second model for baseline period 2 
         model_2 = Model(args.model_type)
         model_2.train(data_set.baseline2, data_name)
-
-        model_1.project(eval_data, "OAT")
+        
+         # Projects data_name into TMY period
+        model_1.project(eval_data, data_name)
         eval_data["out"]["Baseline 1"] = eval_data["out"]["Model"].copy()
-        model_2.project(eval_data, "OAT")
+        model_2.project(eval_data, data_name)
         eval_data["out"]["Baseline 2"] = eval_data["out"]["Model"].copy()
         eval_data["out"].drop(["Model"], inplace=True, axis=1)
         
+        # Get savings over typical TMY period by subtracting from two baseline model results
         savings = eval_data["out"]["Baseline 2"].copy()
         savings = savings.sub(eval_data["out"]["Baseline 1"], fill_value=0)
         eval_data["out"]["Savings"] = savings
@@ -381,15 +386,25 @@ def _parse_args(args):
     try:
         return parser.parse_args(args)
     
-    except SystemExit as err:
-        if err.code == 2:
-            parser.print_help()
+    except SystemExit as err: 
+        # If error is unhandled 
+        if err.code == 2: 
+            parser.print_help() 
+            if sys.argv[1] == "simple": 
+                simple_parser.print_help() 
+            elif sys.argv[1] == "tmy": 
+                tmy_parser.print_help() 
+            else: 
+                parser.print_help() 
+ 
+        # Exit if parsing error regardless
         sys.exit()
-
+        
 if __name__ == "__main__":
     try:
         main()
         
+    # Graceful exit due to parse error or intentional sys.exit() call
     except SystemExit:
         sys.exit()      
           
