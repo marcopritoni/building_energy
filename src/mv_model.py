@@ -310,7 +310,9 @@ def create_models(args=None):
         savings = eval_data["out"]["Baseline 2"].copy()
         savings = savings.sub(eval_data["out"]["Baseline 1"], fill_value=0)
         eval_data["out"]["Savings"] = savings
-
+        
+        model_1.output()
+        model_2.output()
         print(eval_data["out"].to_json())
         return {1: model_1, 2: model_2, 3: eval_data}
 
