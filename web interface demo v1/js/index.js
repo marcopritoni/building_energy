@@ -95,14 +95,16 @@ $(function () {
 
     $('#startDate').datetimepicker({
       pickTime: false,
-      format: "YYYY/MM/DD",
+      format: "YYYY/MM",
+      viewMode: 'months',
       defaultDate: sd,
       maxDate: ed
     });
 
     $('#endDate').datetimepicker({
       pickTime: false,
-      format: "YYYY/MM/DD",
+      format: "YYYY/MM",
+      viewMode: 'months',
       defaultDate: ed,
       minDate: sd
     });
@@ -118,14 +120,16 @@ $(function () {
 
     $('#startDate2').datetimepicker({
       pickTime: false,
-      format: "YYYY/MM/DD",
+      format: "YYYY/MM",
+      viewMode: 'months',
       defaultDate: sd,
       maxDate: ed
     });
 
     $('#endDate2').datetimepicker({
       pickTime: false,
-      format: "YYYY/MM/DD",
+      format: "YYYY/MM",
+      viewMode: 'months',
       defaultDate: ed,
       minDate: sd
     });
@@ -141,14 +145,16 @@ $(function () {
 
     $('#startDate3').datetimepicker({
       pickTime: false,
-      format: "YYYY/MM/DD",
+      format: "YYYY/MM",
+      viewMode: 'months',
       defaultDate: sd,
       maxDate: ed
     });
 
     $('#endDate3').datetimepicker({
       pickTime: false,
-      format: "YYYY/MM/DD",
+      format: "YYYY/MM",
+      viewMode: 'months',
       defaultDate: ed,
       minDate: sd
     });
@@ -163,14 +169,16 @@ $(function () {
 
     $('#startDate4').datetimepicker({
       pickTime: false,
-      format: "YYYY/MM/DD",
+      format: "YYYY/MM",
+      viewMode: 'months',
       defaultDate: sd,
       maxDate: ed
     });
 
     $('#endDate4').datetimepicker({
       pickTime: false,
-      format: "YYYY/MM/DD",
+      format: "YYYY/MM",
+      viewMode: 'months',
       defaultDate: ed,
       minDate: sd
     });

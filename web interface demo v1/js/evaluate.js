@@ -60,6 +60,7 @@ var main = function() {
           $(".defchart").css("border", "2px solid black");
         }
 
+        // Helper function to parse the JSON strings that come from the Python output response
         var parseResponse = function(response) {
           var output = {};
           var object = JSON.parse(response);
@@ -73,7 +74,11 @@ var main = function() {
           }
           return output;
         }
-        if (!tmy_mode_on){
+        if (!tmy_mode_on){ // Non-TMY mode
+          // Expected format of response, 
+          //    response[0] = data for Model 1 against Baseline 1
+          //    response[1] = data for Model 1 against Evaluation Period
+          //    response[2] = statistics for Model 1
           var test = parseResponse(response[0]);
           console.log(test);
     			
@@ -168,9 +173,6 @@ var main = function() {
             }]
           });
 
-          var data3 = parseResponse(response[1]);
-          console.log(data3);
-          var savkeys = Object.keys(data3);
           $('#highstock4').highcharts('StockChart', {
 
           	chart : {
@@ -197,7 +199,7 @@ var main = function() {
             },
             series : [{
               name : "Savings",
-              data : data3[savkeys[3]],
+              data : evaloutput[evalkeys[3]],
               tooltip: {
                 valueDecimals: 2
               },
