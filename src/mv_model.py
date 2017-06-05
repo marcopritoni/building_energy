@@ -285,7 +285,6 @@ def create_models(args=None):
         return model_1
     
     elif args.subparser_name == "tmy":
-        model_1.output()
         tmy_slice = (slice(args.tmy_start, args.tmy_end))
         tmy_raw = get_point(tmy_name, args.tmy_start, args.tmy_end)
         
