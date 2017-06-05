@@ -299,6 +299,9 @@ def create_models(args=None):
         model_2 = Model(args.model_type)
         model_2.train(data_set.baseline2, data_name)
         
+        model_1.output()
+        model_2.output()
+  
          # Projects data_name into TMY period
         model_1.project(eval_data, data_name)
         eval_data["out"]["Baseline 1"] = eval_data["out"]["Model"].copy()
@@ -311,8 +314,6 @@ def create_models(args=None):
         savings = savings.sub(eval_data["out"]["Baseline 1"], fill_value=0)
         eval_data["out"]["Savings"] = savings
         
-        model_1.output()
-        model_2.output()
         print(eval_data["out"].to_json())
         return {1: model_1, 2: model_2, 3: eval_data}
 
