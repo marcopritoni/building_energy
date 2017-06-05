@@ -10,12 +10,14 @@ import sys
 import traceback
 import argparse
 
-# Start logging temporarily with file object
-sys.stderr = open("../logs/error.log", "w")
-info_log = open("../logs/info.log", "w")
-info_log.close()
-# date_format = time.strftime("%m/%d/%Y %H:%M:%S %p ")
-# sys.stderr.write(date_format + " - root - [WARNING] - ")
+if __name__ == "__main__":
+    # Start logging temporarily with file object
+    sys.stderr = open("../logs/error.log", "w")
+    info_log = open("../logs/info.log", "w")
+    info_log.close()
+    
+    # date_format = time.strftime("%m/%d/%Y %H:%M:%S %p ")
+    # sys.stderr.write(date_format + " - root - [WARNING] - ")
 
 # Third-party library imports
 import numpy as np
@@ -26,8 +28,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score, mean_squared_error
 
 # Local imports
-from data_preprocessor import DataPreprocessor
-from test import get_point
+from preprocessor import DataPreprocessor
+from get_data import get_point
 
 tmy_name = "NSRDB.136708.OAT.TMY"
 
@@ -203,7 +205,7 @@ class Model(object):
 
 
 """Logging code"""
-class StreamWriter():
+class _StreamWriter():
     """Custom logger to wrap around file streams"""
 
     def __init__(self, name=__name__):
@@ -213,11 +215,11 @@ class StreamWriter():
         self.logger.warn(message)
 
 
-class InfoFilter(logging.Filter):
+class _InfoFilter(logging.Filter):
     """Filter to allow only INFO level messages to appear in info.log"""
 
     def __init__(self):
-        super(InfoFilter, self).__init__("allow_info")
+        super(_InfoFilter, self).__init__("allow_info")
 
     def filter(self, record):
         if record.levelname == "INFO" or record.levelname == "DEBUG":
@@ -232,8 +234,12 @@ def main():
 
     # Do not truncate numpy arrays when printing
     np.set_printoptions(threshold=np.nan)
+    create_models()   
        
-    args = _parse_args()
+       
+def create_models(args=None):
+    """Create Measurement Verification models and prints data. Default args uses sys.argv"""
+    args = _parse_args(args)
     data_name = "_".join([args.building_name, args.energy_type, "Demand_kBtu"])
 
     # Time period to request data from PI system
@@ -263,19 +269,22 @@ def main():
                   u"TOD_22", u"TOD_23", u"DOW_0", u"DOW_1", u"DOW_2", u"DOW_3", u"DOW_4",
                   u"DOW_5", u"DOW_6"]
     
+    # Create a DataSet with OAT values in output as column
     data_set = DataSet(data, base_slice, base_slice2, eval_slice, output_vars, input_vars)   
     data_set.baseline1["out"]["OAT"] = data.loc[base_slice, "OAT"]
     data_set.baseline2["out"]["OAT"] = data.loc[base_slice2, "OAT"]
     data_set.eval["out"]["OAT"] = data.loc[eval_slice, "OAT"]
     
+    # Create first model for baseline period 1 
     model_1 = Model(args.model_type)
     model_1.train(data_set.baseline1, data_name)
     
     if args.subparser_name == "simple":
         model_1.project(data_set.eval, data_name)
         model_1.output()
+        return model_1
     
-    if args.subparser_name == "tmy":
+    elif args.subparser_name == "tmy":
         tmy_slice = (slice(args.tmy_start, args.tmy_end))
         tmy_raw = get_point(tmy_name, args.tmy_start, args.tmy_end)
         
@@ -285,20 +294,24 @@ def main():
         tmy_data = preprocess(tmy_raw)  
         eval_data = format_eval(data, tmy_data, tmy_slice, input_vars, output_vars)
         
+         # Create second model for baseline period 2 
         model_2 = Model(args.model_type)
         model_2.train(data_set.baseline2, data_name)
-
-        model_1.project(eval_data, "OAT")
+        
+         # Projects data_name into TMY period
+        model_1.project(eval_data, data_name)
         eval_data["out"]["Baseline 1"] = eval_data["out"]["Model"].copy()
-        model_2.project(eval_data, "OAT")
+        model_2.project(eval_data, data_name)
         eval_data["out"]["Baseline 2"] = eval_data["out"]["Model"].copy()
         eval_data["out"].drop(["Model"], inplace=True, axis=1)
         
+        # Get savings over typical TMY period by subtracting from two baseline model results
         savings = eval_data["out"]["Baseline 2"].copy()
         savings = savings.sub(eval_data["out"]["Baseline 1"], fill_value=0)
         eval_data["out"]["Savings"] = savings
 
         print(eval_data["out"].to_json())
+        return {1: model_1, 2: model_2, 3: eval_data}
 
 def preprocess(data):
     preprocessor = DataPreprocessor(data)
@@ -322,7 +335,7 @@ def format_eval(data, tmy_data, tmy_slice, input_vars, output_vars):
 def _start_logger():
     # Source: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
     logger = logging.getLogger(__name__)
-    logger.addFilter(InfoFilter())
+    logger.addFilter(_InfoFilter())
     
     default_path = "logging.yaml"
     default_level = logging.INFO
@@ -339,9 +352,9 @@ def _start_logger():
         logging.basicConfig(level=default_level)
 
     sys.stderr.close()
-    sys.stderr = StreamWriter()
+    sys.stderr = _StreamWriter()
 
-def _parse_args():
+def _parse_args(args):
     """Parses command line arguments using argparse"""
     
     parser = argparse.ArgumentParser(description="A tool for mechanical engineers at the UC Davis Energy Conservation Office to analyze the energy performance of UC Davis buildings.", 
@@ -371,17 +384,27 @@ def _parse_args():
     # See https://stackoverflow.com/a/29293080
     # Prints help message on invalid input
     try:
-        return parser.parse_args()
+        return parser.parse_args(args)
     
-    except SystemExit as err:
-        if err.code == 2:
-            parser.print_help()
+    except SystemExit as err: 
+        # If error is unhandled 
+        if err.code == 2: 
+            parser.print_help() 
+            if sys.argv[1] == "simple": 
+                simple_parser.print_help() 
+            elif sys.argv[1] == "tmy": 
+                tmy_parser.print_help() 
+            else: 
+                parser.print_help() 
+ 
+        # Exit if parsing error regardless
         sys.exit()
-
+        
 if __name__ == "__main__":
     try:
         main()
         
+    # Graceful exit due to parse error or intentional sys.exit() call
     except SystemExit:
         sys.exit()      
           

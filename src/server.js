@@ -19,7 +19,7 @@ app.get('/', function(req, res){
 app.get('/python.json', function(req, res){
 	console.log(req.query);
 	options['args'] = Object.keys(req.query).map(function(key){ return req.query[key]; });
-  PythonShell.run('mv_model_main.py', options, function(err, results) {
+  PythonShell.run('mv_model.py', options, function(err, results) {
   	if (err) {
       console.log(err.stack);     
       res.json({error:err.stack});
