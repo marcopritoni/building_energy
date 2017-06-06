@@ -142,6 +142,7 @@ var main = function() {
           $("#modelStats #numpts").text(test[keys[2]].length);     
 
           var evaloutput = parseResponse(response[1]);
+          console.log(evaloutput);
           var evalkeys = Object.keys(evaloutput);
           $('#highstock3').highcharts('StockChart', {
             rangeSelector : {
@@ -164,8 +165,8 @@ var main = function() {
               },
               color : "green"
             }, {
-              name : evalkeys[2],//data2[1][0],
-              data : evaloutput[evalkeys[2]],//preditiondata,
+              name : "Model",//data2[1][0],
+              data : evaloutput["Model"],//preditiondata,
               tooltip: {
                 valueDecimals: 2
               },
@@ -199,7 +200,7 @@ var main = function() {
             },
             series : [{
               name : "Savings",
-              data : evaloutput[evalkeys[3]],
+              data : evaloutput["Savings"],
               tooltip: {
                 valueDecimals: 2
               },
@@ -213,69 +214,138 @@ var main = function() {
           var savingsTotal = calculateTotalSavings(startTimestamps, startData);
           $("#savings").text(savingsTotal.toFixed(2)+" kBtu*hr");
         }
-        else {
+        else { // TMY Mode ON. Expected output format
+          //
+          //
+          //
+          //
+          //
+          //
+
           console.log(response);
-          var tmyresponse = parseResponse(response[0]);
+          var test = parseResponse(response[0]);
+          
+          var keys = Object.keys(test);
+          $('#highstock').highcharts('StockChart', {
+            rangeSelector : {
+              selected : 1
+            },
+            xAxis: {
+              gridLineWidth: 1
+            },
+            yAxis: [{ // OAT Axis
+              labels: {
+                format: '{value}°F',
+              },
+              opposite:false
+            },
+            { // Energy Use Axis
+
+            }],
+            title : {
+              text : "Model Against Baseline 1"
+            },
+            legend : {
+              enabled: true
+            },
+            series : [{
+              name : keys[0],
+              data : test[keys[0]],
+              tooltip: {
+                valueDecimals: 2
+              },
+              yAxis:1,
+              color : "green"
+            }, {
+              name : 'OAT',
+              data : test["OAT"],
+              tooltip: {
+                valueDecimals: 2
+              },
+              yAxis: 0,
+              color: "#0088ff",
+              visible:false
+            },
+            {
+              name : "Model 1",
+              data : test["Model"],
+              tooltip: {
+                valueDecimals: 2
+              },
+              yAxis:1,
+              color: "red"
+            }]
+          });
+
+          var model1stats = JSON.parse(response[1]);
+          $("#modelStats #R2").text(model1stats["Adj_R2"].toFixed(2));
+          $("#modelStats #cvrmse").text(model1stats["CV_RMSE"].toFixed(2));
+          $("#modelStats #nmbe").text(model1stats["NMBE"].toFixed(2));
+          $("#modelStats #rmse").text(model1stats["RMSE"].toFixed(2));
+          $("#modelStats #numpts").text(test[keys[2]].length);
+          
+          var model2response = parseResponse(response[2]);
+          var model2keys = Object.keys(model2response);
+          $('#highstock2').highcharts('StockChart', {
+            rangeSelector : {
+              selected : 1
+            },
+            xAxis: {
+              gridLineWidth: 1
+            },
+            yAxis: [{ // OAT Axis
+              labels: {
+                format: '{value}°F',
+              },
+              opposite:false
+            },
+            { // Energy Use Axis
+
+            }],
+            title : {
+              text : "Model2 Against Baseline 2"
+            },
+            legend : {
+              enabled: true
+            },
+            series : [{
+              name : model2keys[0],
+              data : model2response[model2keys[0]],
+              tooltip: {
+                valueDecimals: 2
+              },
+              yAxis: 1,
+              color : "green"
+            }, {
+              name : 'OAT',
+              data : model2response["OAT"],
+              tooltip: {
+                valueDecimals: 2
+              },
+              yAxis: 0,
+              color: "#0088ff",
+              visible:false
+            }, {
+              name : "Model 2",
+              data : model2response["Model"],
+              tooltip: {
+                valueDecimals: 2
+              },
+              yAxis: 1,
+              color: "red"
+            }]
+          });
+
+          var model2stats = JSON.parse(response[3]);
+          $("#modelStats2 #R2").text(model2stats["Adj_R2"].toFixed(2));
+          $("#modelStats2 #cvrmse").text(model2stats["CV_RMSE"].toFixed(2));
+          $("#modelStats2 #nmbe").text(model2stats["NMBE"].toFixed(2));
+          $("#modelStats2 #rmse").text(model2stats["RMSE"].toFixed(2));
+          $("#modelStats2 #numpts").text(model2response["Model"].length); 
+
+          var tmyresponse = parseResponse(response[4]);
           var tmykeys = Object.keys(tmyresponse);
-          console.log(tmykeys);          
-          // $('#highstock2').highcharts('StockChart', {
-          //   rangeSelector : {
-          //     selected : 1
-          //   },
-          //   xAxis: {
-          //     gridLineWidth: 1
-          //   },
-          //   yAxis: [{ // OAT Axis
-          //     labels: {
-          //       format: '{value}°F',
-          //     },
-          //     opposite:false
-          //   },
-          //   { // Energy Use Axis
-
-          //   }],
-          //   title : {
-          //     text : "Model2 Against Baseline 2"
-          //   },
-          //   legend : {
-          //     enabled: true
-          //   },
-          //   series : [{
-          //     name : tmykeys[2],
-          //     data : tmyresponse[tmykeys[2]],
-          //     tooltip: {
-          //       valueDecimals: 2
-          //     },
-          //     yAxis: 1,
-          //     color : "green"
-          //   }, {
-          //     name : 'OAT',
-          //     data : tmyresponse["OAT"],
-          //     tooltip: {
-          //       valueDecimals: 2
-          //     },
-          //     yAxis: 0,
-          //     color: "#0088ff",
-          //     visible:false
-          //   }, {
-          //     name : "Baseline 2",
-          //     data : tmyresponse["Baseline 2"],
-          //     tooltip: {
-          //       valueDecimals: 2
-          //     },
-          //     yAxis: 1,
-          //     color: "red"
-          //   }]
-          // });
-
-          // var model2stats = JSON.parse(response[7]);
-          // $("#modelStats2 #R2").text(model2stats["Adj_R2"].toFixed(2));
-          // $("#modelStats2 #cvrmse").text(model2stats["CV_RMSE"].toFixed(2));
-          // $("#modelStats2 #nmbe").text(model2stats["NMBE"].toFixed(2));
-          // $("#modelStats2 #rmse").text(model2stats["RMSE"].toFixed(2));
-          // $("#modelStats2 #numpts").text(preditiondata.length); 
-
-
+          console.log(tmykeys);
           $('#highstock5').highcharts('StockChart', {
             rangeSelector : {
               selected : 1
@@ -325,8 +395,48 @@ var main = function() {
               visible:false 
             }]
           });
-        }
 
+          $('#highstock6').highcharts('StockChart', {
+
+            chart : {
+              events : {
+                redraw: function(){
+                  shownTimestamps = this.series[0].processedXData;
+                  shownData = this.series[0].processedYData;
+                  var savingsTotal = calculateTotalSavings(shownTimestamps, shownData);
+                  $("#tmySavings").text(savingsTotal.toFixed(2)+" kBtu*hr");
+                }
+              }
+            },
+            rangeSelector : {
+              selected : 1
+            },
+            xAxis: {
+              gridLineWidth: 1
+            },
+            title : {
+              text : "Savings"
+            },
+            legend : {
+              enabled : true
+            },
+            series : [{
+              name : "Savings",
+              data : tmyresponse["Savings"],
+              tooltip: {
+                valueDecimals: 2
+              },
+              color : "gold"
+            }]
+          });
+
+          var savingsChart = $('#highstock6').highcharts();
+          var startTimestamps = savingsChart.series[0].processedXData;
+          var startData = savingsChart.series[0].processedYData;
+          var savingsTotal = calculateTotalSavings(startTimestamps, startData);
+          $("#tmySavings").text(savingsTotal.toFixed(2)+" kBtu*hr");
+
+        }
 
         
       
