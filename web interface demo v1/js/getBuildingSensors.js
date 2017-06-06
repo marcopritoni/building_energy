@@ -1,5 +1,5 @@
 buildings = {};
-Papa.parse("http://localhost:8000/BuildingSensors.csv", {
+Papa.parse("http://ec2-54-219-169-58.us-west-1.compute.amazonaws.com:8080/BuildingSensors.csv", { // CHANGE URL TO THIS IF RUNNING LOCALLY "http://localhost:8000/BuildingSensors.csv"
 	download:true,
 	complete:function(results){
 		// Construct the builldings object for referencing building/sensor pairs

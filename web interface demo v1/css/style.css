@@ -214,12 +214,12 @@ a.button:hover {
   opacity: 0;
 }
 
-.btn-default {
+#TMYSwitch.btn-default {
   color:#ccc;
 }
-.btn-default:focus {
+#TMYSwitch.btn-default:focus {
   color:#ccc;
 }
-.btn-default:hover {
+#TMYSwitch.btn-default:hover {
   color:#ccc;
 }

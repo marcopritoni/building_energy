@@ -9,11 +9,16 @@ var options = {
   pythonPath: 'C:/Users/zeusa/Anaconda2/python.exe',//change pythonPath to your pc's python path
   pythonOptions: ['-u','-W ignore']
 };
+var path = require("path");
 var app = express();
 app.use(express.static('../web interface demo v1'));
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + "/../" + "web interface demo v1/index.html");
+});
+
+app.get('/BuildingSensors.csv', function(req, res){
+  res.sendFile(path.resolve(__dirname+'/../data/BuildingSensors.csv'));
 });
 
 app.get('/python.json', function(req, res){
