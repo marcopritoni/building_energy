@@ -1,3 +1,7 @@
+"""
+This file checks the runtime of the program
+"""
+
 #import cProfile
 import os
 #import pstats
@@ -5,8 +9,11 @@ import sys
 
 import line_profiler
 
-# Import function for profiling
 def import_test():
+    """
+    Import function for profiling. Starts temporary logging and imports appropriate libraries
+    """
+
     # Standard library imports
     import json
     import logging.config
@@ -51,6 +58,7 @@ with open("profile-func.txt", "w") as file:
 # Line-by-line profiling
 # See https://github.com/rkern/line_profiler for more details       
 with open("profile-line.txt", "w") as profile:
+    ## Profile object instance
     profiler = line_profiler.LineProfiler(import_test)
     profiler.runcall(import_test)
     
@@ -63,10 +71,12 @@ with open("profile-line.txt", "w") as profile:
     
     with open("output.txt", "w") as output:
         sys.stdout = output
+        ## Command line arguments
         sys.argv = ["", "@test_input.txt"]
         profiler.runcall(mv_model.main)
         #profiler.runcall(test.cache_point, "NSRDB.136708.OAT.TMY")
         
     os.remove("output.txt")  
+    ## Data stream
     profiler.print_stats(stream=profile)
     

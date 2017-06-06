@@ -1,3 +1,7 @@
+"""
+This file tests getting Data from the PI_datalink stream
+"""
+
 import os
 import time 
 
@@ -6,6 +10,15 @@ import pandas as pd
 from pi_datalink import PIDatalink
 
 def cache_point(point_name, start="2014", end="t", remove_duplicates=True):
+    """
+    Gets the stream and saves the data in CSV format
+
+    Parameters:
+    point_name: name of data point
+    start: start parameter
+    end: end parameter
+    remove_duplicates: flag
+    """
     path = "".join(["../data/", point_name, ".csv"])
     
     # Imports previous CSV if it exists    
@@ -34,6 +47,14 @@ def cache_point(point_name, start="2014", end="t", remove_duplicates=True):
     return stream
 
 def get_point(point_names, start="2014", end="t"):
+    """
+    Gets the data point from the data stream
+
+    Parameters:
+    point_names: Names of data points
+    start: start parameter
+    end: end parameter
+    """
     streams = pd.DataFrame()
 
     if not isinstance(point_names, list):
@@ -70,6 +91,9 @@ def get_point(point_names, start="2014", end="t"):
     return streams
         
 def main():
+    """
+    Main function. Initializes sample data point to cache
+    """
     cache_point("NSRDB.136708.OAT.TMY")
 
 if __name__ == "__main__":
