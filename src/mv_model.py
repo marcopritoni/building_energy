@@ -169,7 +169,7 @@ class Model(object):
 
         # Computes difference between model and actual
         self.savings = eval_data["out"]["Model"].copy()
-        self.savings.sub(eval_data["out"][out_var], fill_value=0)
+        self.savings = self.savings.sub(eval_data["out"][out_var], fill_value=0)
         eval_data["out"]["Savings"] = self.savings
         return self.savings
         
