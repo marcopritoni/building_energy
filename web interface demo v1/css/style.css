@@ -1,37 +1,53 @@
 body{
-  
-  background-position: center;
-  background-attachment: fixed;
-  background-image: url(http://wallpapercave.com/wp/F0uViyV.png)
+  background-color:#e5e9ef;
+  font-family: 'Roboto', sans-serif;
 }
 
+label{
+  font-family: 'Lato', sans-serif;
+  font-weight: 500;
+  font-size: 1.2em;
+  margin: 8px;
+}
+
+input{
+  font-family: 'Raleway', sans-serif;
+  font-weight: 800;
+}
 /*Header*/
 .header {
+  font-family: 'Raleway', sans-serif;
   position: fixed;
   margin: auto;
   width: 100%;
-  height: 80px;
+  min-height: 10vh;
+  height: auto;
   top: 0px;
   font-weight: bold;
+  color: white;
   text-align: center;
-  background: gold;
+  background-image: url("../image/global-header-bg.svg");
+  background-size: cover;
   transition: .3s;
   box-shadow: 0 0 5px rgba(black, .2);
   z-index: 1;
 }
 
 .header_logo {
-  font-family: 'Oswald', sans-serif;
-  margin: 0;
-  padding-top: 10px;
-  font-size: 50px;
+  font-weight: bold;
+  margin-top: 15px;
+  font-size: 35px;
   text-shadow: 3px 4px rgba(black, .1);
   transition: .3s;
 }
 
 .content {
-  margin-top: 80px;
+  margin-top: 10vh;
   z-index: 0;
+  background-color: #fafafa;
+  min-height:90vh;
+  height: auto;
+  bottom: 0;
 }
 
 /*input-container*/
@@ -39,7 +55,12 @@ body{
   display: block;
   margin: auto;
   max-width: 60%;
-  margin-top: 100px;
+  /*background-color: #5385BD;*/
+  border-bottom: 1px solid #002855;
+  border-right: 1px solid #002855;
+  border-left: 1px solid #002855;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
   /*flex-flow: row wrap;
   justify-content: center;*/
 
@@ -62,6 +83,7 @@ a {
   display: block;
   margin: 20px auto;
   max-width: 180px;
+  font-size: 1.2em;
   text-decoration: none;
   text-align: center;
   border-radius: 4px;
@@ -69,13 +91,15 @@ a {
 }
 
 a.button {
-  color: rgba(30, 22, 54, 0.6);
-  box-shadow: rgba(81, 124, 3, 0.4) 0 0px 0px 5px inset;
+  color: black;
+  text-decoration: none;
+  box-shadow: #002855 0 0px 0px 5px inset;
 }
 
 a.button:hover {
-  color: rgba(255, 255, 255, 0.85);
-  box-shadow: rgba(81, 124, 3, 0.7) 0 0px 0px 40px inset;
+  color: white;
+  text-decoration: none;
+  box-shadow: #002855 0 0px 0px 40px inset;
 }/*Evaluate Button - end*/
 
 
@@ -90,7 +114,7 @@ a.button:hover {
   border-radius: 5px;
   margin:0;
   width:100%;
-  font-family:arial;
+  font-family: 'Lato', sans-serif;
   background: #eee url("http://blog.idevelopweb.site/wp-content/uploads/2016/05/nw_selarw.png") no-repeat scroll 97.5% center;
 }
 
@@ -106,10 +130,13 @@ a.button:hover {
   opacity: 0;
   width: 100%;
   filter: alpha(opacity=0);
+  cursor: pointer;
 }
 
 .form-group {
   width: 100%;
+  font-weight: 300;
+  font-size: 0.9em;
 }
 
 /*model dropdown menu - end*/
@@ -125,16 +152,102 @@ a.button:hover {
 .chart {
   margin-bottom: 50px;
   width:100%;
+  display:none;
 }
+
 
 .highcharts-container {
   width:100%;
 }
 
-#spinner{
+#loader {
   display: none;
-  width: 100px;
-  height: 100px;
   margin: auto;
-  margin-bottom: 50px;
+  margin-bottom: 20px;
+  border: 8px solid #dadada;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 70px;
+  height: 70px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-bottom {
+  position: relative;
+  -webkit-animation-name: animatebottom;
+  -webkit-animation-duration: 1s;
+  animation-name: animatebottom;
+  animation-duration: 1s
+}
+
+@keyframes animatebottom {
+  from{ bottom:-100px; opacity:0 }
+  to{ bottom:0; opacity:1 }
+}
+
+
+#TMYSwitch.btn-default {
+  color:#ccc;
+}
+#TMYSwitch.btn-default:focus {
+  color:#ccc;
+}
+#TMYSwitch.btn-default:hover {
+  color:#ccc;
+}
+
+/*side bar*/
+.side-bar-button{
+  position: fixed;
+  margin-top: 15vh;
+  margin-left: 5vh;
+  height: 50px;
+  width: 50px;
+  cursor: pointer;
+  z-index: 200;
+}
+
+.side-bar{
+  display: none;
+  position:fixed;
+  margin-top: 10vh;
+  width: 20%;
+  min-height: 90vh;
+  color: white;
+  background-color: #e5e9ef;
+  z-index: 100;
+}
+
+.side-bar-logo1 {
+  width: 65%;
+  height: 50px;
+  margin: 10px;
+}
+
+.side-bar-close{
+  height: 50px;
+  width: 50px;
+  cursor: pointer;
+  float: right;
+  margin: 10px;
+}
+
+.side-bar-content{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 70vh;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.side-bar-content img {
+  height: 50px;
+  width: 70%;
 }

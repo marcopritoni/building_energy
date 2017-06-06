@@ -3,19 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <title>Building Energy Performance Report|UC Davis CEED</title>
+  <!--
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/css/bootstrap-datetimepicker.min.css">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/css/bootstrapValidator.min.css">
-    <link href='https://fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css?family=Lato|Raleway:200|Roboto:100,500" rel="stylesheet">
     <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.bootstrapvalidator/0.5.3/js/bootstrapValidator.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.2/moment.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min.js"></script>
+    -->
 
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font.css">
+    <link rel="stylesheet" href="css/bootstrapValidator.min.css">
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css">
+
+    <script src="js/jquery-2.1.3.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/moment.min.js"></script>
+    <script src="js/bootstrapValidator.min.js"></script>
+    <script src="js/bootstrap-datetimepicker.min.js"></script>
+    <script src="js/papaparse.min.js"></script>
 
     <link rel="stylesheet" href="css/style.css">
-
 
 </head>
 
@@ -25,10 +37,30 @@
   <h1 class="header_logo">Building Energy Performance Report | UC Davis CEED</h1>
 </div>
 
-<div class="content">
-  <div id="input-container" class="container">
+<img class="side-bar-button" onclick="showSideBar()" src="image/ham.png" alt="">
 
+<div class="side-bar">
+  <img src="./image/logo1.png" class="side-bar-logo1" alt="">
+  <img class="side-bar-close" onclick="hideSideBar()" src="image/cross.png" alt="">
+  <div class="side-bar-content">
+    <a href="PythonLibraryUserGuide.pdf" target="_blank">User Guide</a>
+    <a href="https://ceed.ucdavis.edu/#!/" target="_blank">Campus Energy Education Dashboard</a>
+    <a href="https://eco.ucdavis.edu/energy-controls" target="_blank">Energy Conservation Office</a>
+    <img src="./image/logo2.png" alt="">
+  </div>
+</div>
+
+<div class="content col-md-10 col-md-offset-1">
+  <div id="input-container" class="container">
     <div class="row">
+      <h3 class="text-center">Select Parameters<span class="glyphicon glyphicon-chevron-down pull-right" id="dropdown" style="font-size:x-large;padding-right:10px;cursor: pointer;"></span></h3>
+    </div>
+    <div class="row headerRow">
+      <div class = "col-md-2">
+        <button type="button" class="btn btn-default" id="TMYSwitch">TMY Mode</button>
+      </div>
+    </div>
+    <div class="row headerRow">
       <!-- building dropdown menu  -->
       <div class="col-md-4">
         <label for="sbx">Select Building</label>
@@ -36,13 +68,6 @@
            <span class="cus_selt" id="sel_txt1">Select a Building*</span>
           <select id="sel_val1" class="styled" required>
               <option selected value="">Select a Building*</option>
-              <option>Ghausi</option>
-              <option>Bainer</option>
-              <option>Meyer</option>
-              <option>Briggs</option>
-              <option>EPS</option>
-              <option>Physics</option>
-              <option>Hutchison</option>
             </select>
          </div>
        </div>
@@ -55,10 +80,6 @@
            <span class="cus_selt" id="sel_txt2">Select a Type of Fuel*</span>
           <select id="sel_val2" class="styled" required>
               <option value="" selected>Select a Type of Fuel*</option>
-              <option value="ChilledWater">Chilled Water</option>
-              <option value="Electricity">Electricity</option>
-              <option value="NaturalGas">Natural Gas</option>
-              <option value="Steam">Steam</option>
             </select>
          </div>
        </div>
@@ -81,7 +102,7 @@
 
 
 
-    <div class="row">
+    <div class="row defaultRow TMYRow">
       <!-- baseline1 period -->
       <div class="input-period">
       <label for="" style="padding-left: 15px">Select Baseline1</label>
@@ -101,7 +122,7 @@
     </div>
 
     <!-- baseline2 period -->
-    <div class="row">
+    <div class="row TMYRow" style="display: none">
       <div class="input-period">
       <label for="" style="padding-left: 15px">Select Baseline2</label>
       <form id="form2" name="form2" class="form-inline">
@@ -120,7 +141,7 @@
     </div>
 
     <!-- evaluation period  -->
-    <div class="row">
+    <div class="row defaultRow">
       <div class="input-period">
       <label for="" style="padding-left: 15px">Evaluation Period</label>
       <form id="form3" name="form3" class="form-inline">
@@ -139,7 +160,7 @@
     </div>
 
     <!-- optional  -->
-    <div class="row">
+    <div class="row TMYRow" style="display:none">
       <div class="input-period">
       <label for="" style="padding-left: 15px">Extrapolated Performance Period</label>
       <form id="form4" name="form4" class="form-inline">
@@ -157,27 +178,263 @@
       </div>
     </div>
 
-
+    <!-- optional  -->
+    <!-- <div class="row TMYRow" style="display:none">
+      <div class="input-period">
+      <label for="" style="padding-left: 15px">TMY MODE INPUT</label>
+      <form id="form5" name="form5" class="form-inline">
+          <div class="form-group">
+            <div class="col-md-6">
+              <label for="startDate5">Start Date</label>
+              <input id="startDate5" name="startDate5" type="text" class="form-control" />
+            </div>
+            <div class="col-md-6">
+              <label for="endDate5">End Date</label>
+              <input id="endDate5" name="endDate4" type="text" class="form-control" />
+            </div>
+          </div>
+      </form>
+      </div>
+    </div> -->
+    <!-- evaluate button  -->
+    <a href="#" class="button" id="evaluate">EVALUATE</a>
   </div>
 
 
-  <!-- evaluate button  -->
-  <a href="#" class="button" id="evaluate">EVALUATE</a>
 
   <!-- output part == highchart  -->
   <div class="output">
-    <img id="spinner" src="http://www.jellyfishtechnologies.com/wp-content/themes/jellyfish/images/spinner.gif"/>
-    <div id="highstock" class="chart"></div>
-    <div id="highstock2" class="chart"></div>
-    <div id="highstock3" class="chart"></div>
+    <div id="loader"></div>
+
+    <div class="chart container defchart tmychart">
+      <div class="row">
+        <div class="col-md-10">
+          <div id="highstock" class="histock"></div>
+        </div>
+        <div id="modelStats" class="col-md-2">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Adj_R^2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="R2"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>CV_RMSE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="cvrmse"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>NMBE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="nmbe"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>RMSE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="rmse"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Data points used in Model</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="numpts"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" class="btn btn-default col-md-2 export">Export data as CSV</button>
+      </div>
+    </div>
+
+    <div class="chart container tmychart">
+      <div class="row">
+        <div class="col-md-10">
+          <div id="highstock2" class="histock"></div>
+        </div>
+        <div id="modelStats2" class="col-md-2">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Adj_R^2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="R2"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>CV_RMSE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="cvrmse"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>NMBE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="nmbe"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>RMSE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="rmse"></td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Data points used in Model</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="numpts"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" class="btn btn-default col-md-2 export">Export data as CSV</button>
+      </div>
+    </div>
+
+    <div class="chart defchart container">
+      <div class="row">
+        <div id="highstock3" class="histock"></div>
+      </div>
+      <div class="row">
+        <button type="button" class="btn btn-default col-md-2 export">Export data as CSV</button>
+      </div>
+    </div>
+
+    <div class="chart container defchart">
+      <div class="row">
+        <div class="col-md-10">
+          <div id="highstock4" class="histock"></div>
+        </div>
+        <div id="savingsStats" class="col-md-2">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Total Savings in Selected Period</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="savings"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" class="btn btn-default col-md-2 export">Export data as CSV</button>
+      </div>
+    </div>
+
+    <div class="chart tmychart container">
+      <div class="row">
+        <div class="col-md-12">
+          <div id="highstock5" class="histock"></div>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" class="btn btn-default col-md-2 export">Export data as CSV</button>
+      </div>
+    </div>
+
+    <div class="chart container tmychart">
+      <div class="row">
+        <div class="col-md-10">
+          <div id="highstock6" class="histock"></div>
+        </div>
+        <div id="tmySavingsStats" class="col-md-2">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Total Savings in Selected Period</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="tmySavings"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" class="btn btn-default col-md-2 export">Export data as CSV</button>
+      </div>
+    </div>
+
   </div>
 
 </div> <!-- End Content -->
 
+<script src="js/getBuildingSensors.js"></script>
+<script src="js/exportChartAsCSV.js"></script>
+<script src="js/calculateTotalSavings.js"></script>
 <script src="js/index.js"></script>
 <script src="js/evaluate.js"></script>
-<script src="http://code.highcharts.com/stock/highstock.js"></script>
-<script src="http://code.highcharts.com/modules/exporting.js"></script>
+<!--<script src="http://code.highcharts.com/stock/highstock.js"></script>-->
+<script src="js/highstock.js"></script>
+<!--<script src="http://code.highcharts.com/modules/exporting.js"></script>-->
+<script src="js/exporting.js"></script>
 
 
 

@@ -4,10 +4,10 @@ version: 1
 disable_existing_loggers: False
 filters:
     allow_info: 
-        name: allow_info
+        (): mv_model._InfoFilter
 formatters:
     simple:
-        format: "%(asctime)s - %(name)s - [%(levelname)s] - %(message)s \n"
+        format: "%(asctime)s - %(name)s - [%(levelname)s] - %(message)s \r\n"
         datefmt: "%m/%d/%Y %H:%M:%S %p "
 handlers:
     error_console:

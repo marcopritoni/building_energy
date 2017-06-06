@@ -1,12 +1,12 @@
 /*building dropdown menu - JQuery*/
 $( "#sel_val1" ).change(function() {
-  var option = $(this).find('option:selected').val();
+  var option = $(this).find('option:selected').text();
   $('#sel_txt1').text(option);
 });
 
 /*fuel dropdown menu - JQuery*/
 $( "#sel_val2" ).change(function() {
-  var option = $(this).find('option:selected').val();
+  var option = $(this).find('option:selected').text();
   $('#sel_txt2').text(option);
 });
 
@@ -16,11 +16,11 @@ var bindDateRangeValidation = function (f, s, e) {
     if(!(f instanceof jQuery)){
 			console.log("Not passing a jQuery object");
     }
-  
+
     var jqForm = f,
         startDateId = s,
         endDateId = e;
-  
+
     var checkDateRange = function (startDate, endDate) {
         var isValid = (startDate != "" && endDate != "") ? startDate <= endDate : true;
         return isValid;
@@ -59,13 +59,13 @@ var bindDateRangeValidation = function (f, s, e) {
         }
         if (!bstpValidate) {
             jqForm.bootstrapValidator({
-                excluded: [':disabled'], 
+                excluded: [':disabled'],
             })
         }
-      
+
         jqForm.bootstrapValidator('addField', startDateId, validateFields.startDate);
         jqForm.bootstrapValidator('addField', endDateId, validateFields.endDate);
-      
+
     };
 
     var hookValidatorEvt = function () {
@@ -91,20 +91,22 @@ var bindDateRangeValidation = function (f, s, e) {
 
 //baseline1 period --JQuery
 $(function () {
-    var sd = new Date(2014, 0, 1), ed = new Date(2014, 5, 1);
-  
-    $('#startDate').datetimepicker({ 
-      pickTime: false, 
-      format: "YYYY/MM/DD", 
-      defaultDate: sd, 
-      maxDate: ed 
+    var sd = new Date(2015, 0, 1), ed = new Date(2015, 5, 30);
+
+    $('#startDate').datetimepicker({
+      pickTime: false,
+      format: "YYYY/MM",
+      viewMode: 'months',
+      defaultDate: sd,
+      maxDate: ed
     });
-  
-    $('#endDate').datetimepicker({ 
-      pickTime: false, 
-      format: "YYYY/MM/DD", 
-      defaultDate: ed, 
-      minDate: sd 
+
+    $('#endDate').datetimepicker({
+      pickTime: false,
+      format: "YYYY/MM",
+      viewMode: 'months',
+      defaultDate: ed,
+      minDate: sd
     });
 
     //passing 1.jquery form object, 2.start date dom Id, 3.end date dom Id
@@ -114,20 +116,22 @@ $(function () {
 
 // baseline2 period --JQuery
 $(function () {
-    var sd = new Date(2014, 5, 1), ed = new Date(2014, 11, 1);
-  
-    $('#startDate2').datetimepicker({ 
-      pickTime: false, 
-      format: "YYYY/MM/DD", 
-      defaultDate: sd, 
-      maxDate: ed 
+    var sd = new Date(2015, 6, 1), ed = new Date(2015, 11, 31);
+
+    $('#startDate2').datetimepicker({
+      pickTime: false,
+      format: "YYYY/MM",
+      viewMode: 'months',
+      defaultDate: sd,
+      maxDate: ed
     });
-  
-    $('#endDate2').datetimepicker({ 
-      pickTime: false, 
-      format: "YYYY/MM/DD", 
-      defaultDate: ed, 
-      minDate: sd 
+
+    $('#endDate2').datetimepicker({
+      pickTime: false,
+      format: "YYYY/MM",
+      viewMode: 'months',
+      defaultDate: ed,
+      minDate: sd
     });
 
     //passing 1.jquery form object, 2.start date dom Id, 3.end date dom Id
@@ -137,20 +141,22 @@ $(function () {
 
 // evaluation period --JQuery
 $(function () {
-    var sd = new Date(2015, 0, 1), ed = new Date(2015, 11, 1);
-  
-    $('#startDate3').datetimepicker({ 
-      pickTime: false, 
-      format: "YYYY/MM/DD", 
-      defaultDate: sd, 
-      maxDate: ed 
+    var sd = new Date(2016, 0, 1), ed = new Date(2016, 11, 31);
+
+    $('#startDate3').datetimepicker({
+      pickTime: false,
+      format: "YYYY/MM",
+      viewMode: 'months',
+      defaultDate: sd,
+      maxDate: ed
     });
-  
-    $('#endDate3').datetimepicker({ 
-      pickTime: false, 
-      format: "YYYY/MM/DD", 
-      defaultDate: ed, 
-      minDate: sd 
+
+    $('#endDate3').datetimepicker({
+      pickTime: false,
+      format: "YYYY/MM",
+      viewMode: 'months',
+      defaultDate: ed,
+      minDate: sd
     });
 
     //passing 1.jquery form object, 2.start date dom Id, 3.end date dom Id
@@ -159,20 +165,22 @@ $(function () {
 
 // Optional --JQuery
 $(function () {
-    var sd = new Date(2016, 0, 1), ed = new Date(2016, 11, 1);
-  
-    $('#startDate4').datetimepicker({ 
-      pickTime: false, 
-      format: "YYYY/MM/DD", 
-      defaultDate: sd, 
-      maxDate: ed 
+    var sd = new Date(2017, 0, 1), ed = new Date(2017, 11, 1);
+
+    $('#startDate4').datetimepicker({
+      pickTime: false,
+      format: "YYYY/MM",
+      viewMode: 'months',
+      defaultDate: sd,
+      maxDate: ed
     });
-  
-    $('#endDate4').datetimepicker({ 
-      pickTime: false, 
-      format: "YYYY/MM/DD", 
-      defaultDate: ed, 
-      minDate: sd 
+
+    $('#endDate4').datetimepicker({
+      pickTime: false,
+      format: "YYYY/MM",
+      viewMode: 'months',
+      defaultDate: ed,
+      minDate: sd
     });
 
     //passing 1.jquery form object, 2.till date dom Id
@@ -184,3 +192,65 @@ $( "#sel_val3" ).change(function() {
   var option = $(this).find('option:selected').val();
   $('#sel_txt3').text(option);
 });
+
+
+var TMYMode = false;
+$("#TMYSwitch").click(function() {
+  if (!TMYMode) {
+    $(this).removeClass("btn-default");
+    $(this).addClass("active");
+    $(this).addClass("btn-primary");
+
+    $(".defaultRow").hide();
+    $(".TMYRow").show();
+
+    TMYMode = true;
+  }
+  else{
+    $(this).removeClass("btn-primary");
+    $(this).removeClass("active");
+    $(this).addClass("btn-default");
+
+    $(".TMYRow").hide();
+    $(".defaultRow").show();
+
+    TMYMode = false;
+  }
+})
+
+var hidden = false;
+$( "#dropdown" ).click(function() {
+  if (!hidden){
+
+    if (TMYMode) {
+      $(".TMYRow, .headerRow, #evaluate").animate({opacity:0}, {start: function(){ $(this).hide(400) }});
+      // $(this).parent().parent().siblings()
+    }
+    else {
+      $(".defaultRow, .headerRow, #evaluate").animate({opacity:0}, {start: function(){ $(this).hide(400) }});
+    }
+    hidden = true;
+  }
+  else{
+    if (TMYMode) {
+      $(".TMYRow, .headerRow, #evaluate").animate({opacity:1}, {start: function(){ $(this).show(400) }});
+    }
+    else {
+      $(".defaultRow, .headerRow, #evaluate").animate({opacity:1}, {start: function(){ $(this).show(400) }});
+    }
+
+    // $(this).parent().parent().siblings().animate({opacity:1}, {start: function(){ $(this).show(400) }});
+    hidden = false;
+  }
+});
+
+//side-bar
+function showSideBar(){
+    $(".side-bar").css("display", "block");
+    $(".side-bar-button").css("display", "none");
+}
+
+function hideSideBar(){
+    $(".side-bar").css("display", "none");
+    $(".side-bar-button").css("display", "block");
+}

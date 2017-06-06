@@ -1,3 +1,10 @@
+# CSV data
+data/*.dll
+!data/BuildingSensors.dll
+
+# Node modules
+node_modules/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -143,3 +150,4 @@ local.properties
 
 # Code Recommenders
 .recommenders/
+src/profile-line\.txt
