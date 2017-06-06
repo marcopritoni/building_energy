@@ -245,22 +245,12 @@ $( "#dropdown" ).click(function() {
 });
 
 //side-bar
-$(document).ready(function(){
-  $(".side-bar-button").click(function() {
-    var shown = $(".side-bar").css("opacity");
+function showSideBar(){
+    $(".side-bar").css("display", "block");
+    $(".side-bar-button").css("display", "none");
+}
 
-    if(shown == 0){
-      $(".side-bar").css("opacity", "1");
-      $(".side-bar-button").attr("src","image/cross.png");
-      $(".side-bar-button").css("margin-left", "30vh");
-      //alert("The paragraph was clicked.");
-    }
-    if(shown == 1){
-      $(".side-bar").css("opacity", "0");
-      $(".side-bar-button").attr("src","image/ham.png");
-      $(".side-bar-button").css("margin-left", "5vh");
-      //alert("The paragraph was clicked.");
-    }
-
-  });
-});
+function hideSideBar(){
+    $(".side-bar").css("display", "none");
+    $(".side-bar-button").css("display", "block");
+}

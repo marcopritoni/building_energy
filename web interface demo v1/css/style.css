@@ -191,6 +191,16 @@ a.button:hover {
 }
 
 
+#TMYSwitch.btn-default {
+  color:#ccc;
+}
+#TMYSwitch.btn-default:focus {
+  color:#ccc;
+}
+#TMYSwitch.btn-default:hover {
+  color:#ccc;
+}
+
 /*side bar*/
 .side-bar-button{
   position: fixed;
@@ -203,23 +213,39 @@ a.button:hover {
 }
 
 .side-bar{
-  display: block;
+  display: none;
   position:fixed;
   margin-top: 10vh;
   width: 20%;
-  height: 90vh;
+  min-height: 90vh;
   color: white;
-  background-color: gray;
+  background-color: #e5e9ef;
   z-index: 100;
-  opacity: 0;
 }
 
-#TMYSwitch.btn-default {
-  color:#ccc;
+.side-bar-logo1 {
+  width: 65%;
+  height: 50px;
+  margin: 10px;
 }
-#TMYSwitch.btn-default:focus {
-  color:#ccc;
+
+.side-bar-close{
+  height: 50px;
+  width: 50px;
+  cursor: pointer;
+  float: right;
+  margin: 10px;
 }
-#TMYSwitch.btn-default:hover {
-  color:#ccc;
+
+.side-bar-content{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+
+.side-bar-content img {
+  height: 50px;
+  width: 70%;
 }
