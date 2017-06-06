@@ -31,7 +31,7 @@ from sklearn.metrics import r2_score, mean_squared_error
 from preprocessor import DataPreprocessor
 from get_data import get_point
 
-tmy_name = "NSRDB.136708.OAT.TMY"
+tmy_name = "Future_TMY"
 
 class DataSet(object):
     """
