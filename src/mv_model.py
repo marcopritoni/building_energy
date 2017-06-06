@@ -1,6 +1,8 @@
+## @package mv_model
+#  Main function documentation
+#  Analyzes data from sensors in UC Davis buildings. Trains, projects, and calculates scores and savings.
+
 # marco.pritoni@gmail.com
-
-
 
 # Standard library imports
 import json
@@ -52,8 +54,16 @@ class DataSet(object):
         Single model M&V = D vs E
         Post retrofit model performance  = D vs F
         Dual model M&V, normalized to tmy data = G vs H
-    """
 
+    Parameters: 
+    data: Data from the database
+    tPeriod1: First time period
+    tPeriod2: Second time period
+    tPeriod3: Third time period
+    out: Stores output data
+    inp: Stores input data
+    """
+ 
     def __init__(self, data,
                  tPeriod1=(slice(None)),
                  tPeriod2=(slice(None)),
@@ -61,15 +71,19 @@ class DataSet(object):
                  out=[""],
                  inp=[""]
                  ):
-
+        
         # the attributes dynamically calculated using indices and column names
         # first draft duplicates datasets
         #self.baseline1_par={"inpt":{"slicer":(slice(None)), "col":[""]},"outpt":{"slicer":(slice(None)), "col":[""]}}
         #self.baseline1_par={"inpt": {"col": ["OAT"], "slicer":(slice(None))}, "outpt": {"col": ["Ghausi_Electricity_Demand_kBtu"], "slicer":(slice(None))}}
 
+        ## Stores all the data
         self.fulldata = data
+        ## Stores the data associated with baseline 1 period
         self.baseline1 = {}
+        ## Stores the data associated with baseline 2 period
         self.baseline2 = {}
+        ## Stores the data associated with evaluation period
         self.eval = {}
         
         try:
@@ -121,7 +135,12 @@ class Model(object):
     data_set: DataSet used to fit model and create projection
     
     Attributes:
-    
+    clf: Instance of the specified model type
+    data_set: DataSet object created from data
+    baseline: Baseline period data
+    eval: Evaluation period data
+    savings: Energy savings calculated
+    scores: Calculated R2 scores
     """
     
     def __init__(self, model_type, data_set=None):
@@ -131,11 +150,16 @@ class Model(object):
             self.clf = RandomForestRegressor()
         else:
             self.clf = LinearRegression()
-            
+        
+        ## DataSEt object created from data  
         self.data_set = data_set
+        ## Baseline period data
         self.baseline = {}
+        ## Evaluation period data
         self.eval = {}
+        ## Calculated enery savings
         self.savings = {}
+        ## Calculated R2 scores
         self.scores = {}
         
         if data_set != None:
@@ -146,7 +170,8 @@ class Model(object):
             
             
     def train(self, baseline, out_var):
-        """Trains the model using baseline period data
+        """
+        Trains the model using baseline period data. 
         
         Parameters: 
         baseline: A dictionary with keys "in" and "out" that map to a pandas DataFrame
@@ -163,7 +188,14 @@ class Model(object):
         return self.scores 
 
     def project(self, eval_data, out_var):
-        # Predicts in the period specified by eval_data
+        """
+        Predicts in the period specified by eval_data. The energy differences between the model and actual data is
+        also predicted. These values are stored into savings. 
+
+        Parameters:
+        eval_data: Data in the evaluation period
+        out_var: Ouput
+        """
         self.eval = eval_data
         eval_data["out"]["Model"] = self.clf.predict(eval_data["in"].values)
 
@@ -174,13 +206,24 @@ class Model(object):
         return self.savings
         
     def predict(self, data):
+        """
+        Predicts on the data.
+
+        Parameters:
+        data: Data to predict on
+        """
         return self.clf.predict(data)
 
-    # compare is a two column dataframe with one column with output variable and one with the model prediction
-    # p is the number of variables in the model (eg. count the columns in the
-    # dataframe with input variables)
     @staticmethod
     def calc_scores(compare, p, out_var):
+        """
+        Calculates the R2 scores.
+
+        Parameters: 
+        compare: A two column dataframe with one column with output variable and one with the model prediction
+        p: p is the number of variables in the model (eg. count the columns in the dataframe with input variables)
+        out_var: Output
+        """
         scores = {}
 
         n = compare.count()[1]
@@ -194,8 +237,10 @@ class Model(object):
         scores["NMBE"] = np.asscalar(NMBE)
         return scores
 
-    # prints model outputs and relevant statistics
     def output(self):
+        """
+        prints model outputs and relevant statistics
+        """
         print(self.baseline["out"].to_json())
         
         if len(self.eval) > 0:
@@ -206,7 +251,9 @@ class Model(object):
 
 """Logging code"""
 class _StreamWriter():
-    """Custom logger to wrap around file streams"""
+    """
+    Custom logger to wrap around file streams
+    """
 
     def __init__(self, name=__name__):
         self.logger = logging.getLogger(name)
@@ -216,18 +263,25 @@ class _StreamWriter():
 
 
 class _InfoFilter(logging.Filter):
-    """Filter to allow only INFO level messages to appear in info.log"""
+    """
+    Filter to allow only INFO level messages to appear in info.log
+    """
 
     def __init__(self):
         super(_InfoFilter, self).__init__("allow_info")
 
     def filter(self, record):
+        """ 
+        Filters the messages
+        """
         if record.levelname == "INFO" or record.levelname == "DEBUG":
             return 1
         return 0
-    
-    
+     
 def main():
+    """
+    Main function. Starts the logger and creates the models
+    """
     # TODO: Documentation
     # TODO: Merging
     _start_logger()
@@ -236,14 +290,15 @@ def main():
     np.set_printoptions(threshold=np.nan)
     create_models()   
        
-       
+   
 def create_models(args=None):
-    """Create Measurement Verification models and prints data. Default args uses sys.argv"""
+    """
+    Create Measurement Verification models and prints data. Default args uses sys.argv
+    """
     args = _parse_args(args)
     data_name = "_".join([args.building_name, args.energy_type, "Demand_kBtu"])
 
     # Time period to request data from PI system
-    # TODO: Change to actual dates
     start = "2014"
     end = "t"
 
@@ -256,6 +311,7 @@ def create_models(args=None):
     base_slice2 = base_slice
     eval_slice = base_slice
     
+    # Changes the time period to use 
     if args.subparser_name == "simple":
         eval_slice = (slice(args.eval_start, args.eval_end))   
     elif args.subparser_name == "tmy":
@@ -284,6 +340,7 @@ def create_models(args=None):
         model_1.output()
         return model_1
     
+    # Creates model if evaluating with TMY
     elif args.subparser_name == "tmy":
         tmy_slice = (slice(args.tmy_start, args.tmy_end))
         tmy_raw = get_point(tmy_name, args.tmy_start, args.tmy_end)
@@ -317,6 +374,12 @@ def create_models(args=None):
         return {1: model_1, 2: model_2, 3: eval_data}
 
 def preprocess(data):
+    """
+    Cleans and sets up the data to be used
+
+    Parameters:
+    data: Data values
+    """
     preprocessor = DataPreprocessor(data)
     preprocessor.clean_data()
     preprocessor.add_degree_days(preprocessor.data_cleaned)
@@ -326,6 +389,16 @@ def preprocess(data):
     return preprocessor.data_preprocessed
 
 def format_eval(data, tmy_data, tmy_slice, input_vars, output_vars):
+    """
+    Formats the evaluation data using the TMY data and time period.
+
+    Parameters:
+    data: Full data
+    tmy_data: Data from the TMY period
+    tmy_slice: TMY time period
+    input_vars: Input variables
+    output_vars: Output variables
+    """
     eval_data = {}
     eval_data["in"] = tmy_data.loc[tmy_slice, input_vars]
     eval_data["out"] = tmy_data.loc[tmy_slice, ["OAT"]]
@@ -337,6 +410,9 @@ def format_eval(data, tmy_data, tmy_slice, input_vars, output_vars):
 
 def _start_logger():
     # Source: https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
+    """
+    Initializes the logger class. Sets locations to store runtime errors
+    """
     logger = logging.getLogger(__name__)
     logger.addFilter(_InfoFilter())
     
@@ -358,11 +434,17 @@ def _start_logger():
     sys.stderr = _StreamWriter()
 
 def _parse_args(args):
-    """Parses command line arguments using argparse"""
+    """
+    Parses command line arguments using argparse
+
+    Parameters:
+    args: Command line arguments
+    """
     
     parser = argparse.ArgumentParser(description="A tool for mechanical engineers at the UC Davis Energy Conservation Office to analyze the energy performance of UC Davis buildings.", 
         fromfile_prefix_chars="@")
     
+    # TMY mode arguments
     subparsers = parser.add_subparsers(dest="subparser_name")
     tmy_parser = subparsers.add_parser("tmy")
     tmy_parser.add_argument("building_name", help="building to perform analysis on")
