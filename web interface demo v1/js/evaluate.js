@@ -6,7 +6,9 @@ var main = function() {
 
   var tmy_mode_on = $("#TMYSwitch").hasClass("active");
 	parameters = {};
+  // Gathers and parses parameters into correct form for passage to the /python.json request which hands them to the Python script
   if (tmy_mode_on){
+    // If TMY mode, the args are different...
     parameters['parsetype'] = "tmy";
     parameters['building'] = ($('#sel_val1').val());
     parameters['energy'] = ($('#sel_val2').val());
@@ -26,6 +28,7 @@ var main = function() {
     parameters['predictend'] = (predictdate2.slice(0,2).join('-'));
   }
   else{
+    // ...than if in simple mode
     parameters['parsetype'] = "simple"
     parameters['building'] = ($('#sel_val1').val());
     parameters['energy'] = ($('#sel_val2').val());
@@ -46,9 +49,11 @@ var main = function() {
     $.getJSON("/python.json", parameters, function (response) {
       document.getElementById("loader").style.display="none";
       if (!response.error) {
-        console.log("No error!");
-        console.log(response);
+
+        // Hides the parameter selection menu
         $("#dropdown").click();
+
+        // Displays the correct chart containers and adds borders to them for clarity
         if (tmy_mode_on){
           $(".defchart").css("display", "none");
           $(".tmychart").css("display", "block");
@@ -215,17 +220,15 @@ var main = function() {
           $("#savings").text(savingsTotal.toFixed(2)+" kBtu*hr");
         }
         else { // TMY Mode ON. Expected output format
-          //
-          //
-          //
-          //
-          //
-          //
+          // response[0] : Model 1 in Baseline 1 Data
+          // response[1] : Model 1 Stats
+          // response[2] : Model 2 in Baseline 2 Data
+          // response[3] : Model 2 Stats
+          // response[4] : Data Object for Extrapolated Period containing - Model 1 Projection, Model 2 Projection, OAT Data, Actual Sensor Data(if available,not used), and Savings Data
 
-          console.log(response);
-          var test = parseResponse(response[0]);
-          
-          var keys = Object.keys(test);
+          var model1response = parseResponse(response[0]);          
+          var model1keys = Object.keys(test);
+
           $('#highstock').highcharts('StockChart', {
             rangeSelector : {
               selected : 1
@@ -249,8 +252,8 @@ var main = function() {
               enabled: true
             },
             series : [{
-              name : keys[0],
-              data : test[keys[0]],
+              name : model1keys[0],
+              data : model1response[model1keys[0]],
               tooltip: {
                 valueDecimals: 2
               },
@@ -258,7 +261,7 @@ var main = function() {
               color : "green"
             }, {
               name : 'OAT',
-              data : test["OAT"],
+              data : model1response["OAT"],
               tooltip: {
                 valueDecimals: 2
               },
@@ -268,7 +271,7 @@ var main = function() {
             },
             {
               name : "Model 1",
-              data : test["Model"],
+              data : model1response["Model"],
               tooltip: {
                 valueDecimals: 2
               },
@@ -282,7 +285,7 @@ var main = function() {
           $("#modelStats #cvrmse").text(model1stats["CV_RMSE"].toFixed(2));
           $("#modelStats #nmbe").text(model1stats["NMBE"].toFixed(2));
           $("#modelStats #rmse").text(model1stats["RMSE"].toFixed(2));
-          $("#modelStats #numpts").text(test[keys[2]].length);
+          $("#modelStats #numpts").text(model1response[model1keys[2]].length);
           
           var model2response = parseResponse(response[2]);
           var model2keys = Object.keys(model2response);
@@ -430,17 +433,16 @@ var main = function() {
             }]
           });
 
+          // Initializes the summed savings stat since the handler only populates the stat on first movement of the selected area
           var savingsChart = $('#highstock6').highcharts();
           var startTimestamps = savingsChart.series[0].processedXData;
           var startData = savingsChart.series[0].processedYData;
           var savingsTotal = calculateTotalSavings(startTimestamps, startData);
           $("#tmySavings").text(savingsTotal.toFixed(2)+" kBtu*hr");
 
-        }
+        }  
 
-        
-      
-
+        // Adds the CSV export handler to each chart
         $(".chart").each(function(index, chart){
           var highchart = $(chart).find(".histock").highcharts();
           if (highchart)
@@ -449,12 +451,9 @@ var main = function() {
         });
       }
 
-      else { // ERROR RECEIVED
+      else { // ERROR RECEIVED, prints out traceback of python error presuming something can be drawn from that by the user.
         alert("We ran into an error building your models, check that your settings are correct and try again.\n\n"+response.error);
       }
-      
-
-
       
     });
   })();

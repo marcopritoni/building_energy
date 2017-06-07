@@ -224,7 +224,6 @@ $( "#dropdown" ).click(function() {
 
     if (TMYMode) {
       $(".TMYRow, .headerRow, #evaluate").animate({opacity:0}, {start: function(){ $(this).hide(400) }});
-      // $(this).parent().parent().siblings()
     }
     else {
       $(".defaultRow, .headerRow, #evaluate").animate({opacity:0}, {start: function(){ $(this).hide(400) }});
@@ -239,7 +238,6 @@ $( "#dropdown" ).click(function() {
       $(".defaultRow, .headerRow, #evaluate").animate({opacity:1}, {start: function(){ $(this).show(400) }});
     }
 
-    // $(this).parent().parent().siblings().animate({opacity:1}, {start: function(){ $(this).show(400) }});
     hidden = false;
   }
 });
