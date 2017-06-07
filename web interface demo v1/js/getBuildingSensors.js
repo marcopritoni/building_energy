@@ -12,7 +12,6 @@ Papa.parse("/BuildingSensors.csv", {
 			buildings[building].push( {sensor:sensor} );
 		})
 
-		console.log(buildings);
 		// Add options to the building select for each unique building from the CSV
 		Object.keys(buildings).forEach(function(key){
 			var option = new Option(key, key);
