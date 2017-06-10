@@ -32,9 +32,9 @@ class DataPreprocessor(object):
         self.data_cleaned = df
         self.data_removed = pd.DataFrame()
         self.data_preprocessed = pd.DataFrame()
-        self.droppedNA=pd.Series()
-        self.droppedOutliers=pd.Series()
-        self.droppedOutOfBound=pd.Series()
+        self.droppedNA = pd.Series()
+        self.droppedOutliers = pd.Series()
+        self.droppedOutOfBound = pd.Series()
 
     def resample_data(self, data, freq):
         return data.resample(freq).mean()
@@ -56,7 +56,7 @@ class DataPreprocessor(object):
 
     def remove_out_of_bound(self, data, low_bound, high_bound):
         data = data.dropna()
-        data = data[(data > low_bound).all(axis=1) &
+        data = data[(data > low_bound).all(axis=1) & 
                     (data < high_bound).all(axis=1)]
 
         return data
@@ -133,7 +133,7 @@ class DataPreprocessor(object):
         return data
 
 
-    def flag_data(self, 
+    def flag_data(self,
                     runRemoveNA=True,
                     removeNAhow="any",
                     runRemoveOutliers=True,
@@ -141,17 +141,17 @@ class DataPreprocessor(object):
                     runRemoveOutOfBound=True,
                     low_bound=0,
                     high_bound=9998,
-                    runExtendIndex=False ):
+                    runExtendIndex=False):
         
         logging.info("Flagging data")
 
-        data=self.data_raw
+        data = self.data_raw
                     
         if runRemoveNA:
             
             try:
                 self.flagNA(data, removeNAhow)
-                selector=self.droppedNA
+                selector = self.droppedNA
                 
                 logging.info("_dataset NA flagged")
             except:
@@ -159,10 +159,10 @@ class DataPreprocessor(object):
             
         if runRemoveOutliers:
             
-            #sd_val=3
+            # sd_val=3
             try:
                 self.flagOutlier(data, sd_val)
-                selector=selector | self.droppedOutliers
+                selector = selector | self.droppedOutliers
                 
                 logging.info("_outliers flagged")
 
@@ -171,19 +171,19 @@ class DataPreprocessor(object):
 
         if runRemoveOutOfBound:
             
-            #low_bound=0
-            #high_bound=9998
+            # low_bound=0
+            # high_bound=9998
             try:
 
-                self.flagOutOfBound(data, low_bound,high_bound)
-                selector=selector | self.droppedOutOfBound
+                self.flagOutOfBound(data, low_bound, high_bound)
+                selector = selector | self.droppedOutOfBound
                 
                 logging.info("_outOfBound points flagged")
 
             except:
                 pass
         
-        self.data_removed=self.data_raw[selector]
+        self.data_removed = self.data_raw[selector]
 
         return self.data_removed
 

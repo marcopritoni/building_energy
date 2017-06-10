@@ -2,9 +2,9 @@
 This file checks the runtime of the program
 """
 
-#import cProfile
+# import cProfile
 import os
-#import pstats
+# import pstats
 import sys 
 
 import line_profiler
@@ -58,7 +58,7 @@ with open("profile-func.txt", "w") as file:
 # Line-by-line profiling
 # See https://github.com/rkern/line_profiler for more details       
 with open("profile-line.txt", "w") as profile:
-    ## Profile object instance
+    # # Profile object instance
     profiler = line_profiler.LineProfiler(import_test)
     profiler.runcall(import_test)
     
@@ -66,17 +66,17 @@ with open("profile-line.txt", "w") as profile:
     import mv_model
     profiler.add_function(mv_model.main)
     
-    #import test 
-    #profiler.add_function(test.cache_point)
+    # import test 
+    # profiler.add_function(test.cache_point)
     
     with open("output.txt", "w") as output:
         sys.stdout = output
-        ## Command line arguments
+        # # Command line arguments
         sys.argv = ["", "@test_input.txt"]
         profiler.runcall(mv_model.main)
-        #profiler.runcall(test.cache_point, "NSRDB.136708.OAT.TMY")
+        # profiler.runcall(test.cache_point, "NSRDB.136708.OAT.TMY")
         
     os.remove("output.txt")  
-    ## Data stream
+    # # Data stream
     profiler.print_stats(stream=profile)
     

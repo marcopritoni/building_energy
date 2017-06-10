@@ -5,21 +5,24 @@
 # marco.pritoni@gmail.com
 
 # Standard library imports
+import argparse
 import json
 import logging.config
 import os
 import sys
 import traceback
-import argparse
 
-if __name__ == "__main__":
-    # Start logging temporarily with file object
-    sys.stderr = open("../logs/error.log", "w")
-    info_log = open("../logs/info.log", "w")
-    info_log.close()
-    
-    # date_format = time.strftime("%m/%d/%Y %H:%M:%S %p ")
-    # sys.stderr.write(date_format + " - root - [WARNING] - ")
+from datetime import datetime
+
+# Only use these lines if libraries return deprecation warnings
+# if __name__ == "__main__":
+#     # Start logging temporarily with file object
+#     sys.stderr = open("../logs/error.log", "w")
+#     info_log = open("../logs/info.log", "w")
+#     info_log.close()
+#     
+#     # date_format = time.strftime("%m/%d/%Y %H:%M:%S %p ")
+#     # sys.stderr.write(date_format + " - root - [WARNING] - ")
 
 # Third-party library imports
 import numpy as np
@@ -297,10 +300,29 @@ def create_models(args=None):
     """
     args = _parse_args(args)
     data_name = "_".join([args.building_name, args.energy_type, "Demand_kBtu"])
-
-    # Time period to request data from PI system
-    start = "2014"
-    end = "t"
+    
+    # Get the start and end times to request data from PI system
+    if args.subparser_name == "simple":
+        # List of time strings in args
+        dates = [args.base_start, args.base_end, args.eval_start, args.eval_end]
+        
+        # Convert to datetime objects
+        dates = [datetime.strptime(date, "%Y-%m") for date in dates]
+        
+        # Get the oldest and newest of the dates
+        start = min(dates).isoformat()
+        end = max(dates).isoformat()
+        
+    elif args.subparser_name == "tmy": 
+        # List of time strings in args
+        dates = [args.base_start, args.base_end, args.base_start2,  args.base_end2]
+        
+        # Convert to datetime objects
+        dates = [datetime.strptime(date, "%Y-%m") for date in dates]
+        
+        # Get the oldest and newest of the dates
+        start = min(dates).isoformat()
+        end = max(dates).isoformat()       
 
     # Get data from PI system or local storage
     data_raw = get_point([data_name, "OAT"], start, end)
@@ -351,14 +373,14 @@ def create_models(args=None):
         tmy_data = preprocess(tmy_raw)  
         eval_data = format_eval(data, tmy_data, tmy_slice, input_vars, output_vars)
         
-         # Create second model for baseline period 2 
+        # Create second model for baseline period 2 
         model_2 = Model(args.model_type)
         model_2.train(data_set.baseline2, data_name)
         
         model_1.output()
         model_2.output()
   
-         # Projects data_name into TMY period
+        # Projects data_name into TMY period
         model_1.project(eval_data, data_name)
         eval_data["out"]["Baseline 1"] = eval_data["out"]["Model"].copy()
         model_2.project(eval_data, data_name)
