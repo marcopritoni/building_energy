@@ -227,7 +227,7 @@ var main = function() {
           // response[4] : Data Object for Extrapolated Period containing - Model 1 Projection, Model 2 Projection, OAT Data, Actual Sensor Data(if available,not used), and Savings Data
 
           var model1response = parseResponse(response[0]);          
-          var model1keys = Object.keys(test);
+          var model1keys = Object.keys(model1response);
 
           $('#highstock').highcharts('StockChart', {
             rangeSelector : {
